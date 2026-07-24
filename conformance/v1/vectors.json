@@ -1,0 +1,162 @@
+{
+  "$schema": "../schema.json",
+  "schemaVersion": 1,
+  "sources": [
+    "Bluetooth Fitness Machine Service 1.0: https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0/",
+    "Bluetooth SIG public GSS YAML revision 3b58acd4d2446e68f5539acac46c3b4941a34747: https://bitbucket.org/bluetooth-SIG/public.git",
+    "Bluetooth Errata Service Release 11 E8991/E9135: https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=436247"
+  ],
+  "controls": [
+    { "id": "request-control", "request": { "op": "requestControl" }, "expectedBytes": [0] },
+    { "id": "reset", "request": { "op": "reset" }, "expectedBytes": [1] },
+    {
+      "id": "target-speed",
+      "request": { "op": "setTargetSpeed", "speedKph": 12.34 },
+      "expectedBytes": [2, 210, 4]
+    },
+    {
+      "id": "target-inclination",
+      "request": { "op": "setTargetInclination", "inclinationPercent": -1.2 },
+      "expectedBytes": [3, 244, 255]
+    },
+    {
+      "id": "target-resistance-esr11",
+      "request": { "op": "setTargetResistance", "resistanceLevel": -1.2 },
+      "expectedBytes": [4, 244, 255]
+    },
+    {
+      "id": "target-power",
+      "request": { "op": "setTargetPower", "powerWatts": -100 },
+      "expectedBytes": [5, 156, 255]
+    },
+    {
+      "id": "target-heart-rate",
+      "request": { "op": "setTargetHeartRate", "heartRateBpm": 150 },
+      "expectedBytes": [6, 150]
+    },
+    { "id": "start-resume", "request": { "op": "startResume" }, "expectedBytes": [7] },
+    { "id": "stop", "request": { "op": "stopPause", "action": "stop" }, "expectedBytes": [8, 1] },
+    {
+      "id": "target-energy",
+      "request": { "op": "setTargetedExpendedEnergy", "energyKcal": 500 },
+      "expectedBytes": [9, 244, 1]
+    },
+    {
+      "id": "target-steps",
+      "request": { "op": "setTargetedSteps", "steps": 600 },
+      "expectedBytes": [10, 88, 2]
+    },
+    {
+      "id": "target-strides",
+      "request": { "op": "setTargetedStrides", "strides": 700 },
+      "expectedBytes": [11, 188, 2]
+    },
+    {
+      "id": "target-distance",
+      "request": { "op": "setTargetedDistance", "distanceMeters": 66051 },
+      "expectedBytes": [12, 3, 2, 1]
+    },
+    {
+      "id": "target-training-time",
+      "request": { "op": "setTargetedTrainingTime", "seconds": 3600 },
+      "expectedBytes": [13, 16, 14]
+    },
+    {
+      "id": "two-hr-zones",
+      "request": { "op": "setTargetedTimeTwoHrZones", "seconds": [10, 20] },
+      "expectedBytes": [14, 10, 0, 20, 0]
+    },
+    {
+      "id": "three-hr-zones",
+      "request": { "op": "setTargetedTimeThreeHrZones", "seconds": [10, 20, 30] },
+      "expectedBytes": [15, 10, 0, 20, 0, 30, 0]
+    },
+    {
+      "id": "five-hr-zones",
+      "request": { "op": "setTargetedTimeFiveHrZones", "seconds": [10, 20, 30, 40, 50] },
+      "expectedBytes": [16, 10, 0, 20, 0, 30, 0, 40, 0, 50, 0]
+    },
+    {
+      "id": "simulation",
+      "request": {
+        "op": "setIndoorBikeSimulation",
+        "windSpeedMps": 1,
+        "gradePercent": 2.5,
+        "crr": 0.001,
+        "cwKgPerM": 0.2
+      },
+      "expectedBytes": [17, 232, 3, 250, 0, 10, 20]
+    },
+    {
+      "id": "wheel-circumference",
+      "request": { "op": "setWheelCircumference", "circumferenceMm": 2100 },
+      "expectedBytes": [18, 8, 82]
+    },
+    {
+      "id": "spin-down-ignore",
+      "request": { "op": "spinDown", "action": "ignore" },
+      "expectedBytes": [19, 2]
+    },
+    {
+      "id": "target-cadence",
+      "request": { "op": "setTargetedCadence", "cadenceRpm": 90 },
+      "expectedBytes": [20, 180, 0]
+    }
+  ],
+  "measurements": [
+    {
+      "id": "treadmill-mandatory-speed",
+      "characteristicUuid": "00002acd-0000-1000-8000-00805f9b34fb",
+      "bytes": [0, 0, 232, 3],
+      "expectedMetrics": { "speedMps": 2.7777777777777777 }
+    },
+    {
+      "id": "cross-trainer-three-byte-flags",
+      "characteristicUuid": "00002ace-0000-1000-8000-00805f9b34fb",
+      "bytes": [8, 0, 0, 232, 3, 100, 0, 80, 0],
+      "expectedMetrics": {
+        "speedMps": 2.7777777777777777,
+        "stepRateSpm": 100,
+        "averageStepRateSpm": 80
+      }
+    },
+    {
+      "id": "step-climber-uint16-floors-and-steps",
+      "characteristicUuid": "00002acf-0000-1000-8000-00805f9b34fb",
+      "bytes": [0, 0, 12, 0, 44, 1],
+      "expectedMetrics": { "floorCount": 12, "stepCount": 300 }
+    },
+    {
+      "id": "stair-climber-uint16-floors",
+      "characteristicUuid": "00002ad0-0000-1000-8000-00805f9b34fb",
+      "bytes": [0, 0, 20, 0],
+      "expectedMetrics": { "floorCount": 20 }
+    },
+    {
+      "id": "rower-uint8-resistance",
+      "characteristicUuid": "00002ad1-0000-1000-8000-00805f9b34fb",
+      "bytes": [129, 0, 8],
+      "expectedMetrics": { "resistanceLevel": 8 }
+    },
+    {
+      "id": "indoor-bike-cadence-and-power",
+      "characteristicUuid": "00002ad2-0000-1000-8000-00805f9b34fb",
+      "bytes": [69, 0, 180, 0, 250, 0],
+      "expectedMetrics": { "cadenceRpm": 90, "powerWatts": 250 }
+    }
+  ],
+  "statuses": [
+    {
+      "id": "training-status-string",
+      "characteristicUuid": "00002ad3-0000-1000-8000-00805f9b34fb",
+      "bytes": [1, 13, 109, 97, 110, 117, 97, 108],
+      "expectedCode": 13
+    },
+    {
+      "id": "machine-status-permission-lost",
+      "characteristicUuid": "00002ada-0000-1000-8000-00805f9b34fb",
+      "bytes": [255],
+      "expectedCode": 255
+    }
+  ]
+}

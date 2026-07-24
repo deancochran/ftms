@@ -1,0 +1,576 @@
+import { FTMS_OPCODES, FTMS_RESULT_CODES } from "./constants.js";
+import type { ControlMode, FTMSResponse, FtmsControlSupportLevel } from "./types.js";
+
+export type FtmsControlRequest =
+  | { op: "requestControl" }
+  | { op: "reset" }
+  | { op: "setTargetSpeed"; speedKph: number }
+  | { op: "setTargetInclination"; inclinationPercent: number }
+  | { op: "setTargetResistance"; resistanceLevel: number }
+  | { op: "setTargetPower"; powerWatts: number }
+  | { op: "setTargetHeartRate"; heartRateBpm: number }
+  | { op: "startResume" }
+  | { op: "stopPause"; action: "stop" | "pause" }
+  | { op: "setTargetedExpendedEnergy"; energyKcal: number }
+  | { op: "setTargetedSteps"; steps: number }
+  | { op: "setTargetedStrides"; strides: number }
+  | { op: "setTargetedDistance"; distanceMeters: number }
+  | { op: "setTargetedTrainingTime"; seconds: number }
+  | { op: "setTargetedTimeTwoHrZones"; seconds: readonly [number, number] }
+  | { op: "setTargetedTimeThreeHrZones"; seconds: readonly [number, number, number] }
+  | {
+      op: "setTargetedTimeFiveHrZones";
+      seconds: readonly [number, number, number, number, number];
+    }
+  | {
+      op: "setIndoorBikeSimulation";
+      windSpeedMps: number;
+      gradePercent: number;
+      crr: number;
+      cwKgPerM: number;
+    }
+  | { op: "setWheelCircumference"; circumferenceMm: number }
+  | { op: "spinDown"; action: "start" | "ignore" }
+  | { op: "setTargetedCadence"; cadenceRpm: number };
+
+export interface FtmsEncodeError {
+  code: "invalid_request" | "invalid_number" | "out_of_range" | "invalid_resolution";
+  field: string;
+  message: string;
+  value: unknown;
+}
+
+export type FtmsEncodeResult =
+  | { ok: true; value: Uint8Array }
+  | { ok: false; error: FtmsEncodeError };
+
+interface NumericSuccess {
+  ok: true;
+  value: number;
+}
+
+type NumericResult = NumericSuccess | { ok: false; error: FtmsEncodeError };
+
+function encodeError(
+  code: FtmsEncodeError["code"],
+  field: string,
+  message: string,
+  value: unknown,
+): { ok: false; error: FtmsEncodeError } {
+  return { ok: false, error: { code, field, message, value } };
+}
+
+function encodeNumber(
+  value: unknown,
+  field: string,
+  minimumRaw: number,
+  maximumRaw: number,
+  resolution = 1,
+): NumericResult {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return encodeError("invalid_number", field, "Value must be a finite number", value);
+  }
+
+  const raw = Math.round(value / resolution);
+  if (Math.abs(raw * resolution - value) > 1e-9) {
+    return encodeError(
+      "invalid_resolution",
+      field,
+      `Value must align to a resolution of ${resolution}`,
+      value,
+    );
+  }
+
+  if (!Number.isInteger(raw) || raw < minimumRaw || raw > maximumRaw) {
+    return encodeError(
+      "out_of_range",
+      field,
+      `Encoded value must be between ${minimumRaw} and ${maximumRaw}`,
+      value,
+    );
+  }
+
+  return { ok: true, value: raw };
+}
+
+function encodeUint16(opcode: number, value: number): FtmsEncodeResult {
+  const bytes = new Uint8Array(3);
+  bytes[0] = opcode;
+  new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setUint16(1, value, true);
+  return { ok: true, value: bytes };
+}
+
+function encodeInt16(opcode: number, value: number): FtmsEncodeResult {
+  const bytes = new Uint8Array(3);
+  bytes[0] = opcode;
+  new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setInt16(1, value, true);
+  return { ok: true, value: bytes };
+}
+
+function encodeUint16Request(
+  opcode: number,
+  value: unknown,
+  field: string,
+  minimumRaw = 0,
+  maximumRaw = 0xffff,
+  resolution = 1,
+): FtmsEncodeResult {
+  const encoded = encodeNumber(value, field, minimumRaw, maximumRaw, resolution);
+  return encoded.ok ? encodeUint16(opcode, encoded.value) : encoded;
+}
+
+function encodeInt16Request(
+  opcode: number,
+  value: unknown,
+  field: string,
+  resolution = 1,
+): FtmsEncodeResult {
+  const encoded = encodeNumber(value, field, -0x8000, 0x7fff, resolution);
+  return encoded.ok ? encodeInt16(opcode, encoded.value) : encoded;
+}
+
+function encodeHrZones(opcode: number, value: unknown, expectedCount: number): FtmsEncodeResult {
+  if (!Array.isArray(value) || value.length !== expectedCount) {
+    return encodeError(
+      "invalid_request",
+      "seconds",
+      `Expected exactly ${expectedCount} heart-rate zone durations`,
+      value,
+    );
+  }
+
+  const encodedDurations: number[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    const encoded = encodeNumber(value[index], `seconds[${index}]`, 0, 0xffff);
+    if (!encoded.ok) {
+      return encoded;
+    }
+    encodedDurations.push(encoded.value);
+  }
+
+  const bytes = new Uint8Array(1 + expectedCount * 2);
+  bytes[0] = opcode;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  for (let index = 0; index < encodedDurations.length; index += 1) {
+    const duration = encodedDurations[index];
+    if (duration !== undefined) {
+      view.setUint16(1 + index * 2, duration, true);
+    }
+  }
+  return { ok: true, value: bytes };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function encodeUnknownControlRequest(request: unknown): FtmsEncodeResult {
+  if (!isRecord(request) || typeof request.op !== "string") {
+    return encodeError("invalid_request", "op", "Expected an FTMS control request", request);
+  }
+
+  switch (request.op) {
+    case "requestControl":
+      return { ok: true, value: Uint8Array.of(FTMS_OPCODES.REQUEST_CONTROL) };
+    case "reset":
+      return { ok: true, value: Uint8Array.of(FTMS_OPCODES.RESET) };
+    case "setTargetSpeed":
+      return encodeUint16Request(
+        FTMS_OPCODES.SET_TARGET_SPEED,
+        request.speedKph,
+        "speedKph",
+        0,
+        0xffff,
+        0.01,
+      );
+    case "setTargetInclination":
+      return encodeInt16Request(
+        FTMS_OPCODES.SET_TARGET_INCLINATION,
+        request.inclinationPercent,
+        "inclinationPercent",
+        0.1,
+      );
+    case "setTargetResistance":
+      return encodeInt16Request(
+        FTMS_OPCODES.SET_TARGET_RESISTANCE,
+        request.resistanceLevel,
+        "resistanceLevel",
+        0.1,
+      );
+    case "setTargetPower":
+      return encodeInt16Request(FTMS_OPCODES.SET_TARGET_POWER, request.powerWatts, "powerWatts");
+    case "setTargetHeartRate": {
+      const encoded = encodeNumber(request.heartRateBpm, "heartRateBpm", 0, 0xff);
+      return encoded.ok
+        ? { ok: true, value: Uint8Array.of(FTMS_OPCODES.SET_TARGET_HEART_RATE, encoded.value) }
+        : encoded;
+    }
+    case "startResume":
+      return { ok: true, value: Uint8Array.of(FTMS_OPCODES.START_RESUME) };
+    case "stopPause":
+      if (request.action !== "stop" && request.action !== "pause") {
+        return encodeError(
+          "invalid_request",
+          "action",
+          "Action must be stop or pause",
+          request.action,
+        );
+      }
+      return {
+        ok: true,
+        value: Uint8Array.of(FTMS_OPCODES.STOP_PAUSE, request.action === "stop" ? 0x01 : 0x02),
+      };
+    case "setTargetedExpendedEnergy":
+      return encodeUint16Request(
+        FTMS_OPCODES.SET_TARGETED_EXPENDED_ENERGY,
+        request.energyKcal,
+        "energyKcal",
+      );
+    case "setTargetedSteps":
+      return encodeUint16Request(FTMS_OPCODES.SET_TARGETED_STEPS, request.steps, "steps");
+    case "setTargetedStrides":
+      return encodeUint16Request(FTMS_OPCODES.SET_TARGETED_STRIDES, request.strides, "strides");
+    case "setTargetedDistance": {
+      const encoded = encodeNumber(request.distanceMeters, "distanceMeters", 0, 0xffffff);
+      if (!encoded.ok) {
+        return encoded;
+      }
+      return {
+        ok: true,
+        value: Uint8Array.of(
+          FTMS_OPCODES.SET_TARGETED_DISTANCE,
+          encoded.value & 0xff,
+          (encoded.value >>> 8) & 0xff,
+          (encoded.value >>> 16) & 0xff,
+        ),
+      };
+    }
+    case "setTargetedTrainingTime":
+      return encodeUint16Request(
+        FTMS_OPCODES.SET_TARGETED_TRAINING_TIME,
+        request.seconds,
+        "seconds",
+      );
+    // biome-ignore lint/security/noSecrets: FTMS operation identifier from the Bluetooth specification.
+    case "setTargetedTimeTwoHrZones":
+      return encodeHrZones(FTMS_OPCODES.SET_TARGETED_TIME_TWO_HR_ZONES, request.seconds, 2);
+    case "setTargetedTimeThreeHrZones":
+      return encodeHrZones(FTMS_OPCODES.SET_TARGETED_TIME_THREE_HR_ZONES, request.seconds, 3);
+    // biome-ignore lint/security/noSecrets: FTMS operation identifier from the Bluetooth specification.
+    case "setTargetedTimeFiveHrZones":
+      return encodeHrZones(FTMS_OPCODES.SET_TARGETED_TIME_FIVE_HR_ZONES, request.seconds, 5);
+    case "setIndoorBikeSimulation": {
+      const wind = encodeNumber(request.windSpeedMps, "windSpeedMps", -0x8000, 0x7fff, 0.001);
+      if (!wind.ok) return wind;
+      const grade = encodeNumber(request.gradePercent, "gradePercent", -0x8000, 0x7fff, 0.01);
+      if (!grade.ok) return grade;
+      const crr = encodeNumber(request.crr, "crr", 0, 0xff, 0.0001);
+      if (!crr.ok) return crr;
+      const windResistance = encodeNumber(request.cwKgPerM, "cwKgPerM", 0, 0xff, 0.01);
+      if (!windResistance.ok) return windResistance;
+
+      const bytes = new Uint8Array(7);
+      bytes[0] = FTMS_OPCODES.SET_INDOOR_BIKE_SIMULATION;
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      view.setInt16(1, wind.value, true);
+      view.setInt16(3, grade.value, true);
+      bytes[5] = crr.value;
+      bytes[6] = windResistance.value;
+      return { ok: true, value: bytes };
+    }
+    case "setWheelCircumference":
+      return encodeUint16Request(
+        FTMS_OPCODES.SET_WHEEL_CIRCUMFERENCE,
+        request.circumferenceMm,
+        "circumferenceMm",
+        0,
+        0xffff,
+        0.1,
+      );
+    case "spinDown":
+      if (request.action !== "start" && request.action !== "ignore") {
+        return encodeError(
+          "invalid_request",
+          "action",
+          "Action must be start or ignore",
+          request.action,
+        );
+      }
+      return {
+        ok: true,
+        value: Uint8Array.of(
+          FTMS_OPCODES.SPIN_DOWN_CONTROL,
+          request.action === "start" ? 0x01 : 0x02,
+        ),
+      };
+    case "setTargetedCadence":
+      return encodeUint16Request(
+        FTMS_OPCODES.SET_TARGETED_CADENCE,
+        request.cadenceRpm,
+        "cadenceRpm",
+        0,
+        0xffff,
+        0.5,
+      );
+    default:
+      return encodeError("invalid_request", "op", "Unknown FTMS control operation", request.op);
+  }
+}
+
+export function tryEncodeFtmsControlRequest(request: unknown): FtmsEncodeResult {
+  return encodeUnknownControlRequest(request);
+}
+
+export function encodeFtmsControlRequest(request: FtmsControlRequest): Uint8Array {
+  const result = tryEncodeFtmsControlRequest(request);
+  if (result.ok) {
+    return result.value;
+  }
+  throw new RangeError(`${result.error.field}: ${result.error.message}`);
+}
+
+export interface FtmsResponseDecodeError {
+  code: "malformed_response";
+  offset: number;
+  expected: number;
+  actual: number;
+  message: string;
+}
+
+export type FtmsResponseDecodeResult =
+  | { ok: true; value: FTMSResponse }
+  | { ok: false; error: FtmsResponseDecodeError };
+
+export function getFtmsResultCodeName(resultCode: number): string {
+  switch (resultCode) {
+    case FTMS_RESULT_CODES.SUCCESS:
+      return "success";
+    case FTMS_RESULT_CODES.NOT_SUPPORTED:
+      return "not_supported";
+    case FTMS_RESULT_CODES.INVALID_PARAMETER:
+      return "invalid_parameter";
+    case FTMS_RESULT_CODES.OPERATION_FAILED:
+      return "operation_failed";
+    case FTMS_RESULT_CODES.CONTROL_NOT_PERMITTED:
+      return "control_not_permitted";
+    default:
+      return `unknown_0x${resultCode.toString(16).padStart(2, "0")}`;
+  }
+}
+
+export function decodeFtmsControlResponse(
+  data: ArrayBuffer | Uint8Array,
+): FtmsResponseDecodeResult {
+  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
+  if (bytes.byteLength < 3) {
+    return {
+      ok: false,
+      error: {
+        code: "malformed_response",
+        offset: bytes.byteLength,
+        expected: 3,
+        actual: bytes.byteLength,
+        message: "FTMS Control Point response requires at least three bytes",
+      },
+    };
+  }
+
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const responseOpcode = view.getUint8(0);
+  if (responseOpcode !== FTMS_OPCODES.RESPONSE_CODE) {
+    return {
+      ok: false,
+      error: {
+        code: "malformed_response",
+        offset: 0,
+        expected: FTMS_OPCODES.RESPONSE_CODE,
+        actual: responseOpcode,
+        message: "Payload is not an FTMS Control Point response",
+      },
+    };
+  }
+
+  const requestOpCode = view.getUint8(1);
+  const resultCode = view.getUint8(2);
+  return {
+    ok: true,
+    value: {
+      requestOpCode,
+      resultCode,
+      resultCodeName: getFtmsResultCodeName(resultCode),
+      success: resultCode === FTMS_RESULT_CODES.SUCCESS,
+      ...(bytes.byteLength > 3 ? { parameters: bytes.slice(3) } : {}),
+    },
+  };
+}
+
+export interface FtmsPendingOperation {
+  opcode: number;
+  generation: number;
+  requestedMode: ControlMode | null;
+  reset: boolean;
+}
+
+export interface FtmsControlReducerState {
+  support: FtmsControlSupportLevel;
+  pending: FtmsPendingOperation | null;
+  currentMode: ControlMode | null;
+  disposed: boolean;
+}
+
+export type FtmsControlReducerEvent =
+  | { type: "capabilityDiscovered" }
+  | { type: "requestControlSent"; generation: number }
+  | {
+      type: "commandSent";
+      opcode: number;
+      generation: number;
+      requestedMode?: ControlMode;
+    }
+  | { type: "responseReceived"; response: FTMSResponse; generation: number }
+  | { type: "timeout"; generation: number }
+  | { type: "permissionLost" }
+  | { type: "disconnected" }
+  | { type: "disposed" };
+
+export function createInitialFtmsControlState(): FtmsControlReducerState {
+  return {
+    support: "metrics_only",
+    pending: null,
+    currentMode: null,
+    disposed: false,
+  };
+}
+
+/** @experimental Transport-agnostic state helper; the caller still owns GATT serialization. */
+export const initialFtmsControlState: Readonly<FtmsControlReducerState> = Object.freeze(
+  createInitialFtmsControlState(),
+);
+
+/**
+ * @experimental Reduces legal single-flight control transitions. Invalid or
+ * superseding events return the existing state unchanged.
+ */
+export function reduceFtmsControl(
+  state: FtmsControlReducerState,
+  event: FtmsControlReducerEvent,
+): FtmsControlReducerState {
+  if (state.disposed) {
+    return state;
+  }
+
+  switch (event.type) {
+    case "capabilityDiscovered":
+      return state.support === "metrics_only" ||
+        state.support === "control_rejected" ||
+        state.support === "control_lost"
+        ? { ...state, support: "control_capable" }
+        : state;
+    case "requestControlSent": {
+      const canRequestControl =
+        state.support === "control_capable" ||
+        state.support === "control_rejected" ||
+        state.support === "control_lost";
+      if (!canRequestControl || state.pending !== null) {
+        return state;
+      }
+      return {
+        ...state,
+        support: "control_requesting",
+        pending: {
+          opcode: FTMS_OPCODES.REQUEST_CONTROL,
+          generation: event.generation,
+          requestedMode: null,
+          reset: false,
+        },
+      };
+    }
+    case "commandSent": {
+      if (state.support !== "control_granted" || state.pending !== null) {
+        return state;
+      }
+      const reset = event.opcode === FTMS_OPCODES.RESET;
+      return {
+        ...state,
+        support: reset ? "control_lost" : state.support,
+        currentMode: reset ? null : state.currentMode,
+        pending: {
+          opcode: event.opcode,
+          generation: event.generation,
+          requestedMode: event.requestedMode ?? null,
+          reset,
+        },
+      };
+    }
+    case "responseReceived": {
+      const pending = state.pending;
+      if (
+        pending === null ||
+        pending.generation !== event.generation ||
+        pending.opcode !== event.response.requestOpCode
+      ) {
+        return state;
+      }
+
+      const responseSucceeded = event.response.resultCode === FTMS_RESULT_CODES.SUCCESS;
+      if (!responseSucceeded) {
+        const controlLost = event.response.resultCode === FTMS_RESULT_CODES.CONTROL_NOT_PERMITTED;
+        const requestRejected = pending.opcode === FTMS_OPCODES.REQUEST_CONTROL;
+        return {
+          ...state,
+          support: controlLost
+            ? "control_lost"
+            : requestRejected
+              ? "control_rejected"
+              : state.support,
+          currentMode: controlLost ? null : state.currentMode,
+          pending: null,
+        };
+      }
+
+      if (pending.opcode === FTMS_OPCODES.REQUEST_CONTROL) {
+        return { ...state, support: "control_granted", pending: null };
+      }
+      if (pending.reset) {
+        return {
+          ...state,
+          support: "control_capable",
+          pending: null,
+          currentMode: null,
+        };
+      }
+      return {
+        ...state,
+        pending: null,
+        currentMode: pending.requestedMode ?? state.currentMode,
+      };
+    }
+    case "timeout":
+      if (state.pending?.generation !== event.generation) {
+        return state;
+      }
+      return {
+        ...state,
+        support:
+          state.pending.opcode === FTMS_OPCODES.REQUEST_CONTROL
+            ? "control_rejected"
+            : state.support,
+        pending: null,
+      };
+    case "permissionLost":
+    case "disconnected":
+      return {
+        ...state,
+        support: "control_lost",
+        pending: null,
+        currentMode: null,
+      };
+    case "disposed":
+      return {
+        support: "metrics_only",
+        pending: null,
+        currentMode: null,
+        disposed: true,
+      };
+  }
+}

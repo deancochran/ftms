@@ -1,0 +1,79 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    name: Publish verified main build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.33.0 --activate
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install trusted-publishing npm CLI
+        run: npm install --global npm@11.6.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify source and packed artifact
+        run: pnpm verify
+
+      - name: Prepare automatic patch version
+        id: release
+        shell: bash
+        run: |
+          package_name=$(node --input-type=module -e 'import manifest from "./package.json" with { type: "json" }; process.stdout.write(manifest.name)')
+          base_version=$(node --input-type=module -e 'import manifest from "./package.json" with { type: "json" }; process.stdout.write(manifest.version)')
+
+          if ! npm view "$package_name" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Initial package publication is required before trusted publishing can run." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          major_minor=${base_version%.*}
+          release_version="${major_minor}.${GITHUB_RUN_NUMBER}"
+          if npm view "$package_name@$release_version" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "$package_name@$release_version is already published." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          npm version "$release_version" --no-git-tag-version
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=$release_version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish with npm trusted publishing
+        if: steps.release.outputs.publish == 'true'
+        run: npm publish --access public
+
+      - name: Record release
+        if: steps.release.outputs.publish == 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: echo "Published @deancochran/ftms@$RELEASE_VERSION with npm provenance." >> "$GITHUB_STEP_SUMMARY"
