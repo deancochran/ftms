@@ -9,11 +9,11 @@ const executable = (name) => (process.platform === "win32" ? `${name}.cmd` : nam
 const sourceManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
 const packagePathSegments = sourceManifest.name.split("/");
 
-function run(command, args, cwd) {
+function run(command, args, cwd, env = process.env) {
   return new Promise((resolve, reject) => {
     const child = spawn(executable(command), args, {
       cwd,
-      env: process.env,
+      env,
       stdio: "inherit",
     });
     child.once("error", reject);
@@ -39,7 +39,9 @@ try {
   await mkdir(packDirectory);
   await mkdir(consumerDirectory);
 
-  await run("pnpm", ["pack", "--pack-destination", packDirectory], packageRoot);
+  const packEnvironment = { ...process.env };
+  delete packEnvironment.npm_config_dry_run;
+  await run("pnpm", ["pack", "--pack-destination", packDirectory], packageRoot, packEnvironment);
   const tarballs = (await readdir(packDirectory)).filter((entry) => entry.endsWith(".tgz"));
   if (tarballs.length !== 1) {
     throw new Error(`Expected one package tarball, found ${tarballs.length}`);
@@ -54,6 +56,7 @@ try {
     "npm",
     ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball],
     consumerDirectory,
+    packEnvironment,
   );
 
   const installedManifest = JSON.parse(
