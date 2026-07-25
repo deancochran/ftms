@@ -17,7 +17,7 @@ concurrency:
 jobs:
   publish:
     if: github.ref == 'refs/heads/main'
-    name: Publish verified main build
+    name: Validate npm trusted publishing
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -29,10 +29,23 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.33.0 --activate
 
       - name: Setup Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+
+      - name: Verify tokenless npm configuration
+        shell: bash
+        run: |
+          if [[ -n "${NODE_AUTH_TOKEN:-}" || -n "${NPM_TOKEN:-}" ]]; then
+            echo "::error::Long-lived npm credentials must remain unset for trusted publishing."
+            exit 1
+          fi
+
+          if [[ "$(npm config get registry)" != "https://registry.npmjs.org/" ]]; then
+            echo "::error::Trusted publishing must use the public npm registry."
+            exit 1
+          fi
 
       - name: Install trusted-publishing npm CLI
         run: npm install --global npm@11.18.0
@@ -43,8 +56,8 @@ jobs:
       - name: Verify source and packed artifact
         run: pnpm verify
 
-      - name: Prepare automatic patch version
-        id: release
+      - name: Prepare diagnostic patch version
+        id: diagnostic
         shell: bash
         run: |
           package_name=$(node --input-type=module -e 'import manifest from "./package.json" with { type: "json" }; process.stdout.write(manifest.name)')
@@ -68,12 +81,25 @@ jobs:
           echo "publish=true" >> "$GITHUB_OUTPUT"
           echo "version=$release_version" >> "$GITHUB_OUTPUT"
 
-      - name: Publish with npm trusted publishing
-        if: steps.release.outputs.publish == 'true'
-        run: npm publish --access public --loglevel verbose
+      - name: Require unpublished diagnostic version
+        if: steps.diagnostic.outputs.publish != 'true'
+        run: |
+          echo "::error::Unable to prepare an unpublished version for OIDC validation."
+          exit 1
 
-      - name: Record release
-        if: steps.release.outputs.publish == 'true'
+      - name: Validate npm trusted publishing
+        if: steps.diagnostic.outputs.publish == 'true'
+        shell: bash
         env:
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
-        run: echo "Published @deancochran/ftms@$RELEASE_VERSION with npm provenance." >> "$GITHUB_STEP_SUMMARY"
+          NPM_CONFIG_DRY_RUN: "true"
+        run: |
+          set -euo pipefail
+          log_file="$RUNNER_TEMP/npm-publish-dry-run.log"
+          npm publish --access public --dry-run --loglevel verbose 2>&1 | tee "$log_file"
+
+          if ! grep -Fq "npm verbose oidc Successfully retrieved and set token" "$log_file"; then
+            echo "::error::npm OIDC token exchange did not succeed."
+            exit 1
+          fi
+
+          echo "npm OIDC token exchange succeeded during a dry run; no package was published." >> "$GITHUB_STEP_SUMMARY"
