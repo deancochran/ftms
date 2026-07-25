@@ -70,7 +70,7 @@ jobs:
 
       - name: Publish with npm trusted publishing
         if: steps.release.outputs.publish == 'true'
-        run: npm publish --access public
+        run: npm publish --access public --loglevel verbose
 
       - name: Record release
         if: steps.release.outputs.publish == 'true'
