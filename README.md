@@ -137,9 +137,24 @@ the caller owns fragment buffering and lifecycle policy.
 
 ## Machine detection
 
+Application policy and compatibility helpers are isolated from the protocol root:
+
+```ts
+import {
+  createInitialFtmsControlState,
+  detectFtmsMachineType,
+  reduceFtmsControl,
+} from "@deancochran/ftms/application";
+```
+
 `detectFtmsMachineType` prefers an advertised machine-data characteristic and
 can use a user-confirmed type. Feature-only inference is a heuristic and should
 not be treated as authoritative for safety or UI capability decisions.
+
+The experimental reducer enters `control_uncertain` after any pending procedure
+times out. Drain or invalidate stale indications before dispatching
+`recoveryCompleted`, then request control again. This prevents a delayed response
+from being correlated with a later same-opcode command.
 
 ## Conformance corpus
 
@@ -147,6 +162,7 @@ Versioned, language-neutral regression vectors and their JSON Schema are
 published at:
 
 - `@deancochran/ftms/conformance/v1`
+- `@deancochran/ftms/conformance/v1/schema`
 - `@deancochran/ftms/conformance/schema`
 
 Use the JSON loading mechanism appropriate to your runtime or tooling. The
@@ -167,20 +183,42 @@ assessment. No Bluetooth compliance or interoperability claim is made here.
 ## API stability
 
 The package follows semantic versioning. During `0.x`, protocol corrections and
-API cleanup may be released as minor versions. Compatibility projections,
-including `parseFtmsIndoorBikeData`, `ControlMode`, and app-facing control
-presentation types, may move to a compatibility subpath before `1.0.0`.
-Prefer complete `ParsedFtmsPayload` parsers for new code.
+API cleanup may be released as minor versions. Compatibility projections such
+as `parseFtmsIndoorBikeData` remain available, while application-facing control
+presentation and lifecycle types are exported only from
+`@deancochran/ftms/application`. Prefer complete `ParsedFtmsPayload` parsers for
+new code.
 
 ## Development
 
 ```sh
-pnpm install
-pnpm check-types
-pnpm test
-pnpm build
-pnpm verify:package
+pnpm install --frozen-lockfile
+pnpm verify
 ```
+
+Lefthook is installed by `pnpm install` and runs `pnpm test` before every push.
+Run one file with `pnpm exec vitest run test/control.test.ts`.
+
+## Release
+
+Update the source-controlled version and changelog together, merge the verified
+change, then push the matching tag (for example, `v0.2.0`). Publishing rejects a
+tag that does not exactly match `package.json` or lacks a changelog entry.
+
+### Qualification checklist
+
+Before making Bluetooth interoperability, PTS, or qualification claims:
+
+- test supported measurements, statuses, and controls on representative machines; record model,
+  firmware, transport traces, and results;
+- run the adopted FTMS v1.0 PTS suite with Mandatory Errata Correction 23224 and all applicable
+  errata, retaining the PTS version and reports;
+- validate caller-owned GATT behavior, including discovery, characteristic properties,
+  indications, procedure serialization, timeouts, disconnects, and permission loss;
+- convert failures into regression vectors and complete any required Bluetooth SIG qualification
+  or listing process.
+
+`pnpm verify` and the conformance corpus are release gates, not substitutes for these steps.
 
 Security reports should follow the repository's
 [security policy](https://github.com/deancochran/ftms/security/policy).

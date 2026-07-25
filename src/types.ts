@@ -1,17 +1,3 @@
-/** @deprecated Compatibility enum; prefer protocol request unions in new code. */
-export enum ControlMode {
-  ERG = "erg",
-  SIM = "sim",
-  RESISTANCE = "resistance",
-  SPEED = "speed",
-  INCLINATION = "inclination",
-  HEART_RATE = "heart_rate",
-  CADENCE = "cadence",
-}
-
-/** @deprecated Compatibility type; prefer FtmsMachineType. */
-export type FTMSDeviceType = "bike" | "rower" | "elliptical" | "treadmill";
-
 export type FtmsMachineType =
   | "bike"
   | "treadmill"
@@ -20,81 +6,6 @@ export type FtmsMachineType =
   | "step_climber"
   | "stair_climber"
   | "unknown";
-
-export type FtmsMachineTypeSource =
-  | "data_characteristic"
-  | "user_confirmed"
-  | "feature_heuristic"
-  | "unknown";
-
-export type FtmsControlSupportLevel =
-  | "metrics_only"
-  | "control_capable"
-  | "control_requesting"
-  | "control_granted"
-  | "control_rejected"
-  | "control_lost";
-
-export type FtmsControlState = Exclude<FtmsControlSupportLevel, "metrics_only">;
-
-/** @experimental Application-facing control-mode presentation contract. */
-export type FtmsControlMode =
-  | "status"
-  | "erg"
-  | "free_ride"
-  | "grade"
-  | "inclination"
-  | "resistance"
-  | "speed"
-  | "target_heart_rate"
-  | "target_cadence"
-  | "workout_goal"
-  | "calibration"
-  | "machine_state";
-
-export const ftmsControlModes = Object.freeze([
-  "status",
-  "erg",
-  "free_ride",
-  "grade",
-  "inclination",
-  "resistance",
-  "speed",
-  "target_heart_rate",
-  "target_cadence",
-  "workout_goal",
-  "calibration",
-  "machine_state",
-] as const satisfies readonly FtmsControlMode[]);
-
-/** @experimental Application-facing safety policy, not an FTMS wire value. */
-export type FtmsSafetyLevel = "none" | "confirm" | "strong_confirm" | "blocked";
-
-export interface FtmsCharacteristicProperties {
-  readable?: boolean;
-  notifiable?: boolean;
-  indicatable?: boolean;
-  writableWithResponse?: boolean;
-  writableWithoutResponse?: boolean;
-}
-
-/** @experimental Application-facing mode presentation contract. */
-export interface FtmsAvailableModeRange {
-  min: number;
-  max: number;
-  increment: number;
-  unit: string;
-}
-
-/** @experimental Application-facing mode presentation contract. */
-export interface FtmsAvailableMode {
-  id: FtmsControlMode;
-  label: string;
-  enabled: boolean;
-  disabledReason?: string;
-  range?: FtmsAvailableModeRange;
-  safetyLevel: FtmsSafetyLevel;
-}
 
 export interface FtmsSupportedRange {
   min: number;
@@ -156,22 +67,6 @@ export interface FTMSResponse {
   resultCodeName: string;
   success: boolean;
   parameters?: Uint8Array;
-}
-
-export interface FTMSControlEvent {
-  timestamp: number;
-  controlType:
-    | "power_target"
-    | "simulation"
-    | "resistance"
-    | "speed"
-    | "inclination"
-    | "heart_rate"
-    | "cadence";
-  targetValue: number;
-  actualValue?: number;
-  success: boolean;
-  errorMessage?: string;
 }
 
 export interface FtmsRuntimeMetrics {

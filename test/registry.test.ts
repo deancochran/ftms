@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { detectFtmsMachineType, ftmsControlModes } from "../src/application.js";
 import {
-  detectFtmsMachineType,
   FTMS_CHARACTERISTICS,
   FTMS_MEASUREMENT_AND_STATUS_CHARACTERISTIC_UUIDS,
   FTMS_OPCODES,
   FTMS_PARSER_DEFINITIONS_BY_UUID,
-  ftmsControlModes,
   getFtmsParserDefinition,
   listFtmsParserDefinitions,
 } from "../src/index.js";

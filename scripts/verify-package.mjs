@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { builtinModules } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,112 @@ const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const executable = (name) => (process.platform === "win32" ? `${name}.cmd` : name);
 const sourceManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
 const packagePathSegments = sourceManifest.name.split("/");
+const sourceModules = [
+  "application",
+  "binary",
+  "constants",
+  "control",
+  "features",
+  "index",
+  "parsers",
+  "types",
+];
+const expectedPackageFiles = new Set([
+  "CHANGELOG.md",
+  "LICENSE",
+  "README.md",
+  "SECURITY.md",
+  "conformance/v1/schema.json",
+  "conformance/v1/vectors.json",
+  "package.json",
+  ...sourceModules.map((module) => `src/${module}.ts`),
+  ...sourceModules.flatMap((module) => [
+    `dist/${module}.d.ts`,
+    `dist/${module}.d.ts.map`,
+    `dist/${module}.js`,
+    `dist/${module}.js.map`,
+  ]),
+]);
+
+async function listFiles(directory, relativeDirectory = "") {
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const relativePath = path.posix.join(relativeDirectory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await listFiles(path.join(directory, entry.name), relativePath)));
+    } else if (entry.isFile()) {
+      files.push(relativePath);
+    } else {
+      throw new Error(`Packed package contains unsupported entry ${relativePath}`);
+    }
+  }
+  return files.sort();
+}
+
+function assertExactPackageFiles(actualFiles) {
+  const unexpected = actualFiles.filter((file) => !expectedPackageFiles.has(file));
+  const missing = [...expectedPackageFiles].filter((file) => !actualFiles.includes(file));
+  if (unexpected.length > 0 || missing.length > 0) {
+    throw new Error(
+      `Packed file allowlist mismatch; unexpected: ${unexpected.join(", ") || "none"}; missing: ${missing.join(", ") || "none"}`,
+    );
+  }
+}
+
+async function verifySourceMaps(packageDirectory) {
+  for (const module of sourceModules) {
+    for (const targetExtension of ["js", "d.ts"]) {
+      const target = `dist/${module}.${targetExtension}`;
+      const mapPath = `${target}.map`;
+      const sourceMap = JSON.parse(await readFile(path.join(packageDirectory, mapPath), "utf8"));
+      if (
+        sourceMap.version !== 3 ||
+        sourceMap.file !== path.posix.basename(target) ||
+        sourceMap.sourceRoot !== "" ||
+        sourceMap.sources?.length !== 1 ||
+        sourceMap.sources[0] !== `../src/${module}.ts` ||
+        typeof sourceMap.mappings !== "string"
+      ) {
+        throw new Error(`${mapPath} does not map ${target} to its packaged TypeScript source`);
+      }
+    }
+  }
+}
+
+async function verifyBuiltJavaScript(packageDirectory) {
+  const nodeBuiltins = new Set(
+    builtinModules.flatMap((module) => [module, module.replace(/^node:/, "")]),
+  );
+  const forbiddenGlobals =
+    /\b(?:Buffer|setTimeout|clearTimeout|setInterval|clearInterval|setImmediate|clearImmediate|console)\b/;
+  const importPattern =
+    /(?:\b(?:import|export)\s+(?:[^"'();]*?\s+from\s*)?|\b(?:import|require)\s*\(\s*)["']([^"']+)["']/g;
+
+  for (const module of sourceModules) {
+    const relativePath = `dist/${module}.js`;
+    const javascript = await readFile(path.join(packageDirectory, relativePath), "utf8");
+    const forbiddenGlobal = javascript.match(forbiddenGlobals)?.[0];
+    if (forbiddenGlobal !== undefined) {
+      throw new Error(`${relativePath} references forbidden runtime global ${forbiddenGlobal}`);
+    }
+
+    for (const match of javascript.matchAll(importPattern)) {
+      const specifier = match[1];
+      if (specifier === undefined) continue;
+      const bareSpecifier = specifier.replace(/^node:/, "").split("/")[0];
+      if (
+        specifier.startsWith("node:") ||
+        nodeBuiltins.has(specifier) ||
+        nodeBuiltins.has(bareSpecifier)
+      ) {
+        throw new Error(`${relativePath} imports Node built-in ${specifier}`);
+      }
+      if (/(?:^|[/@_-])(?:react-native|bluetooth|ble|noble)(?:$|[/_-])/i.test(specifier)) {
+        throw new Error(`${relativePath} imports runtime-specific module ${specifier}`);
+      }
+    }
+  }
+}
 
 function run(command, args, cwd, env = process.env) {
   return new Promise((resolve, reject) => {
@@ -65,6 +172,14 @@ try {
       "utf8",
     ),
   );
+  const installedPackageDirectory = path.join(
+    consumerDirectory,
+    "node_modules",
+    ...packagePathSegments,
+  );
+  assertExactPackageFiles(await listFiles(installedPackageDirectory));
+  await verifySourceMaps(installedPackageDirectory);
+  await verifyBuiltJavaScript(installedPackageDirectory);
   if (
     installedManifest.name !== sourceManifest.name ||
     installedManifest.version !== sourceManifest.version
@@ -79,7 +194,11 @@ try {
   if (
     installedManifest.exports?.["."]?.types !== "./dist/index.d.ts" ||
     installedManifest.exports?.["."]?.import !== "./dist/index.js" ||
-    installedManifest.exports?.["."]?.["react-native"] !== "./dist/index.js"
+    installedManifest.exports?.["."]?.["react-native"] !== "./dist/index.js" ||
+    installedManifest.exports?.["./application"]?.types !== "./dist/application.d.ts" ||
+    installedManifest.exports?.["./application"]?.import !== "./dist/application.js" ||
+    installedManifest.exports?.["./conformance/schema"] !== "./conformance/v1/schema.json" ||
+    installedManifest.exports?.["./conformance/v1/schema"] !== "./conformance/v1/schema.json"
   ) {
     throw new Error("Installed package exports do not target built artifacts");
   }
@@ -100,6 +219,11 @@ if (request.length !== 3 || request[0] !== 0x05) throw new Error("Control encode
 
 const measurement = parseFtmsIndoorBikeMeasurement(Uint8Array.of(0, 0, 0, 0));
 if (measurement.kind !== "measurement") throw new Error("Measurement parser mismatch");
+
+const root = await import("${sourceManifest.name}");
+if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
+  throw new Error("Application policy leaked into the root protocol API");
+}
 `,
   );
   await run("node", ["runtime.mjs"], consumerDirectory);
@@ -107,15 +231,90 @@ if (measurement.kind !== "measurement") throw new Error("Measurement parser mism
   await run("node", ["--conditions=react-native", "runtime.mjs"], consumerDirectory);
 
   await writeFile(
+    path.join(consumerDirectory, "application.mjs"),
+    `import {
+  createInitialFtmsControlState,
+  detectFtmsMachineType,
+  reduceFtmsControl,
+} from "${sourceManifest.name}/application";
+
+const state = reduceFtmsControl(createInitialFtmsControlState(), {
+  type: "capabilityDiscovered",
+});
+if (state.support !== "control_capable") throw new Error("Application reducer mismatch");
+if (detectFtmsMachineType({}).machineType !== "unknown") {
+  throw new Error("Application machine detection mismatch");
+}
+`,
+  );
+  await run("node", ["application.mjs"], consumerDirectory);
+
+  await writeFile(
+    path.join(consumerDirectory, "conformance.mjs"),
+    `const { default: vectors } = await import("${sourceManifest.name}/conformance/v1", {
+  with: { type: "json" },
+});
+const { default: schema } = await import("${sourceManifest.name}/conformance/schema", {
+  with: { type: "json" },
+});
+const { default: versionedSchema } = await import(
+  "${sourceManifest.name}/conformance/v1/schema",
+  { with: { type: "json" } },
+);
+if (
+  vectors.schemaVersion !== 1 ||
+  !schema["$id"].includes("/v0.2.0/conformance/v1/schema.json") ||
+  !versionedSchema["$id"].includes("/v0.2.0/conformance/v1/schema.json")
+) {
+  throw new Error("ESM conformance exports are not usable");
+}
+`,
+  );
+  await run("node", ["conformance.mjs"], consumerDirectory);
+
+  await writeFile(
     path.join(consumerDirectory, "conformance.cjs"),
     `const vectors = require("${sourceManifest.name}/conformance/v1");
 const schema = require("${sourceManifest.name}/conformance/schema");
-if (vectors.schemaVersion !== 1 || schema.properties.schemaVersion.const !== 1) {
+const versionedSchema = require("${sourceManifest.name}/conformance/v1/schema");
+if (
+  vectors.schemaVersion !== 1 ||
+  !schema["$id"].includes("/v0.2.0/conformance/v1/schema.json") ||
+  !versionedSchema["$id"].includes("/v0.2.0/conformance/v1/schema.json")
+) {
   throw new Error("Conformance exports are not usable");
 }
 `,
   );
   await run("node", ["conformance.cjs"], consumerDirectory);
+
+  await writeFile(
+    path.join(consumerDirectory, "index.html"),
+    '<script type="module" src="/browser.mjs"></script>\n',
+  );
+  await writeFile(
+    path.join(consumerDirectory, "browser.mjs"),
+    `import { decodeFtmsFeatures, parseFtmsIndoorBikeMeasurement } from "${sourceManifest.name}";
+const features = decodeFtmsFeatures(new Uint8Array(8).buffer);
+const measurement = parseFtmsIndoorBikeMeasurement(Uint8Array.of(0, 0, 0, 0));
+if (!features.ok || measurement.kind !== "measurement") {
+  throw new Error("Browser bundle runtime mismatch");
+}
+`,
+  );
+  await run(
+    "pnpm",
+    [
+      "exec",
+      "vite",
+      "build",
+      consumerDirectory,
+      "--outDir",
+      path.join(temporaryRoot, "browser-dist"),
+      "--emptyOutDir",
+    ],
+    packageRoot,
+  );
 
   await writeFile(
     path.join(consumerDirectory, "consumer.ts"),
@@ -125,12 +324,18 @@ if (vectors.schemaVersion !== 1 || schema.properties.schemaVersion.const !== 1) 
   parseFtmsTreadmillData,
   tryEncodeFtmsControlRequest,
 } from "${sourceManifest.name}";
+import {
+  type FtmsControlReducerState,
+  createInitialFtmsControlState,
+} from "${sourceManifest.name}/application";
 
 const request: FtmsControlRequest = { op: "requestControl" };
 const encoded = tryEncodeFtmsControlRequest(request);
 const parsed: ParsedFtmsPayload = parseFtmsTreadmillData(Uint8Array.of(0, 0, 0, 0));
+const state: FtmsControlReducerState = createInitialFtmsControlState();
 void encoded;
 void parsed;
+void state;
 `,
   );
   await writeFile(
@@ -158,7 +363,7 @@ void parsed;
   );
 
   console.log(
-    `Verified packed ${sourceManifest.name} artifact, exports, runtime, and declarations.`,
+    `Verified packed ${sourceManifest.name} allowlist, maps, runtime neutrality, exports, browser resolution, and declarations.`,
   );
 } finally {
   if (process.env.FTMS_KEEP_VERIFY_TEMP === "1") {

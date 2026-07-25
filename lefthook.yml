@@ -1,0 +1,6 @@
+assert_lefthook_installed: true
+
+pre-push:
+  commands:
+    test:
+      run: pnpm test

@@ -208,7 +208,7 @@ describe("complete FTMS measurement layouts", () => {
       distanceMeters: 0x010203,
       stepRateSpm: 100,
       averageStepRateSpm: 80,
-      strideCount: 50,
+      strideCount: 5,
       positiveElevationGainMeters: 10,
       negativeElevationGainMeters: 4,
       inclinationPercent: -1,
@@ -499,6 +499,123 @@ describe("measurement diagnostics", () => {
     });
     expect(result.diagnostics.issues.filter((issue) => issue.code === "unavailable")).toHaveLength(
       7,
+    );
+  });
+
+  it.each([
+    {
+      name: "treadmill",
+      parser: parseFtmsTreadmillData,
+      bytes: flags16(0x0180, 0xe8, 0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+    {
+      name: "cross trainer",
+      parser: parseFtmsCrossTrainerData,
+      bytes: flags24(0x0c01, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+    {
+      name: "step climber",
+      parser: parseFtmsStepClimberData,
+      bytes: flags16(0x0031, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+    {
+      name: "stair climber",
+      parser: parseFtmsStairClimberData,
+      bytes: flags16(0x0061, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+    {
+      name: "rower",
+      parser: parseFtmsRowerData,
+      bytes: flags16(0x0301, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+    {
+      name: "indoor bike",
+      parser: parseFtmsIndoorBikeMeasurement,
+      bytes: flags16(0x0301, 0xff, 0xff, 0xff, 0xff, 0xff, 150),
+    },
+  ])("maps every unavailable $name energy value to null without shifting heart rate", ({
+    parser,
+    bytes,
+  }) => {
+    const result = parser(bytes);
+    expect(result.metrics).toMatchObject({
+      energyKcal: null,
+      energyPerHourKcal: null,
+      energyPerMinuteKcal: null,
+      hrBpm: 150,
+    });
+    expect(result.diagnostics.issues.filter((issue) => issue.code === "unavailable")).toHaveLength(
+      3,
+    );
+    expect(result.diagnostics.truncated).toBe(false);
+  });
+
+  it("maps unavailable cross-trainer step rates and preserves scaled stride alignment", () => {
+    const result = parseFtmsCrossTrainerData(flags24(0x0819, 0xff, 0xff, 0xff, 0xff, 123, 0, 150));
+    expect(result.metrics).toMatchObject({
+      stepRateSpm: null,
+      averageStepRateSpm: null,
+      strideCount: 12.3,
+      hrBpm: 150,
+    });
+    expect(result.diagnostics.issues.filter((issue) => issue.code === "unavailable")).toHaveLength(
+      2,
+    );
+  });
+
+  it("maps unavailable cross-trainer inclination fields without shifting resistance or power", () => {
+    const result = parseFtmsCrossTrainerData(
+      flags24(0x01c1, 0xff, 0x7f, 0xff, 0x7f, 9, 0xec, 0xff),
+    );
+    expect(result.metrics).toMatchObject({
+      inclinationPercent: null,
+      rampAngleDegrees: null,
+      resistanceLevel: 9,
+      powerWatts: -20,
+    });
+    expect(result.diagnostics.issues.filter((issue) => issue.code === "unavailable")).toHaveLength(
+      2,
+    );
+  });
+
+  it.each([
+    {
+      name: "cross trainer instantaneous",
+      parser: parseFtmsCrossTrainerData,
+      bytes: flags24(0x0901, 0xff, 0x7f, 150),
+    },
+    {
+      name: "cross trainer average",
+      parser: parseFtmsCrossTrainerData,
+      bytes: flags24(0x0a01, 0xff, 0x7f, 150),
+    },
+    {
+      name: "rower instantaneous",
+      parser: parseFtmsRowerData,
+      bytes: flags16(0x0221, 0xff, 0x7f, 150),
+    },
+    {
+      name: "rower average",
+      parser: parseFtmsRowerData,
+      bytes: flags16(0x0241, 0xff, 0x7f, 150),
+    },
+    {
+      name: "indoor bike instantaneous",
+      parser: parseFtmsIndoorBikeMeasurement,
+      bytes: flags16(0x0241, 0xff, 0x7f, 150),
+    },
+    {
+      name: "indoor bike average",
+      parser: parseFtmsIndoorBikeMeasurement,
+      bytes: flags16(0x0281, 0xff, 0x7f, 150),
+    },
+  ])("does not invent an unavailable sentinel for $name power", ({ name, parser, bytes }) => {
+    const result = parser(bytes);
+    const field = name.endsWith("average") ? "averagePowerWatts" : "powerWatts";
+    expect(Reflect.get(result.metrics, field)).toBe(0x7fff);
+    expect(result.metrics.hrBpm).toBe(150);
+    expect(result.diagnostics.issues).not.toContainEqual(
+      expect.objectContaining({ code: "unavailable", field }),
     );
   });
 

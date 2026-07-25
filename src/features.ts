@@ -1,7 +1,8 @@
+import { toDataView } from "./binary.js";
 import type { FTMSFeatures } from "./types.js";
 
 export interface FtmsDecodeErrorDetails {
-  code: "length" | "range";
+  code: "kind" | "length" | "range";
   offset: number;
   expected: number;
   actual: number;
@@ -20,12 +21,6 @@ export interface FtmsRange {
   max: number;
   increment: number;
   unit: "km/h" | "percent" | "level" | "bpm" | "watts";
-}
-
-function toDataView(data: ArrayBuffer | Uint8Array): DataView {
-  return data instanceof Uint8Array
-    ? new DataView(data.buffer, data.byteOffset, data.byteLength)
-    : new DataView(data);
 }
 
 function lengthError(actual: number, expected: number): FtmsDecodeError {
@@ -101,13 +96,18 @@ export function decodeFtmsFeatures(data: ArrayBuffer | Uint8Array): FtmsDecodeRe
   };
 }
 
-function rangeError(min: number, max: number, increment: number): FtmsDecodeError {
+function rangeError(
+  min: number,
+  max: number,
+  increment: number,
+  incrementOffset: number,
+): FtmsDecodeError {
   const invalidMinimum = min > max;
   return {
     ok: false,
     error: {
       code: "range",
-      offset: invalidMinimum ? 0 : 2,
+      offset: invalidMinimum ? 0 : incrementOffset,
       expected: 1,
       actual: invalidMinimum ? min - max : increment,
       message: invalidMinimum
@@ -121,6 +121,19 @@ export function decodeFtmsRange(
   kind: FtmsRangeKind,
   data: ArrayBuffer | Uint8Array,
 ): FtmsDecodeResult<FtmsRange> {
+  if (!(["speed", "inclination", "resistance", "heartRate", "power"] as const).includes(kind)) {
+    return {
+      ok: false,
+      error: {
+        code: "kind",
+        offset: 0,
+        expected: 0,
+        actual: 0,
+        message: `Unsupported FTMS range kind: ${String(kind)}`,
+      },
+    };
+  }
+
   const view = toDataView(data);
   const expectedLength = kind === "heartRate" || kind === "resistance" ? 3 : 6;
   if (view.byteLength !== expectedLength) {
@@ -166,7 +179,7 @@ export function decodeFtmsRange(
   }
 
   if (min > max || increment <= 0) {
-    return rangeError(min, max, increment);
+    return rangeError(min, max, increment, expectedLength === 3 ? 2 : 4);
   }
 
   return { ok: true, value: { kind, min, max, increment, unit } };

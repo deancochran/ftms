@@ -1,0 +1,704 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/deancochran/ftms/v0.2.0/conformance/v1/schema.json",
+  "title": "FTMS language-neutral conformance vectors, version 1",
+  "$ref": "#/$defs/corpus",
+  "$defs": {
+    "byteArray": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 255 } },
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "baseVector": {
+      "type": "object",
+      "required": ["id", "source"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "source": { "$ref": "#/$defs/sourceRefs" }
+      }
+    },
+    "boolean": { "type": "boolean" },
+    "featureName": {
+      "enum": [
+        "averageSpeedSupported",
+        "cadenceSupported",
+        "totalDistanceSupported",
+        "inclinationSupported",
+        "elevationGainSupported",
+        "paceSupported",
+        "stepCountSupported",
+        "resistanceLevelSupported",
+        "strideCountSupported",
+        "expendedEnergySupported",
+        "heartRateMeasurementSupported",
+        "metabolicEquivalentSupported",
+        "elapsedTimeSupported",
+        "remainingTimeSupported",
+        "powerMeasurementSupported",
+        "forceOnBeltSupported",
+        "userDataRetentionSupported",
+        "speedTargetSettingSupported",
+        "inclinationTargetSettingSupported",
+        "resistanceTargetSettingSupported",
+        "powerTargetSettingSupported",
+        "heartRateTargetSettingSupported",
+        "targetedExpendedEnergySupported",
+        "targetedStepNumberSupported",
+        "targetedStrideNumberSupported",
+        "targetedDistanceSupported",
+        "targetedTrainingTimeSupported",
+        "targetedTimeTwoHRZonesSupported",
+        "targetedTimeThreeHRZonesSupported",
+        "targetedTimeFiveHRZonesSupported",
+        "indoorBikeSimulationSupported",
+        "wheelCircumferenceSupported",
+        "spinDownControlSupported",
+        "targetedCadenceSupported",
+        "supportsERG",
+        "supportsSIM",
+        "supportsResistance"
+      ]
+    },
+    "featureValues": {
+      "type": "object",
+      "required": [
+        "averageSpeedSupported",
+        "cadenceSupported",
+        "totalDistanceSupported",
+        "inclinationSupported",
+        "elevationGainSupported",
+        "paceSupported",
+        "stepCountSupported",
+        "resistanceLevelSupported",
+        "strideCountSupported",
+        "expendedEnergySupported",
+        "heartRateMeasurementSupported",
+        "metabolicEquivalentSupported",
+        "elapsedTimeSupported",
+        "remainingTimeSupported",
+        "powerMeasurementSupported",
+        "forceOnBeltSupported",
+        "userDataRetentionSupported",
+        "speedTargetSettingSupported",
+        "inclinationTargetSettingSupported",
+        "resistanceTargetSettingSupported",
+        "powerTargetSettingSupported",
+        "heartRateTargetSettingSupported",
+        "targetedExpendedEnergySupported",
+        "targetedStepNumberSupported",
+        "targetedStrideNumberSupported",
+        "targetedDistanceSupported",
+        "targetedTrainingTimeSupported",
+        "targetedTimeTwoHRZonesSupported",
+        "targetedTimeThreeHRZonesSupported",
+        "targetedTimeFiveHRZonesSupported",
+        "indoorBikeSimulationSupported",
+        "wheelCircumferenceSupported",
+        "spinDownControlSupported",
+        "targetedCadenceSupported",
+        "supportsERG",
+        "supportsSIM",
+        "supportsResistance"
+      ],
+      "properties": {
+        "averageSpeedSupported": { "$ref": "#/$defs/boolean" },
+        "cadenceSupported": { "$ref": "#/$defs/boolean" },
+        "totalDistanceSupported": { "$ref": "#/$defs/boolean" },
+        "inclinationSupported": { "$ref": "#/$defs/boolean" },
+        "elevationGainSupported": { "$ref": "#/$defs/boolean" },
+        "paceSupported": { "$ref": "#/$defs/boolean" },
+        "stepCountSupported": { "$ref": "#/$defs/boolean" },
+        "resistanceLevelSupported": { "$ref": "#/$defs/boolean" },
+        "strideCountSupported": { "$ref": "#/$defs/boolean" },
+        "expendedEnergySupported": { "$ref": "#/$defs/boolean" },
+        "heartRateMeasurementSupported": { "$ref": "#/$defs/boolean" },
+        "metabolicEquivalentSupported": { "$ref": "#/$defs/boolean" },
+        "elapsedTimeSupported": { "$ref": "#/$defs/boolean" },
+        "remainingTimeSupported": { "$ref": "#/$defs/boolean" },
+        "powerMeasurementSupported": { "$ref": "#/$defs/boolean" },
+        "forceOnBeltSupported": { "$ref": "#/$defs/boolean" },
+        "userDataRetentionSupported": { "$ref": "#/$defs/boolean" },
+        "speedTargetSettingSupported": { "$ref": "#/$defs/boolean" },
+        "inclinationTargetSettingSupported": { "$ref": "#/$defs/boolean" },
+        "resistanceTargetSettingSupported": { "$ref": "#/$defs/boolean" },
+        "powerTargetSettingSupported": { "$ref": "#/$defs/boolean" },
+        "heartRateTargetSettingSupported": { "$ref": "#/$defs/boolean" },
+        "targetedExpendedEnergySupported": { "$ref": "#/$defs/boolean" },
+        "targetedStepNumberSupported": { "$ref": "#/$defs/boolean" },
+        "targetedStrideNumberSupported": { "$ref": "#/$defs/boolean" },
+        "targetedDistanceSupported": { "$ref": "#/$defs/boolean" },
+        "targetedTrainingTimeSupported": { "$ref": "#/$defs/boolean" },
+        "targetedTimeTwoHRZonesSupported": { "$ref": "#/$defs/boolean" },
+        "targetedTimeThreeHRZonesSupported": { "$ref": "#/$defs/boolean" },
+        "targetedTimeFiveHRZonesSupported": { "$ref": "#/$defs/boolean" },
+        "indoorBikeSimulationSupported": { "$ref": "#/$defs/boolean" },
+        "wheelCircumferenceSupported": { "$ref": "#/$defs/boolean" },
+        "spinDownControlSupported": { "$ref": "#/$defs/boolean" },
+        "targetedCadenceSupported": { "$ref": "#/$defs/boolean" },
+        "supportsERG": { "$ref": "#/$defs/boolean" },
+        "supportsSIM": { "$ref": "#/$defs/boolean" },
+        "supportsResistance": { "$ref": "#/$defs/boolean" }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "oneOf": [
+        { "$ref": "#/$defs/requestControl" },
+        { "$ref": "#/$defs/reset" },
+        { "$ref": "#/$defs/targetSpeed" },
+        { "$ref": "#/$defs/targetInclination" },
+        { "$ref": "#/$defs/targetResistance" },
+        { "$ref": "#/$defs/targetPower" },
+        { "$ref": "#/$defs/targetHeartRate" },
+        { "$ref": "#/$defs/startResume" },
+        { "$ref": "#/$defs/stopPause" },
+        { "$ref": "#/$defs/targetEnergy" },
+        { "$ref": "#/$defs/targetSteps" },
+        { "$ref": "#/$defs/targetStrides" },
+        { "$ref": "#/$defs/targetDistance" },
+        { "$ref": "#/$defs/targetTrainingTime" },
+        { "$ref": "#/$defs/twoZones" },
+        { "$ref": "#/$defs/threeZones" },
+        { "$ref": "#/$defs/fiveZones" },
+        { "$ref": "#/$defs/simulation" },
+        { "$ref": "#/$defs/wheel" },
+        { "$ref": "#/$defs/spinDown" },
+        { "$ref": "#/$defs/targetCadence" }
+      ]
+    },
+    "requestControl": {
+      "type": "object",
+      "required": ["op"],
+      "properties": { "op": { "const": "requestControl" } },
+      "additionalProperties": false
+    },
+    "reset": {
+      "type": "object",
+      "required": ["op"],
+      "properties": { "op": { "const": "reset" } },
+      "additionalProperties": false
+    },
+    "targetSpeed": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": { "op": { "const": "setTargetSpeed" }, "speedKph": { "type": "number" } },
+      "required": ["op", "speedKph"]
+    },
+    "targetInclination": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetInclination" },
+        "inclinationPercent": { "type": "number" }
+      },
+      "required": ["op", "inclinationPercent"]
+    },
+    "targetResistance": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetResistance" },
+        "resistanceLevel": { "type": "number" }
+      },
+      "required": ["op", "resistanceLevel"]
+    },
+    "targetPower": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": { "op": { "const": "setTargetPower" }, "powerWatts": { "type": "number" } },
+      "required": ["op", "powerWatts"]
+    },
+    "targetHeartRate": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetHeartRate" },
+        "heartRateBpm": { "type": "number" }
+      },
+      "required": ["op", "heartRateBpm"]
+    },
+    "startResume": {
+      "type": "object",
+      "required": ["op"],
+      "properties": { "op": { "const": "startResume" } },
+      "additionalProperties": false
+    },
+    "stopPause": {
+      "type": "object",
+      "required": ["op", "action"],
+      "properties": { "op": { "const": "stopPause" }, "action": { "enum": ["stop", "pause"] } },
+      "additionalProperties": false
+    },
+    "targetEnergy": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetedExpendedEnergy" },
+        "energyKcal": { "type": "number" }
+      },
+      "required": ["op", "energyKcal"]
+    },
+    "targetSteps": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": { "op": { "const": "setTargetedSteps" }, "steps": { "type": "number" } },
+      "required": ["op", "steps"]
+    },
+    "targetStrides": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": { "op": { "const": "setTargetedStrides" }, "strides": { "type": "number" } },
+      "required": ["op", "strides"]
+    },
+    "targetDistance": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetedDistance" },
+        "distanceMeters": { "type": "number" }
+      },
+      "required": ["op", "distanceMeters"]
+    },
+    "targetTrainingTime": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "unevaluatedProperties": false,
+      "properties": {
+        "op": { "const": "setTargetedTrainingTime" },
+        "seconds": { "type": "number" }
+      },
+      "required": ["op", "seconds"]
+    },
+    "oneNumber": { "type": "object" },
+    "twoZones": {
+      "$ref": "#/$defs/zones",
+      "type": "object",
+      "properties": {
+        "op": { "const": "setTargetedTimeTwoHrZones" },
+        "seconds": { "$ref": "#/$defs/twoNumbers" }
+      },
+      "required": ["op", "seconds"],
+      "unevaluatedProperties": false
+    },
+    "threeZones": {
+      "$ref": "#/$defs/zones",
+      "type": "object",
+      "properties": {
+        "op": { "const": "setTargetedTimeThreeHrZones" },
+        "seconds": { "$ref": "#/$defs/threeNumbers" }
+      },
+      "required": ["op", "seconds"],
+      "unevaluatedProperties": false
+    },
+    "fiveZones": {
+      "$ref": "#/$defs/zones",
+      "type": "object",
+      "properties": {
+        "op": { "const": "setTargetedTimeFiveHrZones" },
+        "seconds": { "$ref": "#/$defs/fiveNumbers" }
+      },
+      "required": ["op", "seconds"],
+      "unevaluatedProperties": false
+    },
+    "zones": { "type": "object" },
+    "twoNumbers": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "threeNumbers": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "fiveNumbers": { "type": "array", "items": { "type": "number" }, "minItems": 5, "maxItems": 5 },
+    "simulation": {
+      "type": "object",
+      "required": ["op", "windSpeedMps", "gradePercent", "crr", "cwKgPerM"],
+      "properties": {
+        "op": { "const": "setIndoorBikeSimulation" },
+        "windSpeedMps": { "type": "number" },
+        "gradePercent": { "type": "number" },
+        "crr": { "type": "number" },
+        "cwKgPerM": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "wheel": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "properties": {
+        "op": { "const": "setWheelCircumference" },
+        "circumferenceMm": { "type": "number" }
+      },
+      "required": ["op", "circumferenceMm"],
+      "unevaluatedProperties": false
+    },
+    "spinDown": {
+      "type": "object",
+      "required": ["op", "action"],
+      "properties": { "op": { "const": "spinDown" }, "action": { "enum": ["start", "ignore"] } },
+      "additionalProperties": false
+    },
+    "targetCadence": {
+      "$ref": "#/$defs/oneNumber",
+      "type": "object",
+      "properties": { "op": { "const": "setTargetedCadence" }, "cadenceRpm": { "type": "number" } },
+      "required": ["op", "cadenceRpm"],
+      "unevaluatedProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "hrBpm": { "type": ["number", "null"] },
+        "powerWatts": { "type": ["number", "null"] },
+        "averagePowerWatts": { "type": ["number", "null"] },
+        "cadenceRpm": { "type": ["number", "null"] },
+        "averageCadenceRpm": { "type": ["number", "null"] },
+        "speedMps": { "type": ["number", "null"] },
+        "averageSpeedMps": { "type": ["number", "null"] },
+        "distanceMeters": { "type": ["number", "null"] },
+        "elapsedTimeSeconds": { "type": ["number", "null"] },
+        "remainingTimeSeconds": { "type": ["number", "null"] },
+        "energyKcal": { "type": ["number", "null"] },
+        "energyPerHourKcal": { "type": ["number", "null"] },
+        "energyPerMinuteKcal": { "type": ["number", "null"] },
+        "metabolicEquivalent": { "type": ["number", "null"] },
+        "stepCount": { "type": ["number", "null"] },
+        "stepRateSpm": { "type": ["number", "null"] },
+        "averageStepRateSpm": { "type": ["number", "null"] },
+        "strideCount": { "type": ["number", "null"] },
+        "floorCount": { "type": ["number", "null"] },
+        "positiveElevationGainMeters": { "type": ["number", "null"] },
+        "negativeElevationGainMeters": { "type": ["number", "null"] },
+        "inclinationPercent": { "type": ["number", "null"] },
+        "rampAngleDegrees": { "type": ["number", "null"] },
+        "resistanceLevel": { "type": ["number", "null"] },
+        "instantaneousPaceSecondsPer500m": { "type": ["number", "null"] },
+        "averagePaceSecondsPer500m": { "type": ["number", "null"] },
+        "forceOnBeltNewtons": { "type": ["number", "null"] },
+        "strokeRateSpm": { "type": ["number", "null"] },
+        "averageStrokeRateSpm": { "type": ["number", "null"] },
+        "strokeCount": { "type": ["number", "null"] },
+        "movementDirection": { "type": ["string", "null"], "enum": ["forward", "backward", null] }
+      },
+      "additionalProperties": false
+    },
+    "diagnosticCode": {
+      "enum": [
+        "truncated",
+        "unavailable",
+        "more_data",
+        "reserved_flags",
+        "invalid_flags",
+        "reserved_value",
+        "trailing_bytes",
+        "unknown_opcode"
+      ]
+    },
+    "corpus": {
+      "type": "object",
+      "required": [
+        "$schema",
+        "schemaVersion",
+        "provenance",
+        "errata",
+        "features",
+        "ranges",
+        "controls",
+        "controlResponses",
+        "measurements",
+        "statuses",
+        "diagnostics"
+      ],
+      "properties": {
+        "$schema": { "const": "./schema.json" },
+        "schemaVersion": { "const": 1 },
+        "provenance": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "url", "revision"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "url": { "type": "string", "pattern": "^https://" },
+              "revision": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "errata": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "source"],
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "source": { "$ref": "#/$defs/sourceRefs" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "features": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["bytes"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "bytes": {
+                    "$ref": "#/$defs/byteArray",
+                    "type": "array",
+                    "minItems": 8,
+                    "maxItems": 8
+                  },
+                  "expected": { "$ref": "#/$defs/featureValues" },
+                  "expectedTrue": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": { "$ref": "#/$defs/featureName" }
+                  }
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": { "expected": true },
+                    "required": ["expected"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": { "expectedTrue": true },
+                    "required": ["expectedTrue"]
+                  }
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "ranges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["kind", "bytes"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "kind": { "enum": ["speed", "inclination", "resistance", "heartRate", "power"] },
+                  "bytes": { "$ref": "#/$defs/byteArray" },
+                  "expected": {
+                    "type": "object",
+                    "required": ["min", "max", "increment", "unit"],
+                    "properties": {
+                      "min": { "type": "number" },
+                      "max": { "type": "number" },
+                      "increment": { "type": "number" },
+                      "unit": { "enum": ["km/h", "percent", "level", "bpm", "watts"] }
+                    },
+                    "additionalProperties": false
+                  },
+                  "expectedError": { "enum": ["length", "range"] }
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": { "expected": true },
+                    "required": ["expected"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": { "expectedError": true },
+                    "required": ["expectedError"]
+                  }
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["request", "expectedBytes"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "request": { "$ref": "#/$defs/request" },
+                  "expectedBytes": { "$ref": "#/$defs/byteArray", "type": "array", "minItems": 1 }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "controlResponses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["bytes"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "bytes": { "$ref": "#/$defs/byteArray" },
+                  "expected": {
+                    "type": "object",
+                    "required": [
+                      "requestOpCode",
+                      "resultCode",
+                      "resultCodeName",
+                      "success",
+                      "parameters"
+                    ],
+                    "properties": {
+                      "requestOpCode": { "type": "integer" },
+                      "resultCode": { "type": "integer" },
+                      "resultCodeName": { "type": "string" },
+                      "success": { "type": "boolean" },
+                      "parameters": { "$ref": "#/$defs/byteArray" }
+                    },
+                    "additionalProperties": false
+                  },
+                  "expectedError": { "const": "malformed_response" }
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": { "expected": true },
+                    "required": ["expected"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": { "expectedError": true },
+                    "required": ["expectedError"]
+                  }
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "measurements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["characteristicUuid", "bytes", "expectedMetrics"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "characteristicUuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "bytes": { "$ref": "#/$defs/byteArray", "type": "array", "minItems": 1 },
+                  "expectedMetrics": { "$ref": "#/$defs/metrics" }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "statuses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["characteristicUuid", "bytes", "expectedStatus"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "characteristicUuid": { "type": "string" },
+                  "bytes": { "$ref": "#/$defs/byteArray", "type": "array", "minItems": 1 },
+                  "expectedStatus": {
+                    "type": "object",
+                    "required": ["code", "label", "details"],
+                    "properties": {
+                      "code": { "type": ["integer", "null"] },
+                      "label": { "type": "string" },
+                      "details": { "type": ["object", "null"] }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/baseVector" },
+              {
+                "type": "object",
+                "required": ["characteristicUuid", "bytes", "expectedTruncated", "expectedIssues"],
+                "properties": {
+                  "id": true,
+                  "source": true,
+                  "characteristicUuid": { "type": "string" },
+                  "bytes": { "$ref": "#/$defs/byteArray" },
+                  "expectedTruncated": { "type": "boolean" },
+                  "expectedIssues": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": { "$ref": "#/$defs/diagnosticCode" }
+                  },
+                  "expectedMetrics": { "$ref": "#/$defs/metrics" },
+                  "expectedStatusCode": { "type": ["integer", "null"] }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

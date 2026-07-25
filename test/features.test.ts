@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   decodeFtmsFeatures,
+  decodeFtmsRange,
   decodeSupportedHeartRateRange,
   decodeSupportedInclinationRange,
   decodeSupportedPowerRange,
@@ -8,6 +9,7 @@ import {
   decodeSupportedSpeedRange,
   type FTMSFeatures,
   type FtmsRange,
+  type FtmsRangeKind,
 } from "../src/index.js";
 
 const machineFeatureCases: ReadonlyArray<{ name: keyof FTMSFeatures; bit: number }> = [
@@ -182,6 +184,23 @@ describe("supported range decoders", () => {
     expect(decode(Uint8Array.from(zeroIncrement))).toMatchObject({
       ok: false,
       error: { code: "range" },
+    });
+  });
+
+  it("rejects an unsupported range kind at runtime", () => {
+    expect(decodeFtmsRange("unsupported" as FtmsRangeKind, new Uint8Array(6))).toMatchObject({
+      ok: false,
+      error: { code: "kind" },
+    });
+  });
+
+  it.each([
+    { kind: "speed" as const, bytes: [0, 0, 1, 0, 0, 0], offset: 4 },
+    { kind: "heartRate" as const, bytes: [1, 2, 0], offset: 2 },
+  ])("reports the $kind increment at its wire offset", ({ kind, bytes, offset }) => {
+    expect(decodeFtmsRange(kind, Uint8Array.from(bytes))).toMatchObject({
+      ok: false,
+      error: { code: "range", offset },
     });
   });
 });

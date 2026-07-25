@@ -1,3 +1,4 @@
+import { toBytes, toDataView } from "./binary.js";
 import { FTMS_CHARACTERISTICS, FTMS_MACHINE_STATUS_OPCODES } from "./constants.js";
 import type {
   FtmsDiagnostic,
@@ -9,16 +10,6 @@ import type {
   ParsedFtmsIndoorBikeData,
   ParsedFtmsPayload,
 } from "./types.js";
-
-function toDataView(data: ArrayBuffer | Uint8Array): DataView {
-  return data instanceof Uint8Array
-    ? new DataView(data.buffer, data.byteOffset, data.byteLength)
-    : new DataView(data);
-}
-
-function toBytes(data: ArrayBuffer | Uint8Array): Uint8Array {
-  return data instanceof Uint8Array ? data : new Uint8Array(data);
-}
 
 function decodeUtf8(bytes: Uint8Array): string {
   let result = "";
@@ -394,11 +385,21 @@ export function parseFtmsCrossTrainerData(data: ArrayBuffer | Uint8Array): Parse
         metrics.distanceMeters = reader.readUint24("distanceMeters");
       }
       if (isBitSet(flags, 3)) {
-        metrics.stepRateSpm = reader.readUint16("stepRateSpm");
-        metrics.averageStepRateSpm = reader.readUint16("averageStepRateSpm");
+        metrics.stepRateSpm = unavailable(
+          reader.readUint16("stepRateSpm"),
+          0xffff,
+          "stepRateSpm",
+          reader,
+        );
+        metrics.averageStepRateSpm = unavailable(
+          reader.readUint16("averageStepRateSpm"),
+          0xffff,
+          "averageStepRateSpm",
+          reader,
+        );
       }
       if (isBitSet(flags, 4)) {
-        metrics.strideCount = reader.readUint16("strideCount");
+        metrics.strideCount = scale(reader.readUint16("strideCount"), 10);
       }
       if (isBitSet(flags, 5)) {
         metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
@@ -412,10 +413,10 @@ export function parseFtmsCrossTrainerData(data: ArrayBuffer | Uint8Array): Parse
         metrics.resistanceLevel = reader.readUint8("resistanceLevel");
       }
       if (isBitSet(flags, 8)) {
-        metrics.powerWatts = readUnavailableInt16(reader, "powerWatts");
+        metrics.powerWatts = reader.readInt16("powerWatts");
       }
       if (isBitSet(flags, 9)) {
-        metrics.averagePowerWatts = readUnavailableInt16(reader, "averagePowerWatts");
+        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
       }
       if (isBitSet(flags, 10)) {
         readEnergy(reader, metrics);
@@ -543,10 +544,10 @@ export function parseFtmsRowerData(data: ArrayBuffer | Uint8Array): ParsedFtmsPa
         metrics.averagePaceSecondsPer500m = reader.readUint16("averagePaceSecondsPer500m");
       }
       if (isBitSet(flags, 5)) {
-        metrics.powerWatts = readUnavailableInt16(reader, "powerWatts");
+        metrics.powerWatts = reader.readInt16("powerWatts");
       }
       if (isBitSet(flags, 6)) {
-        metrics.averagePowerWatts = readUnavailableInt16(reader, "averagePowerWatts");
+        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
       }
       if (isBitSet(flags, 7)) {
         metrics.resistanceLevel = reader.readUint8("resistanceLevel");
@@ -596,10 +597,10 @@ function parseIndoorBikePayload(data: ArrayBuffer | Uint8Array): ParsedFtmsPaylo
         metrics.resistanceLevel = reader.readUint8("resistanceLevel");
       }
       if (isBitSet(flags, 6)) {
-        metrics.powerWatts = readUnavailableInt16(reader, "powerWatts");
+        metrics.powerWatts = reader.readInt16("powerWatts");
       }
       if (isBitSet(flags, 7)) {
-        metrics.averagePowerWatts = readUnavailableInt16(reader, "averagePowerWatts");
+        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
       }
       if (isBitSet(flags, 8)) {
         readEnergy(reader, metrics);

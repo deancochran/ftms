@@ -2,13 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   ControlMode,
   createInitialFtmsControlState,
-  FTMS_OPCODES,
-  FTMS_RESULT_CODES,
-  type FTMSResponse,
   type FtmsControlReducerState,
   initialFtmsControlState,
   reduceFtmsControl,
-} from "../src/index.js";
+} from "../src/application.js";
+import { FTMS_OPCODES, FTMS_RESULT_CODES, type FTMSResponse } from "../src/index.js";
 
 function response(opcode: number, resultCode: number = FTMS_RESULT_CODES.SUCCESS): FTMSResponse {
   return {
@@ -315,16 +313,20 @@ describe("FTMS control reducer", () => {
     expect(failed).toMatchObject({ support: "control_lost", currentMode: null, pending: null });
   });
 
-  it("marks a request timeout as rejected", () => {
+  it("marks a request timeout as uncertain", () => {
     const requesting = reduceFtmsControl(capableState(), {
       type: "requestControlSent",
       generation: 8,
     });
     const timedOut = reduceFtmsControl(requesting, { type: "timeout", generation: 8 });
-    expect(timedOut).toMatchObject({ support: "control_rejected", pending: null });
+    expect(timedOut).toMatchObject({
+      support: "control_uncertain",
+      pending: null,
+      currentMode: null,
+    });
   });
 
-  it("preserves granted state and mode after an ordinary command timeout", () => {
+  it("invalidates granted control and mode after an ordinary command timeout", () => {
     const pending = reduceFtmsControl(grantedState(ControlMode.ERG), {
       type: "commandSent",
       opcode: FTMS_OPCODES.SET_TARGET_POWER,
@@ -332,9 +334,57 @@ describe("FTMS control reducer", () => {
     });
     const timedOut = reduceFtmsControl(pending, { type: "timeout", generation: 9 });
     expect(timedOut).toMatchObject({
-      support: "control_granted",
-      currentMode: ControlMode.ERG,
+      support: "control_uncertain",
+      currentMode: null,
       pending: null,
+    });
+  });
+
+  it("blocks commands and ignores a delayed same-opcode response while uncertain", () => {
+    const pending = reduceFtmsControl(grantedState(ControlMode.RESISTANCE), {
+      type: "commandSent",
+      opcode: FTMS_OPCODES.SET_TARGET_POWER,
+      generation: 9,
+      requestedMode: ControlMode.ERG,
+    });
+    const timedOut = reduceFtmsControl(pending, { type: "timeout", generation: 9 });
+    const blocked = reduceFtmsControl(timedOut, {
+      type: "commandSent",
+      opcode: FTMS_OPCODES.SET_TARGET_POWER,
+      generation: 10,
+      requestedMode: ControlMode.ERG,
+    });
+    const delayed = reduceFtmsControl(blocked, {
+      type: "responseReceived",
+      generation: 10,
+      response: response(FTMS_OPCODES.SET_TARGET_POWER),
+    });
+
+    expect(blocked).toBe(timedOut);
+    expect(delayed).toBe(timedOut);
+  });
+
+  it("requires explicit recovery before control can be requested again", () => {
+    const requesting = reduceFtmsControl(capableState(), {
+      type: "requestControlSent",
+      generation: 8,
+    });
+    const timedOut = reduceFtmsControl(requesting, { type: "timeout", generation: 8 });
+    const blocked = reduceFtmsControl(timedOut, {
+      type: "requestControlSent",
+      generation: 9,
+    });
+    const recovered = reduceFtmsControl(timedOut, { type: "recoveryCompleted" });
+    const retried = reduceFtmsControl(recovered, {
+      type: "requestControlSent",
+      generation: 9,
+    });
+
+    expect(blocked).toBe(timedOut);
+    expect(recovered.support).toBe("control_capable");
+    expect(retried).toMatchObject({
+      support: "control_requesting",
+      pending: { opcode: FTMS_OPCODES.REQUEST_CONTROL, generation: 9 },
     });
   });
 
@@ -345,6 +395,19 @@ describe("FTMS control reducer", () => {
       generation: 10,
     });
     expect(reduceFtmsControl(pending, { type: "timeout", generation: 9 })).toBe(pending);
+  });
+
+  it.each([
+    FTMS_OPCODES.REQUEST_CONTROL,
+    FTMS_OPCODES.RESPONSE_CODE,
+    0x15,
+    -1,
+    Number.NaN,
+  ])("rejects invalid command opcode $opcode", (opcode) => {
+    const granted = grantedState();
+    expect(reduceFtmsControl(granted, { type: "commandSent", opcode, generation: 10 })).toBe(
+      granted,
+    );
   });
 
   it("clears pending work and mode on permission-loss status", () => {

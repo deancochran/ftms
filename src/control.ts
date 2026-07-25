@@ -1,5 +1,6 @@
+import { toBytes } from "./binary.js";
 import { FTMS_OPCODES, FTMS_RESULT_CODES } from "./constants.js";
-import type { ControlMode, FTMSResponse, FtmsControlSupportLevel } from "./types.js";
+import type { FTMSResponse } from "./types.js";
 
 export type FtmsControlRequest =
   | { op: "requestControl" }
@@ -361,7 +362,7 @@ export function getFtmsResultCodeName(resultCode: number): string {
 export function decodeFtmsControlResponse(
   data: ArrayBuffer | Uint8Array,
 ): FtmsResponseDecodeResult {
-  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
+  const bytes = toBytes(data);
   if (bytes.byteLength < 3) {
     return {
       ok: false,
@@ -402,175 +403,4 @@ export function decodeFtmsControlResponse(
       ...(bytes.byteLength > 3 ? { parameters: bytes.slice(3) } : {}),
     },
   };
-}
-
-export interface FtmsPendingOperation {
-  opcode: number;
-  generation: number;
-  requestedMode: ControlMode | null;
-  reset: boolean;
-}
-
-export interface FtmsControlReducerState {
-  support: FtmsControlSupportLevel;
-  pending: FtmsPendingOperation | null;
-  currentMode: ControlMode | null;
-  disposed: boolean;
-}
-
-export type FtmsControlReducerEvent =
-  | { type: "capabilityDiscovered" }
-  | { type: "requestControlSent"; generation: number }
-  | {
-      type: "commandSent";
-      opcode: number;
-      generation: number;
-      requestedMode?: ControlMode;
-    }
-  | { type: "responseReceived"; response: FTMSResponse; generation: number }
-  | { type: "timeout"; generation: number }
-  | { type: "permissionLost" }
-  | { type: "disconnected" }
-  | { type: "disposed" };
-
-export function createInitialFtmsControlState(): FtmsControlReducerState {
-  return {
-    support: "metrics_only",
-    pending: null,
-    currentMode: null,
-    disposed: false,
-  };
-}
-
-/** @experimental Transport-agnostic state helper; the caller still owns GATT serialization. */
-export const initialFtmsControlState: Readonly<FtmsControlReducerState> = Object.freeze(
-  createInitialFtmsControlState(),
-);
-
-/**
- * @experimental Reduces legal single-flight control transitions. Invalid or
- * superseding events return the existing state unchanged.
- */
-export function reduceFtmsControl(
-  state: FtmsControlReducerState,
-  event: FtmsControlReducerEvent,
-): FtmsControlReducerState {
-  if (state.disposed) {
-    return state;
-  }
-
-  switch (event.type) {
-    case "capabilityDiscovered":
-      return state.support === "metrics_only" ||
-        state.support === "control_rejected" ||
-        state.support === "control_lost"
-        ? { ...state, support: "control_capable" }
-        : state;
-    case "requestControlSent": {
-      const canRequestControl =
-        state.support === "control_capable" ||
-        state.support === "control_rejected" ||
-        state.support === "control_lost";
-      if (!canRequestControl || state.pending !== null) {
-        return state;
-      }
-      return {
-        ...state,
-        support: "control_requesting",
-        pending: {
-          opcode: FTMS_OPCODES.REQUEST_CONTROL,
-          generation: event.generation,
-          requestedMode: null,
-          reset: false,
-        },
-      };
-    }
-    case "commandSent": {
-      if (state.support !== "control_granted" || state.pending !== null) {
-        return state;
-      }
-      const reset = event.opcode === FTMS_OPCODES.RESET;
-      return {
-        ...state,
-        support: reset ? "control_lost" : state.support,
-        currentMode: reset ? null : state.currentMode,
-        pending: {
-          opcode: event.opcode,
-          generation: event.generation,
-          requestedMode: event.requestedMode ?? null,
-          reset,
-        },
-      };
-    }
-    case "responseReceived": {
-      const pending = state.pending;
-      if (
-        pending === null ||
-        pending.generation !== event.generation ||
-        pending.opcode !== event.response.requestOpCode
-      ) {
-        return state;
-      }
-
-      const responseSucceeded = event.response.resultCode === FTMS_RESULT_CODES.SUCCESS;
-      if (!responseSucceeded) {
-        const controlLost = event.response.resultCode === FTMS_RESULT_CODES.CONTROL_NOT_PERMITTED;
-        const requestRejected = pending.opcode === FTMS_OPCODES.REQUEST_CONTROL;
-        return {
-          ...state,
-          support: controlLost
-            ? "control_lost"
-            : requestRejected
-              ? "control_rejected"
-              : state.support,
-          currentMode: controlLost ? null : state.currentMode,
-          pending: null,
-        };
-      }
-
-      if (pending.opcode === FTMS_OPCODES.REQUEST_CONTROL) {
-        return { ...state, support: "control_granted", pending: null };
-      }
-      if (pending.reset) {
-        return {
-          ...state,
-          support: "control_capable",
-          pending: null,
-          currentMode: null,
-        };
-      }
-      return {
-        ...state,
-        pending: null,
-        currentMode: pending.requestedMode ?? state.currentMode,
-      };
-    }
-    case "timeout":
-      if (state.pending?.generation !== event.generation) {
-        return state;
-      }
-      return {
-        ...state,
-        support:
-          state.pending.opcode === FTMS_OPCODES.REQUEST_CONTROL
-            ? "control_rejected"
-            : state.support,
-        pending: null,
-      };
-    case "permissionLost":
-    case "disconnected":
-      return {
-        ...state,
-        support: "control_lost",
-        pending: null,
-        currentMode: null,
-      };
-    case "disposed":
-      return {
-        support: "metrics_only",
-        pending: null,
-        currentMode: null,
-        disposed: true,
-      };
-  }
 }
