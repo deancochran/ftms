@@ -17,7 +17,7 @@ concurrency:
 jobs:
   publish:
     if: github.ref == 'refs/heads/main'
-    name: Validate npm trusted publishing
+    name: Verify and publish package
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -56,17 +56,16 @@ jobs:
       - name: Verify source and packed artifact
         run: pnpm verify
 
-      - name: Prepare diagnostic patch version
-        id: diagnostic
+      - name: Prepare automatic patch version
+        id: release
         shell: bash
         run: |
           package_name=$(node --input-type=module -e 'import manifest from "./package.json" with { type: "json" }; process.stdout.write(manifest.name)')
           base_version=$(node --input-type=module -e 'import manifest from "./package.json" with { type: "json" }; process.stdout.write(manifest.version)')
 
           if ! npm view "$package_name" version >/dev/null 2>&1; then
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "Initial package publication is required before trusted publishing can run." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+            echo "::error::Unable to verify $package_name on the public npm registry."
+            exit 1
           fi
 
           major_minor=${base_version%.*}
@@ -82,13 +81,13 @@ jobs:
           echo "version=$release_version" >> "$GITHUB_OUTPUT"
 
       - name: Require unpublished diagnostic version
-        if: steps.diagnostic.outputs.publish != 'true'
+        if: github.event_name == 'workflow_dispatch' && steps.release.outputs.publish != 'true'
         run: |
           echo "::error::Unable to prepare an unpublished version for OIDC validation."
           exit 1
 
       - name: Validate npm trusted publishing
-        if: steps.diagnostic.outputs.publish == 'true'
+        if: github.event_name == 'workflow_dispatch' && steps.release.outputs.publish == 'true'
         shell: bash
         env:
           NPM_CONFIG_DRY_RUN: "true"
@@ -103,3 +102,13 @@ jobs:
           fi
 
           echo "npm OIDC token exchange succeeded during a dry run; no package was published." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish with npm trusted publishing
+        if: github.event_name == 'push' && steps.release.outputs.publish == 'true'
+        run: npm publish --access public --loglevel verbose
+
+      - name: Record release
+        if: github.event_name == 'push' && steps.release.outputs.publish == 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: echo "Published @deancochran/ftms@$RELEASE_VERSION with npm provenance." >> "$GITHUB_STEP_SUMMARY"
