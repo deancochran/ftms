@@ -95,7 +95,7 @@ jobs:
         run: |
           set -euo pipefail
           log_file="$RUNNER_TEMP/npm-publish-dry-run.log"
-          npm publish --access public --dry-run --loglevel verbose 2>&1 | tee "$log_file"
+          npm publish --access public --dry-run --ignore-scripts --loglevel verbose 2>&1 | tee "$log_file"
 
           if ! grep -Fq "npm verbose oidc Successfully retrieved and set token" "$log_file"; then
             echo "::error::npm OIDC token exchange did not succeed."
