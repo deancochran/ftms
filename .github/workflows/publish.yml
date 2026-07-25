@@ -35,7 +35,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install trusted-publishing npm CLI
-        run: npm install --global npm@11.6.2
+        run: npm install --global npm@11.18.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
