@@ -249,13 +249,15 @@ describe("FTMS Control Point request encoding", () => {
 
 describe("FTMS Control Point response decoding", () => {
   it.each([
-    { code: 0x01, name: "success", success: true },
-    { code: 0x02, name: "not_supported", success: false },
-    { code: 0x03, name: "invalid_parameter", success: false },
-    { code: 0x04, name: "operation_failed", success: false },
-    { code: 0x05, name: "control_not_permitted", success: false },
-    { code: 0x06, name: "unknown_0x06", success: false },
-  ])("decodes result code 0x$code", ({ code, name, success }) => {
+    { code: 0x00, name: "unknown_0x00", success: false, reserved: true },
+    { code: 0x01, name: "success", success: true, reserved: false },
+    { code: 0x02, name: "not_supported", success: false, reserved: false },
+    { code: 0x03, name: "invalid_parameter", success: false, reserved: false },
+    { code: 0x04, name: "operation_failed", success: false, reserved: false },
+    { code: 0x05, name: "control_not_permitted", success: false, reserved: false },
+    { code: 0x06, name: "unknown_0x06", success: false, reserved: true },
+    { code: 0xff, name: "unknown_0xff", success: false, reserved: true },
+  ])("decodes result code 0x$code", ({ code, name, success, reserved }) => {
     const result = decodeFtmsControlResponse(Uint8Array.of(0x80, 0x05, code));
     expect(result).toMatchObject({
       ok: true,
@@ -264,16 +266,90 @@ describe("FTMS Control Point response decoding", () => {
         resultCode: code,
         resultCodeName: name,
         success,
+        parameter: { kind: "none" },
+      },
+    });
+    if (result.ok) {
+      expect(result.value.issues.map(({ code: issueCode }) => issueCode)).toEqual(
+        reserved ? ["reserved_value"] : [],
+      );
+    }
+  });
+
+  it("decodes successful Spin Down target speeds", () => {
+    expect(
+      decodeFtmsControlResponse(Uint8Array.of(0x80, 0x13, 0x01, 0xe8, 0x03, 0x88, 0x13), {
+        spinDownAction: "start",
+      }),
+    ).toEqual({
+      ok: true,
+      value: {
+        requestOpCode: 0x13,
+        resultCode: 0x01,
+        resultCodeName: "success",
+        success: true,
+        parameter: {
+          kind: "spin_down_speeds",
+          targetSpeedLowKph: 10,
+          targetSpeedHighKph: 50,
+        },
+        issues: [],
       },
     });
   });
 
-  it("preserves optional response parameters", () => {
-    const result = decodeFtmsControlResponse(Uint8Array.of(0x80, 0x13, 0x01, 0x02, 0x03));
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(Array.from(result.value.parameters ?? [])).toEqual([0x02, 0x03]);
+  it("decodes a successful ignored Spin Down without parameters", () => {
+    expect(
+      decodeFtmsControlResponse(Uint8Array.of(0x80, 0x13, 0x01), {
+        spinDownAction: "ignore",
+      }),
+    ).toMatchObject({
+      ok: true,
+      value: { parameter: { kind: "none" } },
+    });
+  });
+
+  it("accepts every assigned request opcode and rejects every reserved value", () => {
+    for (let requestOpCode = 0x00; requestOpCode <= 0x14; requestOpCode += 1) {
+      expect(decodeFtmsControlResponse(Uint8Array.of(0x80, requestOpCode, 0x01))).toMatchObject({
+        ok: true,
+        value: { requestOpCode },
+      });
     }
+    for (let requestOpCode = 0x15; requestOpCode <= 0xff; requestOpCode += 1) {
+      expect(decodeFtmsControlResponse(Uint8Array.of(0x80, requestOpCode, 0x01))).toMatchObject({
+        ok: false,
+        error: { code: "malformed_response", offset: 1, actual: requestOpCode },
+      });
+    }
+  });
+
+  it.each([
+    { name: "ordinary success with parameters", bytes: [0x80, 0x05, 0x01, 0xaa] },
+    { name: "error with parameters", bytes: [0x80, 0x05, 0x03, 0xaa] },
+    { name: "short Spin Down parameters", bytes: [0x80, 0x13, 0x01, 0x02, 0x03] },
+    {
+      name: "long Spin Down parameters",
+      bytes: [0x80, 0x13, 0x01, 0xe8, 0x03, 0x88, 0x13, 0],
+    },
+  ])("rejects $name", ({ bytes }) => {
+    expect(decodeFtmsControlResponse(Uint8Array.from(bytes))).toMatchObject({
+      ok: false,
+      error: { code: "malformed_response" },
+    });
+  });
+
+  it("uses request context to distinguish Spin Down Start from Ignore", () => {
+    expect(
+      decodeFtmsControlResponse(Uint8Array.of(0x80, 0x13, 0x01), {
+        spinDownAction: "start",
+      }),
+    ).toMatchObject({ ok: false, error: { code: "malformed_response", expected: 7 } });
+    expect(
+      decodeFtmsControlResponse(Uint8Array.of(0x80, 0x13, 0x01, 0xe8, 0x03, 0x88, 0x13), {
+        spinDownAction: "ignore",
+      }),
+    ).toMatchObject({ ok: false, error: { code: "malformed_response", expected: 3 } });
   });
 
   it.each([

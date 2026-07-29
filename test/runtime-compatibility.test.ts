@@ -46,18 +46,26 @@ const compatibilityCases: readonly CompatibilityCase[] = [
   },
   {
     name: "control response decoder",
-    payload: [0x80, 0x05, 0x01, 0xaa],
+    payload: [0x80, 0x13, 0x01, 0xe8, 0x03, 0x88, 0x13],
     evaluate: (input) => {
       const result = decodeFtmsControlResponse(input);
       return (
         result.ok && {
           requestOpCode: result.value.requestOpCode,
           success: result.value.success,
-          parameters: Array.from(result.value.parameters ?? []),
+          parameter: result.value.parameter,
         }
       );
     },
-    expected: { requestOpCode: 0x05, success: true, parameters: [0xaa] },
+    expected: {
+      requestOpCode: 0x13,
+      success: true,
+      parameter: {
+        kind: "spin_down_speeds",
+        targetSpeedLowKph: 10,
+        targetSpeedHighKph: 50,
+      },
+    },
   },
   {
     name: "measurement parser",

@@ -61,12 +61,21 @@ export interface FTMSFeatures {
   heartRateRange?: FtmsSupportedRange;
 }
 
+export type FtmsControlResponseParameter =
+  | { kind: "none" }
+  | {
+      kind: "spin_down_speeds";
+      targetSpeedLowKph: number;
+      targetSpeedHighKph: number;
+    };
+
 export interface FTMSResponse {
   requestOpCode: number;
   resultCode: number;
   resultCodeName: string;
   success: boolean;
-  parameters?: Uint8Array;
+  parameter: FtmsControlResponseParameter;
+  issues: readonly FtmsDiagnostic[];
 }
 
 export interface FtmsRuntimeMetrics {

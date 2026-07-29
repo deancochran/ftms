@@ -342,6 +342,10 @@ export type FtmsResponseDecodeResult =
   | { ok: true; value: FTMSResponse }
   | { ok: false; error: FtmsResponseDecodeError };
 
+export interface FtmsControlResponseContext {
+  spinDownAction?: "start" | "ignore";
+}
+
 export function getFtmsResultCodeName(resultCode: number): string {
   switch (resultCode) {
     case FTMS_RESULT_CODES.SUCCESS:
@@ -361,6 +365,7 @@ export function getFtmsResultCodeName(resultCode: number): string {
 
 export function decodeFtmsControlResponse(
   data: ArrayBuffer | Uint8Array,
+  context: FtmsControlResponseContext = {},
 ): FtmsResponseDecodeResult {
   const bytes = toBytes(data);
   if (bytes.byteLength < 3) {
@@ -392,15 +397,91 @@ export function decodeFtmsControlResponse(
   }
 
   const requestOpCode = view.getUint8(1);
+  if (requestOpCode > FTMS_OPCODES.SET_TARGETED_CADENCE) {
+    return {
+      ok: false,
+      error: {
+        code: "malformed_response",
+        offset: 1,
+        expected: FTMS_OPCODES.SET_TARGETED_CADENCE,
+        actual: requestOpCode,
+        message: "FTMS Control Point response references a reserved request opcode",
+      },
+    };
+  }
+
   const resultCode = view.getUint8(2);
+  const success = resultCode === FTMS_RESULT_CODES.SUCCESS;
+  const issues: FTMSResponse["issues"] =
+    resultCode === 0 || resultCode > FTMS_RESULT_CODES.CONTROL_NOT_PERMITTED
+      ? [{ code: "reserved_value", field: "resultCode", offset: 2, actual: resultCode }]
+      : [];
+
+  if (!success || requestOpCode !== FTMS_OPCODES.SPIN_DOWN_CONTROL) {
+    if (bytes.byteLength !== 3) {
+      return {
+        ok: false,
+        error: {
+          code: "malformed_response",
+          offset: 3,
+          expected: 3,
+          actual: bytes.byteLength,
+          message: "This FTMS Control Point response must not contain response parameters",
+        },
+      };
+    }
+
+    return {
+      ok: true,
+      value: {
+        requestOpCode,
+        resultCode,
+        resultCodeName: getFtmsResultCodeName(resultCode),
+        success,
+        parameter: { kind: "none" },
+        issues,
+      },
+    };
+  }
+
+  const expectedLength = context.spinDownAction === "start" ? 7 : 3;
+  const validLength =
+    context.spinDownAction === undefined
+      ? bytes.byteLength === 3 || bytes.byteLength === 7
+      : bytes.byteLength === expectedLength;
+  if (!validLength) {
+    return {
+      ok: false,
+      error: {
+        code: "malformed_response",
+        offset: 3,
+        expected: context.spinDownAction === undefined ? 7 : expectedLength,
+        actual: bytes.byteLength,
+        message:
+          context.spinDownAction === undefined
+            ? "A successful Spin Down response must contain either zero or four parameter bytes"
+            : `A successful Spin Down ${context.spinDownAction} response has an invalid length`,
+      },
+    };
+  }
+
+  const parameter: FTMSResponse["parameter"] =
+    bytes.byteLength === 7
+      ? {
+          kind: "spin_down_speeds",
+          targetSpeedLowKph: view.getUint16(3, true) / 100,
+          targetSpeedHighKph: view.getUint16(5, true) / 100,
+        }
+      : { kind: "none" };
   return {
     ok: true,
     value: {
       requestOpCode,
       resultCode,
       resultCodeName: getFtmsResultCodeName(resultCode),
-      success: resultCode === FTMS_RESULT_CODES.SUCCESS,
-      ...(bytes.byteLength > 3 ? { parameters: bytes.slice(3) } : {}),
+      success,
+      parameter,
+      issues,
     },
   };
 }

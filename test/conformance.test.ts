@@ -32,7 +32,9 @@ describe("language-neutral conformance corpus v1", () => {
 
   it("has resolvable provenance, mandatory errata, and globally unique IDs", () => {
     const sourceIds = new Set(vectors.provenance.map(({ id }) => id));
-    expect(vectors.errata.map(({ id }) => id)).toEqual(expect.arrayContaining(["E8991", "E9135"]));
+    expect(vectors.errata.map(({ id }) => id)).toEqual(
+      expect.arrayContaining(["E8991", "E9135", "EC23224"]),
+    );
 
     const categories = [
       vectors.features,
@@ -92,7 +94,7 @@ describe("language-neutral conformance corpus v1", () => {
       if (result.ok) {
         expect({
           ...result.value,
-          parameters: Array.from(result.value.parameters ?? []),
+          issues: result.value.issues.map(({ code }) => code),
         }).toEqual(vector.expected);
       }
     }

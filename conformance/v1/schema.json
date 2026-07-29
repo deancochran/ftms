@@ -584,14 +584,39 @@
                       "resultCode",
                       "resultCodeName",
                       "success",
-                      "parameters"
+                      "parameter",
+                      "issues"
                     ],
                     "properties": {
                       "requestOpCode": { "type": "integer" },
                       "resultCode": { "type": "integer" },
                       "resultCodeName": { "type": "string" },
                       "success": { "type": "boolean" },
-                      "parameters": { "$ref": "#/$defs/byteArray" }
+                      "parameter": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "required": ["kind"],
+                            "properties": { "kind": { "const": "none" } },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "required": ["kind", "targetSpeedLowKph", "targetSpeedHighKph"],
+                            "properties": {
+                              "kind": { "const": "spin_down_speeds" },
+                              "targetSpeedLowKph": { "type": "number" },
+                              "targetSpeedHighKph": { "type": "number" }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "issues": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": { "enum": ["reserved_value"] }
+                      }
                     },
                     "additionalProperties": false
                   },

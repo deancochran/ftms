@@ -69,10 +69,18 @@ describe("Training Status", () => {
     );
   });
 
-  it("labels reserved training states without treating them as truncation", () => {
-    const result = parseFtmsTrainingStatus(Uint8Array.of(0, 0x10));
-    expect(result.status?.label).toBe("reserved");
-    expect(result.diagnostics.truncated).toBe(false);
+  it("diagnoses every reserved training state without treating it as truncation", () => {
+    for (let code = 0x10; code <= 0xff; code += 1) {
+      const result = parseFtmsTrainingStatus(Uint8Array.of(0, code));
+      expect(result.status?.label).toBe("reserved");
+      expect(result.diagnostics.truncated).toBe(false);
+      expect(result.diagnostics.issues).toContainEqual({
+        code: "reserved_value",
+        field: "trainingStatus",
+        offset: 1,
+        actual: code,
+      });
+    }
   });
 });
 

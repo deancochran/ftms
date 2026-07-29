@@ -19,6 +19,12 @@
       "title": "Bluetooth Errata Service Release 11",
       "url": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=436247",
       "revision": "E8991/E9135"
+    },
+    {
+      "id": "ec-23224",
+      "title": "Bluetooth Errata Correction 23224: Update Conformance Section",
+      "url": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=572314",
+      "revision": "v1.0 (2023-08-01)"
     }
   ],
   "errata": [
@@ -31,6 +37,11 @@
       "id": "E9135",
       "description": "Apply corrected Cross Trainer field definitions, including stride count resolution 0.1 stride.",
       "source": ["esr11", "gss-r3"]
+    },
+    {
+      "id": "EC23224",
+      "description": "Apply the replacement FTMS 1.0 Section 1.1 conformance language: each capability and each supported implementation option shall be supported as specified.",
+      "source": ["ec-23224"]
     }
   ],
   "features": [
@@ -470,15 +481,33 @@
   ],
   "controlResponses": [
     {
-      "id": "response-success-parameters",
+      "id": "response-spin-down-start",
       "source": ["ftms-1.0"],
-      "bytes": [128, 19, 1, 2, 3],
+      "bytes": [128, 19, 1, 232, 3, 136, 19],
       "expected": {
         "requestOpCode": 19,
         "resultCode": 1,
         "resultCodeName": "success",
         "success": true,
-        "parameters": [2, 3]
+        "parameter": {
+          "kind": "spin_down_speeds",
+          "targetSpeedLowKph": 10,
+          "targetSpeedHighKph": 50
+        },
+        "issues": []
+      }
+    },
+    {
+      "id": "response-spin-down-ignore",
+      "source": ["ftms-1.0"],
+      "bytes": [128, 19, 1],
+      "expected": {
+        "requestOpCode": 19,
+        "resultCode": 1,
+        "resultCodeName": "success",
+        "success": true,
+        "parameter": { "kind": "none" },
+        "issues": []
       }
     },
     {
@@ -490,7 +519,8 @@
         "resultCode": 2,
         "resultCodeName": "not_supported",
         "success": false,
-        "parameters": []
+        "parameter": { "kind": "none" },
+        "issues": []
       }
     },
     {
@@ -502,7 +532,8 @@
         "resultCode": 3,
         "resultCodeName": "invalid_parameter",
         "success": false,
-        "parameters": []
+        "parameter": { "kind": "none" },
+        "issues": []
       }
     },
     {
@@ -514,7 +545,8 @@
         "resultCode": 4,
         "resultCodeName": "operation_failed",
         "success": false,
-        "parameters": []
+        "parameter": { "kind": "none" },
+        "issues": []
       }
     },
     {
@@ -526,7 +558,8 @@
         "resultCode": 5,
         "resultCodeName": "control_not_permitted",
         "success": false,
-        "parameters": []
+        "parameter": { "kind": "none" },
+        "issues": []
       }
     },
     {
@@ -538,7 +571,8 @@
         "resultCode": 6,
         "resultCodeName": "unknown_0x06",
         "success": false,
-        "parameters": []
+        "parameter": { "kind": "none" },
+        "issues": ["reserved_value"]
       }
     },
     {
@@ -551,6 +585,24 @@
       "id": "response-wrong-opcode",
       "source": ["ftms-1.0"],
       "bytes": [129, 5, 1],
+      "expectedError": "malformed_response"
+    },
+    {
+      "id": "response-reserved-request-opcode",
+      "source": ["ftms-1.0"],
+      "bytes": [128, 21, 1],
+      "expectedError": "malformed_response"
+    },
+    {
+      "id": "response-unexpected-parameters",
+      "source": ["ftms-1.0"],
+      "bytes": [128, 5, 1, 170],
+      "expectedError": "malformed_response"
+    },
+    {
+      "id": "response-spin-down-invalid-length",
+      "source": ["ftms-1.0"],
+      "bytes": [128, 19, 1, 2, 3],
       "expectedError": "malformed_response"
     }
   ],
@@ -851,6 +903,15 @@
       "expectedTruncated": false,
       "expectedIssues": ["reserved_flags", "invalid_flags"],
       "expectedStatusCode": 1
+    },
+    {
+      "id": "diagnostic-training-reserved-value",
+      "source": ["ftms-1.0"],
+      "characteristicUuid": "00002ad3-0000-1000-8000-00805f9b34fb",
+      "bytes": [0, 16],
+      "expectedTruncated": false,
+      "expectedIssues": ["reserved_value"],
+      "expectedStatusCode": 16
     },
     {
       "id": "diagnostic-machine-unknown-opcode",

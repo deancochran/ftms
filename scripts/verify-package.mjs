@@ -9,16 +9,7 @@ const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const executable = (name) => (process.platform === "win32" ? `${name}.cmd` : name);
 const sourceManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
 const packagePathSegments = sourceManifest.name.split("/");
-const sourceModules = [
-  "application",
-  "binary",
-  "constants",
-  "control",
-  "features",
-  "index",
-  "parsers",
-  "types",
-];
+const sourceModules = ["binary", "constants", "control", "features", "index", "parsers", "types"];
 const expectedPackageFiles = new Set([
   "CHANGELOG.md",
   "LICENSE",
@@ -195,8 +186,7 @@ try {
     installedManifest.exports?.["."]?.types !== "./dist/index.d.ts" ||
     installedManifest.exports?.["."]?.import !== "./dist/index.js" ||
     installedManifest.exports?.["."]?.["react-native"] !== "./dist/index.js" ||
-    installedManifest.exports?.["./application"]?.types !== "./dist/application.d.ts" ||
-    installedManifest.exports?.["./application"]?.import !== "./dist/application.js" ||
+    installedManifest.exports?.["./application"] !== undefined ||
     installedManifest.exports?.["./conformance/schema"] !== "./conformance/v1/schema.json" ||
     installedManifest.exports?.["./conformance/v1/schema"] !== "./conformance/v1/schema.json"
   ) {
@@ -229,25 +219,6 @@ if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
   await run("node", ["runtime.mjs"], consumerDirectory);
   await run("node", ["--conditions=development", "runtime.mjs"], consumerDirectory);
   await run("node", ["--conditions=react-native", "runtime.mjs"], consumerDirectory);
-
-  await writeFile(
-    path.join(consumerDirectory, "application.mjs"),
-    `import {
-  createInitialFtmsControlState,
-  detectFtmsMachineType,
-  reduceFtmsControl,
-} from "${sourceManifest.name}/application";
-
-const state = reduceFtmsControl(createInitialFtmsControlState(), {
-  type: "capabilityDiscovered",
-});
-if (state.support !== "control_capable") throw new Error("Application reducer mismatch");
-if (detectFtmsMachineType({}).machineType !== "unknown") {
-  throw new Error("Application machine detection mismatch");
-}
-`,
-  );
-  await run("node", ["application.mjs"], consumerDirectory);
 
   await writeFile(
     path.join(consumerDirectory, "conformance.mjs"),
@@ -324,18 +295,12 @@ if (!features.ok || measurement.kind !== "measurement") {
   parseFtmsTreadmillData,
   tryEncodeFtmsControlRequest,
 } from "${sourceManifest.name}";
-import {
-  type FtmsControlReducerState,
-  createInitialFtmsControlState,
-} from "${sourceManifest.name}/application";
 
 const request: FtmsControlRequest = { op: "requestControl" };
 const encoded = tryEncodeFtmsControlRequest(request);
 const parsed: ParsedFtmsPayload = parseFtmsTreadmillData(Uint8Array.of(0, 0, 0, 0));
-const state: FtmsControlReducerState = createInitialFtmsControlState();
 void encoded;
 void parsed;
-void state;
 `,
   );
   await writeFile(

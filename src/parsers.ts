@@ -680,6 +680,10 @@ export function parseFtmsTrainingStatus(data: ArrayBuffer | Uint8Array): ParsedF
   let details: FtmsStatusPayload["details"] = null;
   let bytesRead = Math.min(bytes.byteLength, 2);
 
+  if (code !== null && code > 0x0f) {
+    issues.push({ code: "reserved_value", field: "trainingStatus", offset: 1, actual: code });
+  }
+
   if (flags !== undefined && code !== null) {
     const stringPresent = isBitSet(flags, 0);
     const extendedStringPresent = isBitSet(flags, 1);

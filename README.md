@@ -1,7 +1,7 @@
 # @deancochran/ftms
 
-Runtime-neutral TypeScript codecs and state helpers for the Bluetooth Fitness
-Machine Service (FTMS).
+Runtime-neutral TypeScript codecs for the Bluetooth Fitness Machine Service
+(FTMS).
 
 The package accepts `Uint8Array` or `ArrayBuffer` values and returns typed,
 normalized data. It does not create BLE connections, own GATT subscriptions,
@@ -135,27 +135,6 @@ reported through `ParsedFtmsPayload.diagnostics`.
 The package deliberately does not reassemble notifications marked More Data;
 the caller owns fragment buffering and lifecycle policy.
 
-## Machine detection
-
-Application policy and compatibility helpers are isolated from the protocol root:
-
-```ts
-import {
-  createInitialFtmsControlState,
-  detectFtmsMachineType,
-  reduceFtmsControl,
-} from "@deancochran/ftms/application";
-```
-
-`detectFtmsMachineType` prefers an advertised machine-data characteristic and
-can use a user-confirmed type. Feature-only inference is a heuristic and should
-not be treated as authoritative for safety or UI capability decisions.
-
-The experimental reducer enters `control_uncertain` after any pending procedure
-times out. Drain or invalidate stale indications before dispatching
-`recoveryCompleted`, then request control again. This prevents a delayed response
-from being correlated with a later same-opcode command.
-
 ## Conformance corpus
 
 Versioned, language-neutral regression vectors and their JSON Schema are
@@ -177,17 +156,20 @@ text supplies service semantics where GSS does not. ESR11 and its FTMS errata
 override older text, including the signed 16-bit, 0.1-resolution resistance
 Control Point correction.
 
-Mandatory Errata Correction 23224 must be included in any future compliance
-assessment. No Bluetooth compliance or interoperability claim is made here.
+Mandatory Errata Correction 23224 replaces the general conformance language in
+FTMS 1.0 Section 1.1: each capability, and each supported implementation option,
+must be supported as specified. It does not change FTMS wire layouts. The corpus
+records the correction as governing provenance, while qualification and
+caller-owned GATT behavior remain outside this codec package. No Bluetooth
+compliance or interoperability claim is made here.
 
 ## API stability
 
 The package follows semantic versioning. During `0.x`, protocol corrections and
 API cleanup may be released as minor versions. Compatibility projections such
-as `parseFtmsIndoorBikeData` remain available, while application-facing control
-presentation and lifecycle types are exported only from
-`@deancochran/ftms/application`. Prefer complete `ParsedFtmsPayload` parsers for
-new code.
+as `parseFtmsIndoorBikeData` remain available. Application policy, transport
+lifecycle, machine inference, and presentation contracts intentionally remain
+outside this package. Prefer complete `ParsedFtmsPayload` parsers for new code.
 
 ## Development
 

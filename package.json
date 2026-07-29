@@ -1,7 +1,7 @@
 {
   "name": "@deancochran/ftms",
   "version": "0.2.0",
-  "description": "Runtime-neutral TypeScript codecs and state helpers for Bluetooth Fitness Machine Service (FTMS)",
+  "description": "Runtime-neutral TypeScript codecs for Bluetooth Fitness Machine Service (FTMS)",
   "private": false,
   "license": "MIT",
   "author": "Dean Cochran",
@@ -41,13 +41,6 @@
       "development": "./dist/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./application": {
-      "types": "./dist/application.d.ts",
-      "react-native": "./dist/application.js",
-      "development": "./dist/application.js",
-      "import": "./dist/application.js",
-      "default": "./dist/application.js"
     },
     "./conformance/schema": "./conformance/v1/schema.json",
     "./conformance/v1": "./conformance/v1/vectors.json",

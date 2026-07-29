@@ -3,26 +3,27 @@
 All notable changes to `@deancochran/ftms` are documented here. The package
 follows [Semantic Versioning](https://semver.org/).
 
-## 0.2.0 - 2026-07-25
+## 0.2.0 - 2026-07-29
+
+### Breaking
+
+- Removed `@deancochran/ftms/application`; application policy, machine inference, presentation,
+  and control lifecycle contracts now remain outside this protocol package.
 
 ### Changed
 
-- Moved application policy, machine detection, and the experimental control reducer to
-  `@deancochran/ftms/application` so the root export remains protocol-focused.
-- Control command timeouts now enter `control_uncertain` and require explicit transport recovery
-  before control can be requested again.
+- Added authoritative provenance for mandatory Correction 23224, which updates FTMS 1.0
+  conformance language without changing wire formats.
+- Reserved Control Point request opcodes are now rejected, and reserved Training Status and result
+  values produce diagnostics.
 - Corrected Cross Trainer stride-count scaling and unavailable step-rate handling from the pinned
   Bluetooth GSS definitions.
-- Expanded the versioned conformance corpus to cover features, ranges, responses, diagnostics,
-  optional fields, unavailable values, and mandatory FTMS errata.
-- Releases now publish only from a matching source-controlled version tag.
 
 ### Added
 
 - Cross-realm and offset binary-view compatibility across public decoders and parsers.
-- A version-coupled `@deancochran/ftms/conformance/v1/schema` export.
-- Packed-artifact browser bundling, content allowlist, source-map, and runtime-neutrality checks.
-- Lefthook pre-push test enforcement for contributors.
+- Expanded versioned conformance vectors and schema, plus packed-artifact browser,
+  runtime-neutrality, export, and source-map verification.
 
 ## 0.1.0 - 2026-07-24
 
