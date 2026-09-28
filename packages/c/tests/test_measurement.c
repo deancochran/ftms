@@ -4,6 +4,8 @@
 
 #define BIT(f) (UINT64_C(1) << (f))
 
+static void same_measurement(const ftms_measurement *left, const ftms_measurement *right);
+
 static void one(ftms_measurement_kind kind, uint32_t flags, ftms_measurement_field field,
                 int32_t value) {
   ftms_measurement in, decoded;
@@ -280,8 +282,11 @@ static void record_assembly(void) {
                              UINT64_C(0x9cfe20), UINT64_C(0xe62ff84), UINT64_C(0x3062fe07)};
   size_t k;
   for (k = 0U; k < sizeof kinds / sizeof *kinds; ++k) {
-    ftms_measurement source, out; ftms_measurement_packet packets[32];
-    ftms_record_context context; size_t count, i;
+    ftms_measurement source, out, formatted_out, pending, formatted_pending;
+    ftms_measurement_packet packets[32];
+    ftms_record_context context;
+    ftms_record_format_context formatted_context;
+    size_t count, i;
     memset(&source, 0, sizeof source); source.kind = kinds[k]; source.flags = flags[k];
     source.present = fields[k];
     for (i = 0U; i < FTMS_MEASUREMENT_FIELD_COUNT; ++i) source.value[i] = (int32_t)(i + 10U);
@@ -292,12 +297,24 @@ static void record_assembly(void) {
     if (k == 1U) source.flags |= UINT32_C(0x8000);
     assert(ftms_measurement_plan(&source, 20U, packets, 32U, &count) == FTMS_OK && count > 1U);
     memset(&out, 0xa5, sizeof out);
+    memset(&formatted_out, 0xa5, sizeof formatted_out);
+    pending = out;
+    formatted_pending = formatted_out;
     assert(ftms_record_init(&context, kinds[k], 7U, 10U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_init_with_format(&formatted_context, kinds[k], NULL, 7U, 10U) == FTMS_RECORD_PENDING);
     for (i = 0U; i < count; ++i) {
       ftms_record_status status = ftms_record_feed(&context, packets[i].value, packets[i].length,
-                                                   7U, (uint32_t)i, &out);
+                                                    7U, (uint32_t)i, &out);
+      ftms_record_status formatted_status = ftms_record_feed_with_format(&formatted_context,
+        packets[i].value, packets[i].length, 7U, (uint32_t)i, &formatted_out);
       assert(status == (i + 1U == count ? FTMS_RECORD_COMPLETE : FTMS_RECORD_PENDING));
+      assert(formatted_status == status);
+      if (status == FTMS_RECORD_PENDING) {
+        same_measurement(&out, &pending);
+        same_measurement(&formatted_out, &formatted_pending);
+      }
     }
+    same_measurement(&out, &formatted_out);
     assert(out.flags == source.flags && out.present == source.present &&
            out.unavailable == source.unavailable && out.more_data == 0U);
     for (i = 0U; i < FTMS_MEASUREMENT_FIELD_COUNT; ++i)
