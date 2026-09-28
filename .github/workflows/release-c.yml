@@ -1,0 +1,134 @@
+name: Release C
+
+on:
+  push:
+    tags: ["c-v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: c-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      tag: ${{ steps.metadata.outputs.tag }}
+      commit: ${{ steps.metadata.outputs.commit }}
+      sha256: ${{ steps.metadata.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - name: Validate tag, version, changelog and main ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(cat packages/c/VERSION)
+          test "$GITHUB_REF_TYPE" = tag
+          test "$GITHUB_REF_NAME" = "c-v$version"
+          grep -Fx "## $version" packages/c/CHANGELOG.md
+          test -z "$(git status --porcelain --untracked-files=all)"
+          git merge-base --is-ancestor HEAD origin/main
+      - name: Install native verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc g++ clang libclang-rt-dev make python3-venv cmake ninja-build pkg-config
+          python3 -m venv "$RUNNER_TEMP/ftms-c-tests"
+          "$RUNNER_TEMP/ftms-c-tests/bin/pip" install -r packages/c/requirements-test.txt
+          echo "$RUNNER_TEMP/ftms-c-tests/bin" >> "$GITHUB_PATH"
+      - name: Verify source and installation
+        run: |
+          make -C packages/c BUILD=build/release-readiness test
+          python3 -m unittest discover -s packages/c/tests -p test_source_bundle.py
+          python3 packages/c/scripts/verify-cmake.py
+      - name: Build and test the exact release artifact
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 packages/c/scripts/source-bundle.py --release
+          archive="packages/c/build/source-candidate/ftms-c-$(cat packages/c/VERSION).tar.gz"
+          python3 packages/c/scripts/verify-source-bundle.py --archive "$archive"
+          echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "$archive" | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: c-source-release
+          path: packages/c/build/source-candidate/*
+          if-no-files-found: error
+
+  consumers:
+    needs: gate
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: c-source-release
+          path: artifact
+      - name: Test downloaded artifact with native platform compiler
+        shell: bash
+        env:
+          EXPECTED_SHA256: ${{ needs.gate.outputs.sha256 }}
+        run: |
+          python -c "import hashlib,os,pathlib; p=list(pathlib.Path('artifact').glob('*.tar.gz')); assert len(p)==1; assert hashlib.sha256(p[0].read_bytes()).hexdigest()==os.environ['EXPECTED_SHA256']"
+          python packages/c/scripts/verify-source-bundle.py --archive "artifact/ftms-c-$(cat packages/c/VERSION).tar.gz"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        if: runner.os == 'Linux'
+        with:
+          repository: microsoft/vcpkg
+          ref: 58845ed63eb19aff55e896ea1f5d51f2a0df5b66
+          path: packages/c/build/vcpkg-tool
+      - name: Test Conan and vcpkg against the exact release artifact
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build gcc g++ curl zip unzip tar python3-venv pkg-config
+          python3 -m venv "$RUNNER_TEMP/conan"
+          "$RUNNER_TEMP/conan/bin/pip" install conan==2.32.0
+          packages/c/build/vcpkg-tool/bootstrap-vcpkg.sh -disableMetrics
+          python3 packages/c/scripts/verify-package-managers.py \
+            "artifact/ftms-c-$(cat packages/c/VERSION).tar.gz" \
+            --conan "$RUNNER_TEMP/conan/bin/conan" --vcpkg "$PWD/packages/c/build/vcpkg-tool/vcpkg"
+
+  release:
+    needs: [gate, consumers]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: c-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: c-source-release
+          path: artifact
+      - name: Publish only the verified immutable source artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.gate.outputs.tag }}
+          EXPECTED_SHA256: ${{ needs.gate.outputs.sha256 }}
+        run: |
+          set -euo pipefail
+          python -c "import hashlib,os,pathlib; p=list(pathlib.Path('artifact').glob('*.tar.gz')); assert len(p)==1; assert hashlib.sha256(p[0].read_bytes()).hexdigest()==os.environ['EXPECTED_SHA256']"
+          (cd artifact && sha256sum -c ./*.sha256)
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Refusing to modify an existing release"; exit 1
+          fi
+          gh release create "$RELEASE_TAG" artifact/* --verify-tag --title "FTMS C ${RELEASE_TAG#c-v}" \
+            --notes "Portable C99 source package. All codec and artifact checks passed. Registry submissions are separate. No board or Bluetooth qualification is implied."

@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/@FTMS_PC_PREFIX_RELATIVE@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: ftms
+Description: Portable C99 Fitness Machine Service protocol codecs
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -lftms
+Cflags: -I${includedir}

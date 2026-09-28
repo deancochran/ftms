@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ftms:controls:conformance:v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "specificationBasis", "requests", "responses", "invalid"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "specificationBasis": {"type": "string", "minLength": 1},
+    "requests": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/requestCase"}},
+    "responses": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/responseCase"}},
+    "invalid": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/invalidCase"}}
+  },
+  "$defs": {
+    "byte": {"type": "integer", "minimum": 0, "maximum": 255},
+    "u16": {"type": "integer", "minimum": 0, "maximum": 65535},
+    "flag": {"type": "integer", "enum": [0, 1]},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "bytes": {"type": "array", "items": {"$ref": "#/$defs/byte"}},
+    "request": {
+      "type": "object", "additionalProperties": false, "required": ["opcode", "operands"],
+      "properties": {"opcode": {"type": "integer", "minimum": 0, "maximum": 20},
+        "operands": {"type": "array", "maxItems": 5, "items": {"type": "integer", "minimum": -32768, "maximum": 4294967295}}}
+    },
+    "response": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requestOpcode", "resultCode", "parameter", "low", "high", "unknownRequest", "unknownResult", "unexpectedParameters"],
+      "properties": {
+        "requestOpcode": {"$ref": "#/$defs/byte"}, "resultCode": {"$ref": "#/$defs/byte"},
+        "parameter": {"$ref": "#/$defs/flag"}, "low": {"$ref": "#/$defs/u16"}, "high": {"$ref": "#/$defs/u16"},
+        "unknownRequest": {"$ref": "#/$defs/flag"}, "unknownResult": {"$ref": "#/$defs/flag"},
+        "unexpectedParameters": {"$ref": "#/$defs/flag"}
+      }
+    },
+    "requestCase": {
+      "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "operation": {"const": "request"},
+        "bytes": {"$ref": "#/$defs/bytes"}, "decoded": {"$ref": "#/$defs/request"}, "encode": {"const": true}}
+    },
+    "responseCase": {
+      "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "operation": {"const": "response"},
+        "bytes": {"$ref": "#/$defs/bytes"}, "decoded": {"$ref": "#/$defs/response"}, "encode": {"type": "boolean"}}
+    },
+    "invalidCase": {
+      "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "error"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "operation": {"enum": ["request", "response"]},
+        "bytes": {"$ref": "#/$defs/bytes"}, "error": {"enum": ["kind", "length", "range"]}}
+    }
+  }
+}

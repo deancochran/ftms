@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 1,
+  "specificationBasis": "FTMS 1.0 Control Point; ESR11 signed resistance correction",
+  "requests": [
+    {
+      "id": "request-opcode-00",
+      "operation": "request",
+      "bytes": [
+        0
+      ],
+      "decoded": {
+        "opcode": 0,
+        "operands": []
+      }
+    },
+    {
+      "id": "request-opcode-01",
+      "operation": "request",
+      "bytes": [
+        1
+      ],
+      "decoded": {
+        "opcode": 1,
+        "operands": []
+      }
+    },
+    {
+      "id": "request-opcode-02",
+      "operation": "request",
+      "bytes": [
+        2,
+        210,
+        4
+      ],
+      "decoded": {
+        "opcode": 2,
+        "operands": [
+          1234
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-03",
+      "operation": "request",
+      "bytes": [
+        3,
+        133,
+        255
+      ],
+      "decoded": {
+        "opcode": 3,
+        "operands": [
+          -123
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-04",
+      "operation": "request",
+      "bytes": [
+        4,
+        246,
+        255
+      ],
+      "decoded": {
+        "opcode": 4,
+        "operands": [
+          -10
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-05",
+      "operation": "request",
+      "bytes": [
+        5,
+        250,
+        0
+      ],
+      "decoded": {
+        "opcode": 5,
+        "operands": [
+          250
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-06",
+      "operation": "request",
+      "bytes": [
+        6,
+        180
+      ],
+      "decoded": {
+        "opcode": 6,
+        "operands": [
+          180
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-07",
+      "operation": "request",
+      "bytes": [
+        7
+      ],
+      "decoded": {
+        "opcode": 7,
+        "operands": []
+      }
+    },
+    {
+      "id": "request-opcode-08",
+      "operation": "request",
+      "bytes": [
+        8,
+        1
+      ],
+      "decoded": {
+        "opcode": 8,
+        "operands": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-09",
+      "operation": "request",
+      "bytes": [
+        9,
+        88,
+        2
+      ],
+      "decoded": {
+        "opcode": 9,
+        "operands": [
+          600
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-10",
+      "operation": "request",
+      "bytes": [
+        10,
+        42,
+        0
+      ],
+      "decoded": {
+        "opcode": 10,
+        "operands": [
+          42
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-11",
+      "operation": "request",
+      "bytes": [
+        11,
+        43,
+        0
+      ],
+      "decoded": {
+        "opcode": 11,
+        "operands": [
+          43
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-12",
+      "operation": "request",
+      "bytes": [
+        12,
+        0,
+        0,
+        1
+      ],
+      "decoded": {
+        "opcode": 12,
+        "operands": [
+          65536
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-13",
+      "operation": "request",
+      "bytes": [
+        13,
+        16,
+        14
+      ],
+      "decoded": {
+        "opcode": 13,
+        "operands": [
+          3600
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-14",
+      "operation": "request",
+      "bytes": [
+        14,
+        1,
+        0,
+        2,
+        0
+      ],
+      "decoded": {
+        "opcode": 14,
+        "operands": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-15",
+      "operation": "request",
+      "bytes": [
+        15,
+        1,
+        0,
+        2,
+        0,
+        3,
+        0
+      ],
+      "decoded": {
+        "opcode": 15,
+        "operands": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-16",
+      "operation": "request",
+      "bytes": [
+        16,
+        1,
+        0,
+        2,
+        0,
+        3,
+        0,
+        4,
+        0,
+        5,
+        0
+      ],
+      "decoded": {
+        "opcode": 16,
+        "operands": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-17",
+      "operation": "request",
+      "bytes": [
+        17,
+        156,
+        255,
+        125,
+        0,
+        3,
+        4
+      ],
+      "decoded": {
+        "opcode": 17,
+        "operands": [
+          -100,
+          125,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-18",
+      "operation": "request",
+      "bytes": [
+        18,
+        52,
+        8
+      ],
+      "decoded": {
+        "opcode": 18,
+        "operands": [
+          2100
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-19",
+      "operation": "request",
+      "bytes": [
+        19,
+        2
+      ],
+      "decoded": {
+        "opcode": 19,
+        "operands": [
+          2
+        ]
+      }
+    },
+    {
+      "id": "request-opcode-20",
+      "operation": "request",
+      "bytes": [
+        20,
+        120,
+        0
+      ],
+      "decoded": {
+        "opcode": 20,
+        "operands": [
+          120
+        ]
+      }
+    },
+    {
+      "id": "request-speed-max",
+      "operation": "request",
+      "bytes": [
+        2,
+        255,
+        255
+      ],
+      "decoded": {
+        "opcode": 2,
+        "operands": [
+          65535
+        ]
+      }
+    },
+    {
+      "id": "request-inclination-min",
+      "operation": "request",
+      "bytes": [
+        3,
+        0,
+        128
+      ],
+      "decoded": {
+        "opcode": 3,
+        "operands": [
+          -32768
+        ]
+      }
+    }
+  ],
+  "responses": [
+    {
+      "id": "response-success",
+      "operation": "response",
+      "bytes": [
+        128,
+        0,
+        1
+      ],
+      "decoded": {
+        "requestOpcode": 0,
+        "resultCode": 1,
+        "parameter": 0,
+        "low": 0,
+        "high": 0,
+        "unknownRequest": 0,
+        "unknownResult": 0,
+        "unexpectedParameters": 0
+      }
+    },
+    {
+      "id": "response-not-supported",
+      "operation": "response",
+      "bytes": [
+        128,
+        2,
+        2
+      ],
+      "decoded": {
+        "requestOpcode": 2,
+        "resultCode": 2,
+        "parameter": 0,
+        "low": 0,
+        "high": 0,
+        "unknownRequest": 0,
+        "unknownResult": 0,
+        "unexpectedParameters": 0
+      }
+    },
+    {
+      "id": "response-spin-speeds",
+      "operation": "response",
+      "bytes": [
+        128,
+        19,
+        1,
+        100,
+        0,
+        200,
+        0
+      ],
+      "decoded": {
+        "requestOpcode": 19,
+        "resultCode": 1,
+        "parameter": 1,
+        "low": 100,
+        "high": 200,
+        "unknownRequest": 0,
+        "unknownResult": 0,
+        "unexpectedParameters": 0
+      }
+    },
+    {
+      "id": "response-unknown-request",
+      "operation": "response",
+      "bytes": [
+        128,
+        250,
+        2
+      ],
+      "decoded": {
+        "requestOpcode": 250,
+        "resultCode": 2,
+        "parameter": 0,
+        "low": 0,
+        "high": 0,
+        "unknownRequest": 1,
+        "unknownResult": 0,
+        "unexpectedParameters": 0
+      }
+    },
+    {
+      "id": "response-unknown-result",
+      "operation": "response",
+      "bytes": [
+        128,
+        2,
+        99
+      ],
+      "decoded": {
+        "requestOpcode": 2,
+        "resultCode": 99,
+        "parameter": 0,
+        "low": 0,
+        "high": 0,
+        "unknownRequest": 0,
+        "unknownResult": 1,
+        "unexpectedParameters": 0
+      },
+      "encode": false
+    },
+    {
+      "id": "response-trailing-diagnostic",
+      "operation": "response",
+      "bytes": [
+        128,
+        2,
+        1,
+        7
+      ],
+      "decoded": {
+        "requestOpcode": 2,
+        "resultCode": 1,
+        "parameter": 0,
+        "low": 0,
+        "high": 0,
+        "unknownRequest": 0,
+        "unknownResult": 0,
+        "unexpectedParameters": 1
+      },
+      "encode": false
+    }
+  ],
+  "invalid": [
+    {
+      "id": "invalid-request-empty",
+      "operation": "request",
+      "bytes": [],
+      "error": "length"
+    },
+    {
+      "id": "invalid-request-opcode",
+      "operation": "request",
+      "bytes": [
+        255
+      ],
+      "error": "kind"
+    },
+    {
+      "id": "invalid-request-length",
+      "operation": "request",
+      "bytes": [
+        2,
+        1
+      ],
+      "error": "length"
+    },
+    {
+      "id": "invalid-request-action",
+      "operation": "request",
+      "bytes": [
+        8,
+        0
+      ],
+      "error": "range"
+    },
+    {
+      "id": "invalid-response-header",
+      "operation": "response",
+      "bytes": [
+        127,
+        2,
+        1
+      ],
+      "error": "kind"
+    },
+    {
+      "id": "invalid-response-length",
+      "operation": "response",
+      "bytes": [
+        128,
+        19,
+        1,
+        1
+      ],
+      "error": "length"
+    }
+  ]
+}

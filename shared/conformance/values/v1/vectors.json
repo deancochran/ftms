@@ -1,0 +1,10 @@
+{"schemaVersion":1,"cases":[
+{"id":"feature-zero","operation":"features","machine":0,"target":0,"expectedBytes":[0,0,0,0,0,0,0,0]},
+{"id":"feature-all-bits","operation":"features","machine":4294967295,"target":4294967295,"expectedBytes":[255,255,255,255,255,255,255,255]},
+{"id":"feature-unknown-bits","operation":"features","machine":2164260335,"target":4026531841,"expectedBytes":[239,253,255,128,1,0,0,240]},
+{"id":"speed-wire-extrema","operation":"range","kind":"speed","minimum":0,"maximum":65535,"increment":1,"scaleDivisor":100,"unit":0,"expectedBytes":[0,0,255,255,1,0]},
+{"id":"inclination-signed-extrema","operation":"range","kind":"inclination","minimum":-32768,"maximum":32767,"increment":65535,"scaleDivisor":10,"unit":1,"expectedBytes":[0,128,255,127,255,255]},
+{"id":"power-negative","operation":"range","kind":"power","minimum":-100,"maximum":4000,"increment":5,"scaleDivisor":1,"unit":4,"expectedBytes":[156,255,160,15,5,0]},
+{"id":"resistance-u8","operation":"range","kind":"resistance","minimum":1,"maximum":255,"increment":1,"scaleDivisor":1,"unit":2,"expectedBytes":[1,255,1]},
+{"id":"heart-rate-u8","operation":"range","kind":"heartRate","minimum":60,"maximum":200,"increment":1,"scaleDivisor":1,"unit":3,"expectedBytes":[60,200,1]}
+]}

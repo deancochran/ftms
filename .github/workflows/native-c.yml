@@ -1,0 +1,86 @@
+name: Native C
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-c-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-managers:
+    name: Conan and vcpkg installed consumers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: microsoft/vcpkg
+          ref: 58845ed63eb19aff55e896ea1f5d51f2a0df5b66
+          path: packages/c/build/vcpkg-tool
+      - name: Prepare isolated package-manager tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build gcc g++ curl zip unzip tar python3-venv pkg-config
+          python3 -m venv "$RUNNER_TEMP/conan"
+          "$RUNNER_TEMP/conan/bin/pip" install conan==2.32.0
+          echo "$RUNNER_TEMP/conan/bin" >> "$GITHUB_PATH"
+          packages/c/build/vcpkg-tool/bootstrap-vcpkg.sh -disableMetrics
+      - name: Test recipes against candidate artifact
+        run: |
+          python3 packages/c/scripts/source-bundle.py
+          python3 packages/c/scripts/verify-package-managers.py \
+            "packages/c/build/source-candidate/ftms-c-$(cat packages/c/VERSION).tar.gz" \
+            --conan conan --vcpkg "$PWD/packages/c/build/vcpkg-tool/vcpkg"
+
+  source-consumers:
+    name: Standalone artifact / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Verify standalone C and C++ installation paths
+        run: python packages/c/scripts/verify-source-bundle.py
+
+  verify:
+    name: C99 and C++11 host verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install host toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc g++ clang libclang-rt-dev make binutils python3-venv cmake ninja-build pkg-config
+
+      - name: Install host-only conformance dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/ftms-c-tests"
+          "$RUNNER_TEMP/ftms-c-tests/bin/python" -m pip install -r packages/c/requirements-test.txt
+          echo "$RUNNER_TEMP/ftms-c-tests/bin" >> "$GITHUB_PATH"
+
+      - name: Verify codecs, corpora, sanitizers and installed consumers
+        run: make -C packages/c BUILD=build/ci test
+
+      - name: Compile Cortex-M0 objects (not board execution)
+        run: make -C packages/c BUILD=build/ci check-embedded
+
+      - name: Verify CMake installation and relocated consumers
+        run: python3 packages/c/scripts/verify-cmake.py
+
+      - name: Verify deterministic extracted source package
+        run: python3 packages/c/scripts/verify-source-bundle.py

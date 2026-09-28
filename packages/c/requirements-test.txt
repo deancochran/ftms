@@ -1,0 +1,2 @@
+# Host conformance tooling only; never a dependency of the C library.
+jsonschema==4.26.0

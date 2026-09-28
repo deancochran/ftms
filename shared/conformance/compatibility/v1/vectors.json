@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "bike-known-resistance-power-elapsed",
+      "kind": 5,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "signed16Tenths",
+        "treadmillPaceFormat": "uint16"
+      },
+      "bytes": [
+        96,
+        8,
+        1,
+        0,
+        120,
+        0,
+        44,
+        1,
+        133,
+        3
+      ],
+      "expected": {
+        "kind": 5,
+        "flags": 2144,
+        "present": 2244609,
+        "unavailable": 0,
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          901,
+          0,
+          0,
+          300,
+          0,
+          0,
+          0,
+          120,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 0,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 10
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "Known literal: signed resistance selection makes bit 5 a 16-bit raw field."
+      }
+    },
+    {
+      "id": "cross-more-data-resistance-power-elapsed",
+      "kind": 1,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "signed16Tenths",
+        "treadmillPaceFormat": "uint16"
+      },
+      "bytes": [
+        129,
+        33,
+        0,
+        120,
+        0,
+        44,
+        1,
+        133,
+        3
+      ],
+      "expected": {
+        "kind": 1,
+        "flags": 8577,
+        "present": 2244608,
+        "unavailable": 0,
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          901,
+          0,
+          0,
+          300,
+          0,
+          0,
+          0,
+          120,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 1,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 9
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "Synthetic More Data record selecting two-byte signed resistance; no physical-device capture is claimed."
+      }
+    },
+    {
+      "id": "rower-more-data-power-before-resistance",
+      "kind": 4,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "signed16Tenths",
+        "treadmillPaceFormat": "uint16"
+      },
+      "bytes": [
+        161,
+        8,
+        44,
+        1,
+        120,
+        0,
+        133,
+        3
+      ],
+      "expected": {
+        "kind": 4,
+        "flags": 2209,
+        "present": 2244608,
+        "unavailable": 0,
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          901,
+          0,
+          0,
+          300,
+          0,
+          0,
+          0,
+          120,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 1,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 8
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "The rower wire order places instantaneous power before resistance."
+      }
+    },
+    {
+      "id": "treadmill-legacy-pace-octets",
+      "kind": 0,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "uint8Whole",
+        "treadmillPaceFormat": "uint8Legacy"
+      },
+      "bytes": [
+        96,
+        4,
+        232,
+        3,
+        42,
+        43,
+        133,
+        3
+      ],
+      "expected": {
+        "kind": 0,
+        "flags": 1120,
+        "present": 16769,
+        "unavailable": 0,
+        "values": [
+          1000,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          42,
+          43,
+          0,
+          0,
+          0,
+          0,
+          0,
+          901,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 0,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 8
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "Explicit legacy pace selection changes each pace field to one octet."
+      }
+    },
+    {
+      "id": "treadmill-default-pace-uint16",
+      "kind": 0,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "uint8Whole",
+        "treadmillPaceFormat": "uint16"
+      },
+      "bytes": [
+        96,
+        4,
+        232,
+        3,
+        42,
+        0,
+        43,
+        0,
+        133,
+        3
+      ],
+      "expected": {
+        "kind": 0,
+        "flags": 1120,
+        "present": 16769,
+        "unavailable": 0,
+        "values": [
+          1000,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          42,
+          43,
+          0,
+          0,
+          0,
+          0,
+          0,
+          901,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 0,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 10
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "Default treadmill pace fields are little-endian uint16 values."
+      }
+    },
+    {
+      "id": "bike-signed-negative-resistance-power",
+      "kind": 5,
+      "area": "measurement",
+      "options": {
+        "resistanceFormat": "signed16Tenths",
+        "treadmillPaceFormat": "uint16"
+      },
+      "bytes": [
+        96,
+        8,
+        1,
+        0,
+        244,
+        255,
+        156,
+        255,
+        1,
+        0
+      ],
+      "expected": {
+        "kind": 5,
+        "flags": 2144,
+        "present": 2244609,
+        "unavailable": 0,
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          -100,
+          0,
+          0,
+          0,
+          -12,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "moreData": 0,
+        "backward": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "reservedFlags": 0,
+        "bytesRead": 10
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 wire layout",
+        "note": "Explicit signed-tenths resistance preserves negative raw resistance values."
+      }
+    },
+    {
+      "id": "resistance-observed-signed-tenths",
+      "kind": "resistance",
+      "area": "range",
+      "options": {
+        "resistanceFormat": "signed16Tenths"
+      },
+      "bytes": [
+        0,
+        0,
+        100,
+        0,
+        1,
+        0
+      ],
+      "expected": {
+        "minimum": 0,
+        "maximum": 100,
+        "increment": 1,
+        "scaleDivisor": 10,
+        "unit": 2,
+        "kind": "resistance"
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "captured-characteristic",
+        "source": "primary source profile",
+        "note": "Observed raw six-byte profile; divisor 10 is conditional layout meaning, not device-verified."
+      }
+    },
+    {
+      "id": "resistance-signed-tenths-bounds",
+      "kind": "resistance",
+      "area": "range",
+      "options": {
+        "resistanceFormat": "signed16Tenths"
+      },
+      "bytes": [
+        0,
+        128,
+        255,
+        127,
+        255,
+        255
+      ],
+      "expected": {
+        "minimum": -32768,
+        "maximum": 32767,
+        "increment": 65535,
+        "scaleDivisor": 10,
+        "unit": 2,
+        "kind": "resistance"
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 Supported Resistance Level Range",
+        "note": "Synthetic signed bounds exercise signed minimum/maximum and unsigned increment."
+      }
+    },
+    {
+      "id": "resistance-default-three-byte",
+      "kind": "resistance",
+      "area": "range",
+      "options": {
+        "resistanceFormat": "uint8Whole"
+      },
+      "bytes": [
+        0,
+        10,
+        1
+      ],
+      "expected": {
+        "minimum": 0,
+        "maximum": 10,
+        "increment": 1,
+        "scaleDivisor": 1,
+        "unit": 2,
+        "kind": "resistance"
+      },
+      "encode": true,
+      "provenance": {
+        "classification": "synthetic-regression",
+        "source": "FTMS 1.0 Supported Resistance Level Range",
+        "note": "Default resistance range remains the three-byte whole-level layout."
+      }
+    }
+  ]
+}

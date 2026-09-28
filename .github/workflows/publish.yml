@@ -53,25 +53,25 @@ jobs:
           node --input-type=module <<'NODE'
           import { appendFileSync, readFileSync } from "node:fs";
 
-          const manifest = JSON.parse(readFileSync("package.json", "utf8"));
+          const manifest = JSON.parse(readFileSync("packages/typescript/package.json", "utf8"));
           const version = manifest.version;
           const semver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 
           if (typeof version !== "string" || !semver.test(version)) {
-            throw new Error(`package.json version is not valid SemVer: ${version}`);
+            throw new Error(`packages/typescript/package.json version is not valid SemVer: ${version}`);
           }
 
           if (process.env.GITHUB_REF_NAME !== `v${version}`) {
-            throw new Error(`tag ${process.env.GITHUB_REF_NAME} must exactly match package.json version v${version}`);
+            throw new Error(`tag ${process.env.GITHUB_REF_NAME} must exactly match packages/typescript/package.json version v${version}`);
           }
 
-          const changelog = readFileSync("CHANGELOG.md", "utf8").split(/\r?\n/);
+          const changelog = readFileSync("packages/typescript/CHANGELOG.md", "utf8").split(/\r?\n/);
           const headings = [`## ${version}`, `## [${version}]`];
           const hasEntry = changelog.some((line) =>
             headings.some((heading) => line === heading || line.startsWith(`${heading} - `)),
           );
           if (!hasEntry) {
-            throw new Error(`CHANGELOG.md must contain a level-two entry for ${version}`);
+            throw new Error(`packages/typescript/CHANGELOG.md must contain a level-two entry for ${version}`);
           }
 
           appendFileSync(process.env.GITHUB_OUTPUT, `name=${manifest.name}\nversion=${version}\n`);
@@ -125,6 +125,7 @@ jobs:
 
       - name: Publish with npm trusted publishing
         if: steps.registry.outputs.publish == 'true'
+        working-directory: packages/typescript
         run: npm publish --access public --provenance --loglevel verbose
 
       - name: Record release
@@ -177,6 +178,7 @@ jobs:
           fi
 
       - name: Exercise npm OIDC exchange without publishing
+        working-directory: packages/typescript
         shell: bash
         env:
           NPM_CONFIG_DRY_RUN: "true"

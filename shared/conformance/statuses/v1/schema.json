@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ftms:statuses:conformance:v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "machine", "training"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "machine": {"type": "array", "minItems": 1, "items": {"allOf": [{"$ref": "#/$defs/case"}, {"properties": {
+      "operation": {"const": "machine"}, "decoded": {"$ref": "#/$defs/machine"}
+    }}]}},
+    "training": {"type": "array", "minItems": 1, "items": {"allOf": [{"$ref": "#/$defs/case"}, {"properties": {
+      "operation": {"const": "training"}, "decoded": {"$ref": "#/$defs/training"}
+    }}]}}
+  },
+  "$defs": {
+    "flag": {"type": "integer", "enum": [0, 1]},
+    "byte": {"type": "integer", "minimum": 0, "maximum": 255},
+    "size": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+    "case": {
+      "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded", "encode"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "operation": {"enum": ["machine", "training"]},
+        "bytes": {"type": "array", "items": {"$ref": "#/$defs/byte"}},
+        "decoded": {"type": "object"}, "encode": {"type": "boolean"}
+      }
+    },
+    "parameter": {
+      "type": "object", "additionalProperties": false, "required": ["opcode", "operands"],
+      "properties": {
+        "opcode": {"type": "integer", "minimum": 0, "maximum": 20},
+        "operands": {"type": "array", "maxItems": 5, "items": {"type": "integer", "minimum": -32768, "maximum": 16777215}}
+      }
+    },
+    "machine": {
+      "type": "object", "additionalProperties": false,
+      "required": ["opcode", "action", "parameter", "unknownOpcode", "reservedValue", "truncated", "trailingBytes"],
+      "properties": {
+        "opcode": {"$ref": "#/$defs/byte"}, "action": {"$ref": "#/$defs/byte"},
+        "parameter": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/parameter"}]},
+        "unknownOpcode": {"$ref": "#/$defs/flag"}, "reservedValue": {"$ref": "#/$defs/flag"},
+        "truncated": {"$ref": "#/$defs/flag"}, "trailingBytes": {"$ref": "#/$defs/flag"}
+      }
+    },
+    "training": {
+      "type": "object", "additionalProperties": false,
+      "required": ["flags", "code", "textOffset", "textSize", "textPresent", "extendedString", "reservedFlags", "reservedValue", "invalidFlags", "invalidUtf8", "truncated", "trailingBytes", "textHex"],
+      "properties": {
+        "flags": {"$ref": "#/$defs/byte"}, "code": {"$ref": "#/$defs/byte"},
+        "textOffset": {"$ref": "#/$defs/size"}, "textSize": {"$ref": "#/$defs/size"},
+        "textPresent": {"$ref": "#/$defs/flag"}, "extendedString": {"$ref": "#/$defs/flag"},
+        "reservedFlags": {"$ref": "#/$defs/byte"}, "reservedValue": {"$ref": "#/$defs/flag"},
+        "invalidFlags": {"$ref": "#/$defs/flag"}, "invalidUtf8": {"$ref": "#/$defs/flag"},
+        "truncated": {"$ref": "#/$defs/flag"}, "trailingBytes": {"$ref": "#/$defs/flag"},
+        "textHex": {"type": "string", "pattern": "^(?:[0-9a-f]{2})*$"}
+      }
+    }
+  }
+}
