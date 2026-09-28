@@ -85,12 +85,7 @@ const rawRangeMetadata: Record<FtmsRangeRaw["kind"], readonly [number, number, n
   power: [6, 1, 4],
 };
 
-/** Decode a Supported Range into its exact raw integer numerators and metadata. */
-export function decodeFtmsRangeRaw(
-  kind: FtmsRangeRaw["kind"],
-  data: ArrayBuffer | Uint8Array,
-  options?: FtmsRangeFormatOptions,
-): FtmsRangeRaw {
+function validateRangeOptions(options?: FtmsRangeFormatOptions): void {
   if (
     options !== undefined &&
     (options === null ||
@@ -104,6 +99,15 @@ export function decodeFtmsRangeRaw(
     !["uint8Whole", "signed16Tenths"].includes(options.resistanceFormat)
   )
     throw new RawCodecError("kind", "Unsupported resistance range format");
+}
+
+/** Decode a Supported Range into its exact raw integer numerators and metadata. */
+export function decodeFtmsRangeRaw(
+  kind: FtmsRangeRaw["kind"],
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsRangeFormatOptions,
+): FtmsRangeRaw {
+  validateRangeOptions(options);
   if (options?.resistanceFormat === "signed16Tenths" && kind !== "resistance")
     throw new RawCodecError("kind", "Signed resistance format applies only to resistance");
   const alternateResistance =
@@ -137,19 +141,7 @@ export function encodeFtmsRangeRaw(
 ): Uint8Array {
   if (typeof range !== "object" || range === null)
     throw new RawCodecError("null", "Raw range value is required");
-  if (
-    options !== undefined &&
-    (options === null ||
-      typeof options !== "object" ||
-      Array.isArray(options) ||
-      Object.keys(options).some((key) => key !== "resistanceFormat"))
-  )
-    throw new RawCodecError("kind", "Range format options must be an options object");
-  if (
-    options?.resistanceFormat !== undefined &&
-    !["uint8Whole", "signed16Tenths"].includes(options.resistanceFormat)
-  )
-    throw new RawCodecError("kind", "Unsupported resistance range format");
+  validateRangeOptions(options);
   if (options?.resistanceFormat === "signed16Tenths") {
     if (range.kind !== "resistance")
       throw new RawCodecError("kind", "Signed resistance format applies only to resistance");
@@ -311,6 +303,7 @@ function rangeError(
 export function decodeFtmsRange(
   kind: FtmsRangeKind,
   data: ArrayBuffer | Uint8Array,
+  options?: FtmsRangeFormatOptions,
 ): FtmsDecodeResult<FtmsRange> {
   if (!(["speed", "inclination", "resistance", "heartRate", "power"] as const).includes(kind)) {
     return {
@@ -325,8 +318,19 @@ export function decodeFtmsRange(
     };
   }
 
+  // Keep normalized callers subject to the same explicit, caller-owned format
+  // validation as raw callers; selections are never inferred from bytes.
+  validateRangeOptions(options);
+  if (options?.resistanceFormat === "signed16Tenths" && kind !== "resistance")
+    throw new RawCodecError("kind", "Signed resistance format applies only to resistance");
   const view = toDataView(data);
-  const expectedLength = kind === "heartRate" || kind === "resistance" ? 3 : 6;
+  const alternateResistance =
+    kind === "resistance" && options?.resistanceFormat === "signed16Tenths";
+  const expectedLength = alternateResistance
+    ? 6
+    : kind === "heartRate" || kind === "resistance"
+      ? 3
+      : 6;
   if (view.byteLength !== expectedLength) {
     return lengthError(view.byteLength, expectedLength);
   }
@@ -362,9 +366,9 @@ export function decodeFtmsRange(
       unit = "bpm";
       break;
     case "resistance":
-      min = view.getUint8(0);
-      max = view.getUint8(1);
-      increment = view.getUint8(2);
+      min = alternateResistance ? view.getInt16(0, true) / 10 : view.getUint8(0);
+      max = alternateResistance ? view.getInt16(2, true) / 10 : view.getUint8(1);
+      increment = alternateResistance ? view.getUint16(4, true) / 10 : view.getUint8(2);
       unit = "level";
       break;
   }
@@ -390,8 +394,9 @@ export function decodeSupportedInclinationRange(
 
 export function decodeSupportedResistanceRange(
   data: ArrayBuffer | Uint8Array,
+  options?: FtmsRangeFormatOptions,
 ): FtmsDecodeResult<FtmsRange> {
-  return decodeFtmsRange("resistance", data);
+  return decodeFtmsRange("resistance", data, options);
 }
 
 export function decodeSupportedHeartRateRange(
@@ -460,7 +465,12 @@ function validateSnapshot(snapshot: FtmsCapabilitySnapshot): void {
 
 /** Evaluate static FTMS declarations and protocol prerequisites. This does not
  * authorize a control procedure or perform BLE/GATT I/O. */
-export function evaluateFtmsCapabilities(snapshot: FtmsCapabilitySnapshot): FtmsCapabilityReport {
+export function evaluateFtmsCapabilities(
+  snapshot: FtmsCapabilitySnapshot,
+  rangeOptions?: FtmsRangeFormatOptions,
+): FtmsCapabilityReport {
+  // Invalid caller format is an API error, not malformed device evidence.
+  validateRangeOptions(rangeOptions);
   validateSnapshot(snapshot);
   const characteristics = snapshot.characteristics;
   const kinds = characteristics.map((c) => capabilityKind(c.uuid));
@@ -519,6 +529,7 @@ export function evaluateFtmsCapabilities(snapshot: FtmsCapabilitySnapshot): Ftms
       const raw = decodeFtmsRangeRaw(
         (["speed", "inclination", "resistance", "heartRate", "power"] as const)[range],
         capabilityBytes(c.bytes),
+        range === 2 ? rangeOptions : undefined,
       );
       return [
         1,

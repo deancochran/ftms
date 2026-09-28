@@ -231,13 +231,21 @@ interface MeasurementDefinition {
   machineType: FtmsMachineType;
   flagBytes: 2 | 3;
   validFlagsMask: number;
-  readFields: (flags: number, reader: FieldReader, metrics: FtmsRuntimeMetrics) => void;
+  readFields: (
+    flags: number,
+    reader: FieldReader,
+    metrics: FtmsRuntimeMetrics,
+    options: FtmsMeasurementFormatOptions | undefined,
+  ) => void;
 }
 
 function parseMeasurement(
   data: ArrayBuffer | Uint8Array,
   definition: MeasurementDefinition,
+  options?: FtmsMeasurementFormatOptions,
 ): ParsedFtmsPayload {
+  // Validate before parsing any bytes, even when this family does not use a selection.
+  formattedRawDef(0, options);
   const view = toDataView(data);
   const metrics = createEmptyMetrics();
 
@@ -271,7 +279,7 @@ function parseMeasurement(
   }
 
   const reader = new FieldReader(view, definition.flagBytes);
-  definition.readFields(flags, reader, metrics);
+  definition.readFields(flags, reader, metrics, options);
   const moreData = isBitSet(flags, 0);
 
   if (moreData) {
@@ -313,323 +321,388 @@ function parseMeasurement(
   };
 }
 
-export function parseFtmsTreadmillData(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.TREADMILL_DATA,
-    machineType: "treadmill",
-    flagBytes: 2,
-    validFlagsMask: 0x1fff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.distanceMeters = reader.readUint24("distanceMeters");
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.inclinationPercent = scale(readUnavailableInt16(reader, "inclinationPercent"), 10);
-        metrics.rampAngleDegrees = scale(readUnavailableInt16(reader, "rampAngleDegrees"), 10);
-      }
-      if (isBitSet(flags, 4)) {
-        metrics.positiveElevationGainMeters = scale(
-          reader.readUint16("positiveElevationGainMeters"),
-          10,
-        );
-        metrics.negativeElevationGainMeters = scale(
-          reader.readUint16("negativeElevationGainMeters"),
-          10,
-        );
-      }
-      if (isBitSet(flags, 5)) {
-        metrics.instantaneousPaceSecondsPer500m = reader.readUint16(
-          "instantaneousPaceSecondsPer500m",
-        );
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.averagePaceSecondsPer500m = reader.readUint16("averagePaceSecondsPer500m");
-      }
-      if (isBitSet(flags, 7)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 8)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 9)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 10)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 11)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
-      if (isBitSet(flags, 12)) {
-        metrics.forceOnBeltNewtons = readUnavailableInt16(reader, "forceOnBeltNewtons");
-        metrics.powerWatts = readUnavailableInt16(reader, "powerWatts");
-      }
+export function parseFtmsTreadmillData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.TREADMILL_DATA,
+      machineType: "treadmill",
+      flagBytes: 2,
+      validFlagsMask: 0x1fff,
+      readFields(flags, reader, metrics, options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.distanceMeters = reader.readUint24("distanceMeters");
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.inclinationPercent = scale(
+            readUnavailableInt16(reader, "inclinationPercent"),
+            10,
+          );
+          metrics.rampAngleDegrees = scale(readUnavailableInt16(reader, "rampAngleDegrees"), 10);
+        }
+        if (isBitSet(flags, 4)) {
+          metrics.positiveElevationGainMeters = scale(
+            reader.readUint16("positiveElevationGainMeters"),
+            10,
+          );
+          metrics.negativeElevationGainMeters = scale(
+            reader.readUint16("negativeElevationGainMeters"),
+            10,
+          );
+        }
+        if (isBitSet(flags, 5)) {
+          if (options?.treadmillPaceFormat === "uint8Legacy") {
+            reader.readUint8("instantaneousPaceLegacy");
+          } else
+            metrics.instantaneousPaceSecondsPer500m = reader.readUint16(
+              "instantaneousPaceSecondsPer500m",
+            );
+        }
+        if (isBitSet(flags, 6)) {
+          if (options?.treadmillPaceFormat === "uint8Legacy") {
+            reader.readUint8("averagePaceLegacy");
+          } else metrics.averagePaceSecondsPer500m = reader.readUint16("averagePaceSecondsPer500m");
+        }
+        if (isBitSet(flags, 7)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 8)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 9)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 10)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 11)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+        if (isBitSet(flags, 12)) {
+          metrics.forceOnBeltNewtons = readUnavailableInt16(reader, "forceOnBeltNewtons");
+          metrics.powerWatts = readUnavailableInt16(reader, "powerWatts");
+        }
+      },
     },
-  });
+    options,
+  );
 }
 
-export function parseFtmsCrossTrainerData(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA,
-    machineType: "cross_trainer",
-    flagBytes: 3,
-    validFlagsMask: 0xffff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.distanceMeters = reader.readUint24("distanceMeters");
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.stepRateSpm = unavailable(
-          reader.readUint16("stepRateSpm"),
-          0xffff,
-          "stepRateSpm",
-          reader,
-        );
-        metrics.averageStepRateSpm = unavailable(
-          reader.readUint16("averageStepRateSpm"),
-          0xffff,
-          "averageStepRateSpm",
-          reader,
-        );
-      }
-      if (isBitSet(flags, 4)) {
-        metrics.strideCount = scale(reader.readUint16("strideCount"), 10);
-      }
-      if (isBitSet(flags, 5)) {
-        metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
-        metrics.negativeElevationGainMeters = reader.readUint16("negativeElevationGainMeters");
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.inclinationPercent = scale(readUnavailableInt16(reader, "inclinationPercent"), 10);
-        metrics.rampAngleDegrees = scale(readUnavailableInt16(reader, "rampAngleDegrees"), 10);
-      }
-      if (isBitSet(flags, 7)) {
-        metrics.resistanceLevel = reader.readUint8("resistanceLevel");
-      }
-      if (isBitSet(flags, 8)) {
-        metrics.powerWatts = reader.readInt16("powerWatts");
-      }
-      if (isBitSet(flags, 9)) {
-        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
-      }
-      if (isBitSet(flags, 10)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 11)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 12)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 13)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 14)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
-      metrics.movementDirection = isBitSet(flags, 15) ? "backward" : "forward";
+export function parseFtmsCrossTrainerData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA,
+      machineType: "cross_trainer",
+      flagBytes: 3,
+      validFlagsMask: 0xffff,
+      readFields(flags, reader, metrics, options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.distanceMeters = reader.readUint24("distanceMeters");
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.stepRateSpm = unavailable(
+            reader.readUint16("stepRateSpm"),
+            0xffff,
+            "stepRateSpm",
+            reader,
+          );
+          metrics.averageStepRateSpm = unavailable(
+            reader.readUint16("averageStepRateSpm"),
+            0xffff,
+            "averageStepRateSpm",
+            reader,
+          );
+        }
+        if (isBitSet(flags, 4)) {
+          metrics.strideCount = scale(reader.readUint16("strideCount"), 10);
+        }
+        if (isBitSet(flags, 5)) {
+          metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
+          metrics.negativeElevationGainMeters = reader.readUint16("negativeElevationGainMeters");
+        }
+        if (isBitSet(flags, 6)) {
+          metrics.inclinationPercent = scale(
+            readUnavailableInt16(reader, "inclinationPercent"),
+            10,
+          );
+          metrics.rampAngleDegrees = scale(readUnavailableInt16(reader, "rampAngleDegrees"), 10);
+        }
+        if (isBitSet(flags, 7)) {
+          metrics.resistanceLevel =
+            options?.resistanceFormat === "signed16Tenths"
+              ? scale(reader.readInt16("resistanceLevel"), 10)
+              : reader.readUint8("resistanceLevel");
+        }
+        if (isBitSet(flags, 8)) {
+          metrics.powerWatts = reader.readInt16("powerWatts");
+        }
+        if (isBitSet(flags, 9)) {
+          metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
+        }
+        if (isBitSet(flags, 10)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 11)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 12)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 13)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 14)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+        metrics.movementDirection = isBitSet(flags, 15) ? "backward" : "forward";
+      },
     },
-  });
+    options,
+  );
 }
 
-export function parseFtmsStepClimberData(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA,
-    machineType: "step_climber",
-    flagBytes: 2,
-    validFlagsMask: 0x01ff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.floorCount = reader.readUint16("floorCount");
-        metrics.stepCount = reader.readUint16("stepCount");
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.stepRateSpm = reader.readUint16("stepRateSpm");
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.averageStepRateSpm = reader.readUint16("averageStepRateSpm");
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
-      }
-      if (isBitSet(flags, 4)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 5)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 7)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 8)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
+export function parseFtmsStepClimberData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA,
+      machineType: "step_climber",
+      flagBytes: 2,
+      validFlagsMask: 0x01ff,
+      readFields(flags, reader, metrics, _options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.floorCount = reader.readUint16("floorCount");
+          metrics.stepCount = reader.readUint16("stepCount");
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.stepRateSpm = reader.readUint16("stepRateSpm");
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.averageStepRateSpm = reader.readUint16("averageStepRateSpm");
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
+        }
+        if (isBitSet(flags, 4)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 5)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 6)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 7)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 8)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+      },
     },
-  });
+    options,
+  );
 }
 
-export function parseFtmsStairClimberData(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA,
-    machineType: "stair_climber",
-    flagBytes: 2,
-    validFlagsMask: 0x03ff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.floorCount = reader.readUint16("floorCount");
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.stepRateSpm = reader.readUint16("stepRateSpm");
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.averageStepRateSpm = reader.readUint16("averageStepRateSpm");
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
-      }
-      if (isBitSet(flags, 4)) {
-        metrics.strideCount = reader.readUint16("strideCount");
-      }
-      if (isBitSet(flags, 5)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 7)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 8)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 9)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
+export function parseFtmsStairClimberData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA,
+      machineType: "stair_climber",
+      flagBytes: 2,
+      validFlagsMask: 0x03ff,
+      readFields(flags, reader, metrics, _options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.floorCount = reader.readUint16("floorCount");
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.stepRateSpm = reader.readUint16("stepRateSpm");
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.averageStepRateSpm = reader.readUint16("averageStepRateSpm");
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.positiveElevationGainMeters = reader.readUint16("positiveElevationGainMeters");
+        }
+        if (isBitSet(flags, 4)) {
+          metrics.strideCount = reader.readUint16("strideCount");
+        }
+        if (isBitSet(flags, 5)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 6)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 7)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 8)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 9)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+      },
     },
-  });
+    options,
+  );
 }
 
-export function parseFtmsRowerData(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.ROWER_DATA,
-    machineType: "rower",
-    flagBytes: 2,
-    validFlagsMask: 0x1fff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.strokeRateSpm = scale(reader.readUint8("strokeRateSpm"), 2);
-        metrics.strokeCount = reader.readUint16("strokeCount");
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.averageStrokeRateSpm = scale(reader.readUint8("averageStrokeRateSpm"), 2);
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.distanceMeters = reader.readUint24("distanceMeters");
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.instantaneousPaceSecondsPer500m = reader.readUint16(
-          "instantaneousPaceSecondsPer500m",
-        );
-      }
-      if (isBitSet(flags, 4)) {
-        metrics.averagePaceSecondsPer500m = reader.readUint16("averagePaceSecondsPer500m");
-      }
-      if (isBitSet(flags, 5)) {
-        metrics.powerWatts = reader.readInt16("powerWatts");
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
-      }
-      if (isBitSet(flags, 7)) {
-        metrics.resistanceLevel = reader.readUint8("resistanceLevel");
-      }
-      if (isBitSet(flags, 8)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 9)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 10)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 11)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 12)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
+export function parseFtmsRowerData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.ROWER_DATA,
+      machineType: "rower",
+      flagBytes: 2,
+      validFlagsMask: 0x1fff,
+      readFields(flags, reader, metrics, options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.strokeRateSpm = scale(reader.readUint8("strokeRateSpm"), 2);
+          metrics.strokeCount = reader.readUint16("strokeCount");
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.averageStrokeRateSpm = scale(reader.readUint8("averageStrokeRateSpm"), 2);
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.distanceMeters = reader.readUint24("distanceMeters");
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.instantaneousPaceSecondsPer500m = reader.readUint16(
+            "instantaneousPaceSecondsPer500m",
+          );
+        }
+        if (isBitSet(flags, 4)) {
+          metrics.averagePaceSecondsPer500m = reader.readUint16("averagePaceSecondsPer500m");
+        }
+        if (isBitSet(flags, 5)) {
+          metrics.powerWatts = reader.readInt16("powerWatts");
+        }
+        if (isBitSet(flags, 6)) {
+          metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
+        }
+        if (isBitSet(flags, 7)) {
+          metrics.resistanceLevel =
+            options?.resistanceFormat === "signed16Tenths"
+              ? scale(reader.readInt16("resistanceLevel"), 10)
+              : reader.readUint8("resistanceLevel");
+        }
+        if (isBitSet(flags, 8)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 9)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 10)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 11)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 12)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+      },
     },
-  });
+    options,
+  );
 }
 
-function parseIndoorBikePayload(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseMeasurement(data, {
-    characteristicUuid: FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA,
-    machineType: "bike",
-    flagBytes: 2,
-    validFlagsMask: 0x1fff,
-    readFields(flags, reader, metrics) {
-      if (!isBitSet(flags, 0)) {
-        metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
-      }
-      if (isBitSet(flags, 1)) {
-        metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
-      }
-      if (isBitSet(flags, 2)) {
-        metrics.cadenceRpm = scale(reader.readUint16("cadenceRpm"), 2);
-      }
-      if (isBitSet(flags, 3)) {
-        metrics.averageCadenceRpm = scale(reader.readUint16("averageCadenceRpm"), 2);
-      }
-      if (isBitSet(flags, 4)) {
-        metrics.distanceMeters = reader.readUint24("distanceMeters");
-      }
-      if (isBitSet(flags, 5)) {
-        metrics.resistanceLevel = reader.readUint8("resistanceLevel");
-      }
-      if (isBitSet(flags, 6)) {
-        metrics.powerWatts = reader.readInt16("powerWatts");
-      }
-      if (isBitSet(flags, 7)) {
-        metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
-      }
-      if (isBitSet(flags, 8)) {
-        readEnergy(reader, metrics);
-      }
-      if (isBitSet(flags, 9)) {
-        metrics.hrBpm = reader.readUint8("heartRateBpm");
-      }
-      if (isBitSet(flags, 10)) {
-        metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
-      }
-      if (isBitSet(flags, 11)) {
-        metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
-      }
-      if (isBitSet(flags, 12)) {
-        metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
-      }
+function parseIndoorBikePayload(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseMeasurement(
+    data,
+    {
+      characteristicUuid: FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA,
+      machineType: "bike",
+      flagBytes: 2,
+      validFlagsMask: 0x1fff,
+      readFields(flags, reader, metrics, options) {
+        if (!isBitSet(flags, 0)) {
+          metrics.speedMps = speedHundredthsKphToMps(reader.readUint16("speed"));
+        }
+        if (isBitSet(flags, 1)) {
+          metrics.averageSpeedMps = speedHundredthsKphToMps(reader.readUint16("averageSpeed"));
+        }
+        if (isBitSet(flags, 2)) {
+          metrics.cadenceRpm = scale(reader.readUint16("cadenceRpm"), 2);
+        }
+        if (isBitSet(flags, 3)) {
+          metrics.averageCadenceRpm = scale(reader.readUint16("averageCadenceRpm"), 2);
+        }
+        if (isBitSet(flags, 4)) {
+          metrics.distanceMeters = reader.readUint24("distanceMeters");
+        }
+        if (isBitSet(flags, 5)) {
+          metrics.resistanceLevel =
+            options?.resistanceFormat === "signed16Tenths"
+              ? scale(reader.readInt16("resistanceLevel"), 10)
+              : reader.readUint8("resistanceLevel");
+        }
+        if (isBitSet(flags, 6)) {
+          metrics.powerWatts = reader.readInt16("powerWatts");
+        }
+        if (isBitSet(flags, 7)) {
+          metrics.averagePowerWatts = reader.readInt16("averagePowerWatts");
+        }
+        if (isBitSet(flags, 8)) {
+          readEnergy(reader, metrics);
+        }
+        if (isBitSet(flags, 9)) {
+          metrics.hrBpm = reader.readUint8("heartRateBpm");
+        }
+        if (isBitSet(flags, 10)) {
+          metrics.metabolicEquivalent = scale(reader.readUint8("metabolicEquivalent"), 10);
+        }
+        if (isBitSet(flags, 11)) {
+          metrics.elapsedTimeSeconds = reader.readUint16("elapsedTimeSeconds");
+        }
+        if (isBitSet(flags, 12)) {
+          metrics.remainingTimeSeconds = reader.readUint16("remainingTimeSeconds");
+        }
+      },
     },
-  });
+    options,
+  );
 }
 
 /** Complete Indoor Bike Data payload, including diagnostics and optional fields. */
-export function parseFtmsIndoorBikeMeasurement(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload {
-  return parseIndoorBikePayload(data);
+export function parseFtmsIndoorBikeMeasurement(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsPayload {
+  return parseIndoorBikePayload(data, options);
 }
 
 /**
@@ -637,8 +710,11 @@ export function parseFtmsIndoorBikeMeasurement(data: ArrayBuffer | Uint8Array): 
  * This compatibility projection falls back to average values when instantaneous
  * speed, cadence, or power is absent.
  */
-export function parseFtmsIndoorBikeData(data: ArrayBuffer | Uint8Array): ParsedFtmsIndoorBikeData {
-  const parsed = parseIndoorBikePayload(data);
+export function parseFtmsIndoorBikeData(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
+): ParsedFtmsIndoorBikeData {
+  const parsed = parseIndoorBikePayload(data, options);
   return {
     hrBpm: parsed.metrics.hrBpm,
     powerWatts: parsed.metrics.powerWatts ?? parsed.metrics.averagePowerWatts,
@@ -687,7 +763,12 @@ export function parseFtmsTrainingStatus(data: ArrayBuffer | Uint8Array): ParsedF
   let bytesRead = Math.min(bytes.byteLength, 2);
 
   if (code !== null && code > 0x0f) {
-    issues.push({ code: "reserved_value", field: "trainingStatus", offset: 1, actual: code });
+    issues.push({
+      code: "reserved_value",
+      field: "trainingStatus",
+      offset: 1,
+      actual: code,
+    });
   }
 
   if (flags !== undefined && code !== null) {
@@ -696,7 +777,11 @@ export function parseFtmsTrainingStatus(data: ArrayBuffer | Uint8Array): ParsedF
     const reservedFlags = flags & 0xfc;
 
     if (reservedFlags !== 0) {
-      issues.push({ code: "reserved_flags", field: "flags", actual: reservedFlags });
+      issues.push({
+        code: "reserved_flags",
+        field: "flags",
+        actual: reservedFlags,
+      });
     }
     if (extendedStringPresent && !stringPresent) {
       issues.push({ code: "invalid_flags", field: "flags", actual: flags });
@@ -846,7 +931,10 @@ function decodeMachineStatusParameter(
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGET_RESISTANCE_CHANGED: {
       const resistanceLevel = view.getInt16(1, true) / 10;
-      return { details: { kind: "resistance", resistanceLevel }, parameter: resistanceLevel };
+      return {
+        details: { kind: "resistance", resistanceLevel },
+        parameter: resistanceLevel,
+      };
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGET_POWER_CHANGED: {
       const powerWatts = view.getInt16(1, true);
@@ -854,7 +942,10 @@ function decodeMachineStatusParameter(
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGET_HEART_RATE_CHANGED: {
       const heartRateBpm = view.getUint8(1);
-      return { details: { kind: "heart_rate", heartRateBpm }, parameter: heartRateBpm };
+      return {
+        details: { kind: "heart_rate", heartRateBpm },
+        parameter: heartRateBpm,
+      };
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_EXPENDED_ENERGY_CHANGED: {
       const energyKcal = view.getUint16(1, true);
@@ -870,18 +961,30 @@ function decodeMachineStatusParameter(
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_DISTANCE_CHANGED: {
       const distanceMeters = view.getUint8(1) | (view.getUint8(2) << 8) | (view.getUint8(3) << 16);
-      return { details: { kind: "distance", distanceMeters }, parameter: distanceMeters };
+      return {
+        details: { kind: "distance", distanceMeters },
+        parameter: distanceMeters,
+      };
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_TRAINING_TIME_CHANGED: {
       const seconds = view.getUint16(1, true);
-      return { details: { kind: "training_time", seconds }, parameter: seconds };
+      return {
+        details: { kind: "training_time", seconds },
+        parameter: seconds,
+      };
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_TIME_TWO_HR_ZONES_CHANGED:
-      return { details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 2) } };
+      return {
+        details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 2) },
+      };
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_TIME_THREE_HR_ZONES_CHANGED:
-      return { details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 3) } };
+      return {
+        details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 3) },
+      };
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_TIME_FIVE_HR_ZONES_CHANGED:
-      return { details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 5) } };
+      return {
+        details: { kind: "hr_zones", seconds: decodeHrZoneSeconds(view, 5) },
+      };
     case FTMS_MACHINE_STATUS_OPCODES.INDOOR_BIKE_SIMULATION_PARAMETERS_CHANGED:
       return {
         details: {
@@ -915,7 +1018,10 @@ function decodeMachineStatusParameter(
     }
     case FTMS_MACHINE_STATUS_OPCODES.TARGETED_CADENCE_CHANGED: {
       const cadenceRpm = view.getUint16(1, true) / 2;
-      return { details: { kind: "cadence", cadenceRpm }, parameter: cadenceRpm };
+      return {
+        details: { kind: "cadence", cadenceRpm },
+        parameter: cadenceRpm,
+      };
     }
     default:
       return { details: { kind: "none" } };
@@ -1081,8 +1187,12 @@ export function listFtmsParserDefinitions(): FtmsParserDefinition[] {
 export function parseRegisteredFtmsPayload(
   uuid: string,
   data: ArrayBuffer | Uint8Array,
+  options?: FtmsMeasurementFormatOptions,
 ): ParsedFtmsPayload | null {
-  return getFtmsParserDefinition(uuid)?.parse(data) ?? null;
+  const definition = getFtmsParserDefinition(uuid);
+  return definition?.kind === "measurement"
+    ? definition.parse(data, options)
+    : (definition?.parse(data) ?? null);
 }
 
 // Raw codecs deliberately retain wire units and diagnostics; normalized parsers above remain unchanged.
@@ -1126,7 +1236,11 @@ const rf = (b: number, w: number, n: keyof typeof RM, s = false, u = false): Raw
   s,
   u,
 ];
-const rawDefs: readonly { fb: number; valid: number; fields: readonly RawField[] }[] = [
+const rawDefs: readonly {
+  fb: number;
+  valid: number;
+  fields: readonly RawField[];
+}[] = [
   {
     fb: 2,
     valid: 0x1fff,

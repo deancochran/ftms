@@ -10,6 +10,14 @@ TypeScript wire codec. This release-packaging milestone records that difference
 rather than claiming renewed complete API parity or silently expanding protocol
 scope. Swift/Kotlin remain scaffold-only and are not package releases.
 
+Explicit format propagation is intentionally asymmetric: TypeScript propagates
+caller-selected layouts through normalized measurement parsing, registry dispatch,
+normalized resistance ranges and static capability evaluation. C keeps raw native
+values but propagates formats through capability requirements/evaluation and packet
+planning and receive assembly. There is no TypeScript planner and C's normalized
+floating metrics are not invented. Legacy C assembly remains default-layout only;
+its separate format context fixes an explicit copied profile for one record.
+
 2026-09-28; local dirty branch `scaffold/native-capabilities`, base/HEAD
 `41023a60cff6efdeef5e36730c3d7356a91d26b6`. No release or remote mutation.
 

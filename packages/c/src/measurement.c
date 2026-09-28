@@ -15,6 +15,20 @@ static uint32_t get(const uint8_t *p,uint8_t n){uint32_t v=0;uint8_t i;for(i=0;i
 static void put(uint8_t *p,uint8_t n,uint32_t v){uint8_t i;for(i=0;i<n;i++)p[i]=(uint8_t)(v>>(8U*i));}
 static int valid(ftms_measurement_kind k) { return (unsigned)k < 6U; }
 static int mandatory(const field_def *f){return f->bit==0;}
+static int valid_options(const ftms_measurement_format_options *options) {
+  return options == NULL || ((unsigned)options->resistance_format <= FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS &&
+    (unsigned)options->treadmill_pace_format <= FTMS_TREADMILL_PACE_UINT8_LEGACY);
+}
+static field_def formatted_field(ftms_measurement_kind kind, field_def field,
+                                 const ftms_measurement_format_options *options) {
+  if (options != NULL && field.field == FTMS_M_RESISTANCE &&
+      (kind == FTMS_MEASUREMENT_CROSS_TRAINER || kind == FTMS_MEASUREMENT_ROWER || kind == FTMS_MEASUREMENT_INDOOR_BIKE) &&
+      options->resistance_format == FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS) { field.width = 2U; field.signed_value = 1U; }
+  if (options != NULL && kind == FTMS_MEASUREMENT_TREADMILL &&
+      (field.field == FTMS_M_INSTANTANEOUS_PACE || field.field == FTMS_M_AVERAGE_PACE) &&
+      options->treadmill_pace_format == FTMS_TREADMILL_PACE_UINT8_LEGACY) field.width = 1U;
+  return field;
+}
 static uint32_t sentinel(const field_def *field) {
   if (field->signed_value) return UINT32_C(0x7fff);
   return field->width == 1U ? UINT32_C(0xff) : UINT32_C(0xffff);
@@ -27,7 +41,7 @@ static int selected(const ftms_measurement *measurement, const field_def *field)
 
 ftms_result ftms_decode_measurement_with_format(ftms_measurement_kind kind, const uint8_t *data, size_t size, const ftms_measurement_format_options *options, ftms_measurement *out) {
   const kind_def *definition; ftms_measurement decoded = {0}; size_t offset, index;
-  if (!valid(kind) || (options != NULL && ((unsigned)options->resistance_format > FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS || (unsigned)options->treadmill_pace_format > FTMS_TREADMILL_PACE_UINT8_LEGACY))) return FTMS_ERROR_KIND;
+  if (!valid(kind) || !valid_options(options)) return FTMS_ERROR_KIND;
   if (data == NULL || out == NULL) return FTMS_ERROR_NULL;
   definition = &defs[(unsigned)kind];
   if (size < definition->flag_bytes) return FTMS_ERROR_LENGTH;
@@ -39,9 +53,7 @@ ftms_result ftms_decode_measurement_with_format(ftms_measurement_kind kind, cons
   offset = definition->flag_bytes;
   for (index = 0U; index < definition->count; ++index) {
     field_def changed, *field = &changed; uint32_t raw;
-    changed = definition->fields[index];
-    if (options != NULL && changed.field == FTMS_M_RESISTANCE && (kind == FTMS_MEASUREMENT_CROSS_TRAINER || kind == FTMS_MEASUREMENT_ROWER || kind == FTMS_MEASUREMENT_INDOOR_BIKE) && options->resistance_format == FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS) { changed.width = 2U; changed.signed_value = 1U; }
-    if (options != NULL && kind == FTMS_MEASUREMENT_TREADMILL && (changed.field == FTMS_M_INSTANTANEOUS_PACE || changed.field == FTMS_M_AVERAGE_PACE) && options->treadmill_pace_format == FTMS_TREADMILL_PACE_UINT8_LEGACY) changed.width = 1U;
+    changed = formatted_field(kind, definition->fields[index], options);
     if (!selected(&decoded, field)) continue;
     if (offset + field->width > size) { decoded.truncated = 1U; decoded.bytes_read = offset; *out = decoded; return FTMS_OK; }
     raw = get(data + offset, field->width); offset += field->width;
@@ -58,7 +70,7 @@ ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurem
   const kind_def *definition; uint8_t local[64] = {0}; uint64_t required = 0U;
   size_t offset, index, byte;
   if (measurement == NULL || out == NULL || written == NULL) return FTMS_ERROR_NULL;
-  if (!valid(measurement->kind) || (options != NULL && ((unsigned)options->resistance_format > FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS || (unsigned)options->treadmill_pace_format > FTMS_TREADMILL_PACE_UINT8_LEGACY))) return FTMS_ERROR_KIND;
+  if (!valid(measurement->kind) || !valid_options(options)) return FTMS_ERROR_KIND;
   definition = &defs[(unsigned)measurement->kind];
   if ((measurement->flags & ~definition->valid) != 0U ||
       (measurement->unavailable & ~measurement->present) != 0U) return FTMS_ERROR_RANGE;
@@ -67,9 +79,7 @@ ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurem
   put(local, definition->flag_bytes, measurement->flags); offset = definition->flag_bytes;
   for (index = 0U; index < definition->count; ++index) {
     field_def changed, *field = &changed; uint64_t bit; int32_t value;
-    changed = definition->fields[index];
-    if (options != NULL && changed.field == FTMS_M_RESISTANCE && (measurement->kind == FTMS_MEASUREMENT_CROSS_TRAINER || measurement->kind == FTMS_MEASUREMENT_ROWER || measurement->kind == FTMS_MEASUREMENT_INDOOR_BIKE) && options->resistance_format == FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS) { changed.width = 2U; changed.signed_value = 1U; }
-    if (options != NULL && measurement->kind == FTMS_MEASUREMENT_TREADMILL && (changed.field == FTMS_M_INSTANTANEOUS_PACE || changed.field == FTMS_M_AVERAGE_PACE) && options->treadmill_pace_format == FTMS_TREADMILL_PACE_UINT8_LEGACY) changed.width = 1U;
+    changed = formatted_field(measurement->kind, definition->fields[index], options);
     bit = UINT64_C(1) << field->field;
     if (!selected(measurement, field)) continue;
     if (sizeof local - offset < field->width) return FTMS_ERROR_LENGTH;
@@ -94,10 +104,11 @@ ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurem
 ftms_result ftms_decode_measurement(ftms_measurement_kind kind, const uint8_t *data, size_t size, ftms_measurement *out) { return ftms_decode_measurement_with_format(kind, data, size, NULL, out); }
 ftms_result ftms_encode_measurement(const ftms_measurement *measurement, uint8_t *out, size_t capacity, size_t *written) { return ftms_encode_measurement_with_format(measurement, NULL, out, capacity, written); }
 
-static size_t group_width(const kind_def *definition, size_t start) {
+static size_t group_width(ftms_measurement_kind kind, const kind_def *definition, size_t start,
+                          const ftms_measurement_format_options *options) {
   size_t width = 0U, index; uint8_t bit = definition->fields[start].bit;
   for (index = start; index < definition->count && definition->fields[index].bit == bit; ++index)
-    width += definition->fields[index].width;
+    width += formatted_field(kind, definition->fields[index], options).width;
   return width;
 }
 
@@ -124,7 +135,13 @@ static void fragment_from(const ftms_measurement *source, const kind_def *defini
 ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
                                   size_t value_budget,
                                   ftms_measurement_packet *packets,
-                                  size_t packet_capacity, size_t *count) {
+                                   size_t packet_capacity, size_t *count) {
+  return ftms_measurement_plan_with_format(snapshot, NULL, value_budget, packets, packet_capacity, count);
+}
+ftms_result ftms_measurement_plan_with_format(const ftms_measurement *snapshot,
+                                   const ftms_measurement_format_options *options,
+                                   size_t value_budget, ftms_measurement_packet *packets,
+                                   size_t packet_capacity, size_t *count) {
   const kind_def *definition; ftms_measurement fragment;
   uint8_t checked[64]; size_t complete, index, required = 1U, used = 0U;
   size_t flag_bytes, mandatory_width, optional_in_current = 0U;
@@ -133,7 +150,7 @@ ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
   if (snapshot == NULL || count == NULL) return FTMS_ERROR_NULL;
   if (packets == NULL && packet_capacity != 0U) return FTMS_ERROR_NULL;
   query = packets == NULL;
-  if (!valid(snapshot->kind)) return FTMS_ERROR_KIND;
+  if (!valid(snapshot->kind) || !valid_options(options)) return FTMS_ERROR_KIND;
   if ((snapshot->flags & 1U) != 0U) return FTMS_ERROR_RANGE;
   definition = &defs[(unsigned)snapshot->kind]; flag_bytes = definition->flag_bytes;
   for (index = 0U; index < definition->count; ++index)
@@ -141,9 +158,9 @@ ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
   /* Cross Trainer's backward-direction flag is metadata, not a value group. */
   fixed_flags = snapshot->flags & ~field_flag_mask;
   /* Reuse the canonical encoder as the complete immutable-snapshot validator. */
-  if (ftms_encode_measurement(snapshot, checked, sizeof checked, &complete) != FTMS_OK)
+  if (ftms_encode_measurement_with_format(snapshot, options, checked, sizeof checked, &complete) != FTMS_OK)
     return FTMS_ERROR_RANGE;
-  mandatory_width = group_width(definition, 0U);
+  mandatory_width = group_width(snapshot->kind, definition, 0U, options);
   if (value_budget < flag_bytes + mandatory_width) return FTMS_ERROR_LENGTH;
   if (complete <= value_budget) {
     if (query) { *count = 1U; return FTMS_OK; }
@@ -154,7 +171,7 @@ ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
   /* Count optional-only records before writing anything. Bit-zero is mandatory
    * and deliberately reserved for the last record. */
   for (index = group_end(definition, 0U); index < definition->count;) {
-    size_t width = group_width(definition, index); uint8_t bit = definition->fields[index].bit;
+    size_t width = group_width(snapshot->kind, definition, index, options); uint8_t bit = definition->fields[index].bit;
     if ((snapshot->flags & (UINT32_C(1) << bit)) != 0U) {
       if (value_budget < flag_bytes + width) return FTMS_ERROR_LENGTH;
       if (optional_in_current != 0U && used + width > value_budget - flag_bytes) {
@@ -172,11 +189,11 @@ ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
    * because it is a subset of the validated snapshot. */
   required = 0U; used = 0U; optional_in_current = 0U;
   for (index = group_end(definition, 0U); index < definition->count;) {
-    size_t width = group_width(definition, index); uint8_t bit = definition->fields[index].bit;
+    size_t width = group_width(snapshot->kind, definition, index, options); uint8_t bit = definition->fields[index].bit;
     if ((snapshot->flags & (UINT32_C(1) << bit)) != 0U) {
       if (optional_in_current != 0U && used + width > value_budget - flag_bytes) {
         fragment_from(snapshot, definition, fixed_flags | current_flags | 1U, &fragment);
-        (void)ftms_encode_measurement(&fragment, packets[required].value, value_budget,
+        (void)ftms_encode_measurement_with_format(&fragment, options, packets[required].value, value_budget,
                                       &packets[required].length);
         ++required; current_flags = 0U; used = 0U; optional_in_current = 0U;
       }
@@ -186,12 +203,12 @@ ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
   }
   if (optional_in_current != 0U) {
     fragment_from(snapshot, definition, fixed_flags | current_flags | 1U, &fragment);
-    (void)ftms_encode_measurement(&fragment, packets[required].value, value_budget,
+    (void)ftms_encode_measurement_with_format(&fragment, options, packets[required].value, value_budget,
                                   &packets[required].length);
     ++required;
   }
   fragment_from(snapshot, definition, fixed_flags, &fragment);
-  (void)ftms_encode_measurement(&fragment, packets[required].value, value_budget,
+  (void)ftms_encode_measurement_with_format(&fragment, options, packets[required].value, value_budget,
                                 &packets[required].length);
   ++required; *count = required;
   return FTMS_OK;
@@ -201,9 +218,9 @@ void ftms_record_reset(ftms_record_context *context) {
   if (context != NULL) { context->active = 0U; context->started_at = 0U; }
 }
 
-ftms_record_status ftms_record_init(ftms_record_context *context,
-                                    ftms_measurement_kind kind,
-                                    uint32_t generation, uint32_t max_age) {
+static ftms_record_status record_init_core(ftms_record_context *context,
+                                           ftms_measurement_kind kind,
+                                           uint32_t generation, uint32_t max_age) {
   ftms_record_context initialized = {0};
   if (context == NULL || !valid(kind) || max_age == 0U || max_age >= UINT32_C(0x80000000))
     return FTMS_RECORD_INVALID;
@@ -212,13 +229,20 @@ ftms_record_status ftms_record_init(ftms_record_context *context,
   return FTMS_RECORD_PENDING;
 }
 
+ftms_record_status ftms_record_init(ftms_record_context *context,
+                                     ftms_measurement_kind kind,
+                                     uint32_t generation, uint32_t max_age) {
+  return record_init_core(context, kind, generation, max_age);
+}
+
 static int strict_fragment(ftms_measurement_kind kind, const uint8_t *data,
-                           size_t size, ftms_measurement *fragment) {
+                            size_t size, const ftms_measurement_format_options *options,
+                            ftms_measurement *fragment) {
   uint8_t canonical[64]; size_t written, index;
-  if (ftms_decode_measurement(kind, data, size, fragment) != FTMS_OK) return 0;
+  if (ftms_decode_measurement_with_format(kind, data, size, options, fragment) != FTMS_OK) return 0;
   if (fragment->truncated != 0U || fragment->trailing_bytes != 0U ||
-      fragment->reserved_flags != 0U ||
-      ftms_encode_measurement(fragment, canonical, sizeof canonical, &written) != FTMS_OK ||
+       fragment->reserved_flags != 0U ||
+       ftms_encode_measurement_with_format(fragment, options, canonical, sizeof canonical, &written) != FTMS_OK ||
       written != size) return 0;
   for (index = 0U; index < size; ++index) if (canonical[index] != data[index]) return 0;
   return 1;
@@ -231,20 +255,21 @@ static int has_mandatory(const kind_def *definition, const ftms_measurement *fra
   return 1;
 }
 
-ftms_record_status ftms_record_feed(ftms_record_context *context,
-                                    const uint8_t *data, size_t size,
-                                    uint32_t generation, uint32_t now,
-                                    ftms_measurement *out) {
+static ftms_record_status record_feed_core(ftms_record_context *context,
+                                           const ftms_measurement_format_options *options,
+                                           const uint8_t *data, size_t size,
+                                           uint32_t generation, uint32_t now,
+                                           ftms_measurement *out) {
   ftms_measurement fragment, complete;
   size_t index;
-  if (context == NULL || data == NULL || out == NULL || !valid(context->kind) ||
+  if (context == NULL || data == NULL || out == NULL || !valid_options(options) || !valid(context->kind) ||
       context->max_age == 0U || context->max_age >= UINT32_C(0x80000000))
     return FTMS_RECORD_INVALID;
   if (generation != context->generation) { ftms_record_reset(context); return FTMS_RECORD_GENERATION; }
   if (context->active != 0U && (uint32_t)(now - context->started_at) >= context->max_age) {
     ftms_record_reset(context); return FTMS_RECORD_EXPIRED;
   }
-  if (!strict_fragment(context->kind, data, size, &fragment)) {
+  if (!strict_fragment(context->kind, data, size, options, &fragment)) {
     ftms_record_reset(context); return FTMS_RECORD_INVALID;
   }
   if (context->active == 0U) {
@@ -273,4 +298,40 @@ ftms_record_status ftms_record_feed(ftms_record_context *context,
   *out = complete;
   ftms_record_reset(context);
   return FTMS_RECORD_COMPLETE;
+}
+
+ftms_record_status ftms_record_feed(ftms_record_context *context,
+                                     const uint8_t *data, size_t size,
+                                     uint32_t generation, uint32_t now,
+                                     ftms_measurement *out) {
+  return record_feed_core(context, NULL, data, size, generation, now, out);
+}
+
+ftms_record_status ftms_record_init_with_format(ftms_record_format_context *context,
+                                                ftms_measurement_kind kind,
+                                                const ftms_measurement_format_options *options,
+                                                uint32_t generation, uint32_t max_age) {
+  ftms_measurement_format_options copied = {FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE,
+                                             FTMS_TREADMILL_PACE_UINT16};
+  ftms_record_format_context initialized = {0};
+  if (options != NULL) copied = *options;
+  if (context == NULL || !valid_options(&copied) || !valid(kind) || max_age == 0U ||
+      max_age >= UINT32_C(0x80000000)) return FTMS_RECORD_INVALID;
+  initialized.options = copied;
+  if (record_init_core(&initialized.record, kind, generation, max_age) != FTMS_RECORD_PENDING)
+    return FTMS_RECORD_INVALID;
+  *context = initialized;
+  return FTMS_RECORD_PENDING;
+}
+
+void ftms_record_reset_with_format(ftms_record_format_context *context) {
+  if (context != NULL) ftms_record_reset(&context->record);
+}
+
+ftms_record_status ftms_record_feed_with_format(ftms_record_format_context *context,
+                                                const uint8_t *data, size_t size,
+                                                uint32_t generation, uint32_t now,
+                                                ftms_measurement *out) {
+  if (context == NULL || !valid_options(&context->options)) return FTMS_RECORD_INVALID;
+  return record_feed_core(&context->record, &context->options, data, size, generation, now, out);
 }

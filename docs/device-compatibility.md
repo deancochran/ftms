@@ -2,11 +2,10 @@
 
 FTMS codecs default to the adopted historical layout. For known exceptional
 wire layouts, pass an explicit range or measurement format option on every
-**raw** decode and encode call that needs it. TypeScript supports this through
-`decode/encodeFtmsRangeRaw` and `decode/encodeFtmsMeasurementRaw`; the existing
-normalized `parseFtms*` functions and UUID registry retain their historical
-layouts and do **not** accept these options. Applications needing an alternate
-layout must use the raw API and normalize its values using the selected format.
+raw decode and encode call that needs it. TypeScript also accepts measurement
+options on normalized `parseFtms*` parsers and registry dispatch, and range
+options on normalized resistance-range decoding and capability evaluation.
+Omitted options preserve historical layouts.
 C exposes the corresponding `_with_format` APIs. Do not auto-select an option from device
 name, advertised features, a range length, measurement flags, or a prior
 control request. Range, measurement, and command decisions are separate.
@@ -46,10 +45,11 @@ corpus. Swift and Kotlin remain scaffolds, not validated implementations.
 
 ## Open integration and normative work
 
-- The new options apply to **raw codecs only**. Existing normalized measurement
-  parsers, aggregate capability range interpretation, and measurement packet
-  planning do not yet carry explicit format options. An application must not
-  assume selecting a raw range profile changes any of those paths.
+- The selected option must be supplied consistently to each related decode,
+  capability pass, and (in C) measurement-planning or record-assembly pass.
+  Legacy C record APIs retain the default layout; format-aware record contexts
+  copy one explicit profile at initialization and reinitialization discards
+  pending fragments before changing it.
 - Resistance **commands** remain separate from measurement and range layouts.
   Legacy command widths, rounding and scale require independently justified
   contracts and tests; no command format was changed by this work.
@@ -69,6 +69,55 @@ corpus. Swift and Kotlin remain scaffolds, not validated implementations.
   this new corpus, with conditional scale interpretation explicitly recorded.
 
 ## Verification boundary
+
+### Format-aware receive assembly follow-up
+
+Pulled `main` and fast-forwarded the working branch to
+`ba182b1a68a80774f23bf36a13bfdf8200ac66cf` before delivery. The new
+`ftms_record_format_context` copies its profile at initialization and retains it
+across resets; reinitialization discards any pending update. Existing context
+layout and record API signatures are unchanged.
+
+`make BUILD=build/record-formats test` and `env -u TMPDIR pnpm verify` passed
+locally, including 532 TypeScript tests, native strict/sanitized suites, all
+shared corpora, 20,000 deterministic fuzz inputs and installation/source-artifact
+consumer checks. New tests use literal alternate-format bike and treadmill
+fragments, verify copied profile lifetime, independent contexts, reset/reinit,
+invalid input, duplicate fields, direction changes, expiry, timestamp wrap and
+generation boundaries. A CMake consumer links and calls the new record APIs.
+These remain host protocol tests, not physical-device or embedded execution.
+
+### Format propagation follow-up
+
+Verified locally on `release/ports-installation-readiness`, base
+`65fc11f0a137f42f3b1d0556e893a35e48f217ea`, with uncommitted changes:
+
+- `env -u TMPDIR pnpm verify`: 532 tests in 12 files, lint/types/build and packed
+  package checks passed. Tests include all three normalized resistance families,
+  registry and deprecated bike dispatch, unknown-unit legacy pace omission,
+  complete selected-profile capability reports, and preserved range error results.
+- `make BUILD=build/format-propagation test`: passed strict/sanitized tests,
+  original 97 vectors, 49 capability cases, 18 compatibility assertions, both
+  10,000-input fuzz suites, installed C/C++ and source-artifact consumers. New
+  native tests verify literal planned packet bytes, profile-dependent counts,
+  indivisible field groups, invalid options and unchanged outputs on errors.
+  The CMake consumer also links and calls the three new format-aware APIs.
+- Independent review findings (normalized profile validation and contradictory
+  README guidance) were fixed and re-reviewed. The full TypeScript suite passed
+  after those fixes. An initial added capability expectation omitted the new
+  six-byte observation length; the literal expectation was corrected.
+
+Canonical corpus JSON and comparison READMEs were not modified. Capability
+protocol-contract SHA-256 is
+`a50e3a7a00d39afeec8ead6594b6d6de065bc3a09b3ae9e883bda28d3d1b3742`;
+wire-compatibility contract SHA-256 is
+`b0a7dcbfceeae84382be1417c7185bf070d8cc400d965b5c3b1fdad7a479b6f4`.
+Native reports record all corpus/schema/comparison hashes and case accounting.
+C receive assembly has a separate format-aware context API; legacy assembly
+remains historical-only and alternate fragments require their matching copied
+record profile.
+
+### Earlier raw-codec verification
 
 The shared compatibility corpus has 9 cases and 18 independent encode/decode
 assertions per implemented port. Native runner reports include exact corpus,

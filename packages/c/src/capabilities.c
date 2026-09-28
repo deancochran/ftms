@@ -67,6 +67,9 @@ static ftms_result validate(const ftms_cap_snapshot *s) {
   }
   return FTMS_OK;
 }
+static int valid_range_options(const ftms_range_format_options *options) {
+  return options == NULL || (unsigned)options->resistance_format <= FTMS_RESISTANCE_RANGE_SINT16_TENTHS;
+}
 
 static void add_diag(ftms_cap_diagnostic *diags, ftms_cap_report *r,
                      ftms_cap_diagnostic_code code, uint8_t kind, size_t index) {
@@ -94,10 +97,13 @@ static ftms_cap_decode decode_feature(const ftms_cap_characteristic *c,
 }
 
 static ftms_cap_decode decode_range(const ftms_cap_characteristic *c,
-                                   ftms_range_kind kind, ftms_range *value) {
+                                    ftms_range_kind kind, const ftms_range_format_options *options,
+                                    ftms_range *value) {
   if (c->read_state == FTMS_CAP_READ_FAILED) return FTMS_CAP_DECODE_FAILED;
   if (c->read_state != FTMS_CAP_READ_SUCCESS) return FTMS_CAP_DECODE_NOT_ATTEMPTED;
-  if (c->read_size == 0U || ftms_decode_range(kind, c->read_bytes, c->read_size, value) != FTMS_OK) {
+  if (c->read_size == 0U || (kind == FTMS_RANGE_RESISTANCE_LEVEL
+      ? ftms_decode_range_with_format(kind, c->read_bytes, c->read_size, options, value)
+      : ftms_decode_range(kind, c->read_bytes, c->read_size, value)) != FTMS_OK) {
     return FTMS_CAP_DECODE_MALFORMED;
   }
   return FTMS_CAP_DECODE_VALID;
@@ -189,7 +195,8 @@ static void evaluate_operations(const ftms_cap_snapshot *s, ftms_cap_report *r,
 }
 
 static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observations,
-                     ftms_cap_diagnostic *diags, ftms_cap_report *r) {
+                      ftms_cap_diagnostic *diags, const ftms_range_format_options *options,
+                      ftms_cap_report *r) {
   size_t i;
   uint8_t counts[FTMS_CAP_KIND_COUNT] = {0};
   size_t first[FTMS_CAP_KIND_COUNT] = {0};
@@ -269,7 +276,7 @@ static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observati
     e->input_index = FTMS_CAP_NO_INDEX;
     if (scope_ok && e->presence == FTMS_CAP_PRESENCE_UNIQUE) {
       e->input_index = first[kind];
-      e->decode = decode_range(&s->characteristics[e->input_index], (ftms_range_kind)i, &e->value);
+      e->decode = decode_range(&s->characteristics[e->input_index], (ftms_range_kind)i, options, &e->value);
       if (e->decode == FTMS_CAP_DECODE_MALFORMED) {
         add_diag(diags, r, FTMS_CAP_DIAG_MALFORMED_BYTES, kind, e->input_index);
       }
@@ -303,29 +310,41 @@ static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observati
 }
 
 ftms_result ftms_capability_requirements(const ftms_cap_snapshot *s, ftms_cap_requirements *out) {
+  return ftms_capability_requirements_with_format(s, NULL, out);
+}
+ftms_result ftms_capability_requirements_with_format(const ftms_cap_snapshot *s,
+                                                     const ftms_range_format_options *options,
+                                                     ftms_cap_requirements *out) {
   ftms_cap_report report;
   ftms_result result;
   if (out == NULL) return FTMS_ERROR_NULL;
+  if (!valid_range_options(options)) return FTMS_ERROR_KIND;
   result = validate(s);
   if (result != FTMS_OK) return result;
-  evaluate(s, NULL, NULL, &report);
+  evaluate(s, NULL, NULL, options, &report);
   out->observation_count = report.observation_count;
   out->diagnostic_count = report.diagnostic_count;
   return FTMS_OK;
 }
 
 ftms_result ftms_evaluate_capabilities(const ftms_cap_snapshot *s, ftms_cap_output *out) {
+  return ftms_evaluate_capabilities_with_format(s, NULL, out);
+}
+ftms_result ftms_evaluate_capabilities_with_format(const ftms_cap_snapshot *s,
+                                                   const ftms_range_format_options *options,
+                                                   ftms_cap_output *out) {
   ftms_cap_report report;
   ftms_result result;
   if (out == NULL) return FTMS_ERROR_NULL;
+  if (!valid_range_options(options)) return FTMS_ERROR_KIND;
   result = validate(s);
   if (result != FTMS_OK) return result;
-  evaluate(s, NULL, NULL, &report);
+  evaluate(s, NULL, NULL, options, &report);
   if (out->observation_capacity < report.observation_count || out->diagnostic_capacity < report.diagnostic_count) {
     return FTMS_ERROR_LENGTH;
   }
   if ((report.observation_count != 0U && out->observations == NULL) ||
       (report.diagnostic_count != 0U && out->diagnostics == NULL)) return FTMS_ERROR_NULL;
-  evaluate(s, out->observations, out->diagnostics, &out->report);
+  evaluate(s, out->observations, out->diagnostics, options, &out->report);
   return FTMS_OK;
 }

@@ -50,8 +50,10 @@ Parsers are available for:
 - Training Status
 - Fitness Machine Status
 
-Use `parseRegisteredFtmsPayload(characteristicUuid, bytes)` when dispatching by
-characteristic UUID.
+Use `parseRegisteredFtmsPayload(characteristicUuid, bytes, formatOptions)` when dispatching by
+characteristic UUID. Measurement parsers accept explicit caller-owned format
+options; legacy treadmill pace is retained only by raw decoding because its unit
+is unknown, so normalized pace remains null.
 
 ## Decode features and supported ranges
 
@@ -188,9 +190,12 @@ remain compatible. Additive raw APIs are exported from the package root:
 - `decodeFtmsTrainingStatusRaw` / `encodeFtmsTrainingStatusRaw`
 - `evaluateFtmsCapabilities`
 
-Explicit resistance/pace compatibility options apply only to the raw range and
-measurement APIs. Existing normalized `parseFtms*` functions and registry dispatch
-keep their original layouts; use the raw API when selecting an alternate layout.
+Explicit resistance/pace compatibility options apply to raw codecs and normalized
+measurement parsers, including registry dispatch. Resistance-range options also
+apply to normalized range decoding and capability evaluation. Each call requires
+its own explicit selection; no setting changes another API's defaults. Legacy
+treadmill pace values remain available through raw decoding, but normalized
+seconds-per-500m fields stay null because the legacy units are unresolved.
 Omit options or pass `{}` for defaults; malformed option values are rejected.
 See the repository's `docs/device-compatibility.md` for field applicability.
 

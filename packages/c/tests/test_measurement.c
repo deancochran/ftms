@@ -148,6 +148,59 @@ static void format_overrides(void) {
     assert(ftms_encode_measurement_with_format(&input, &bad, output, sizeof output, &written) == FTMS_ERROR_KIND); }
 }
 
+static void formatted_planner_regressions(void) {
+  const ftms_measurement_format_options signed_resistance = {
+    FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS, FTMS_TREADMILL_PACE_UINT16};
+  const ftms_measurement_format_options legacy_pace = {
+    FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE, FTMS_TREADMILL_PACE_UINT8_LEGACY};
+  ftms_measurement in;
+  ftms_measurement_packet packets[FTMS_MEASUREMENT_PLAN_MAX_PACKETS], saved[FTMS_MEASUREMENT_PLAN_MAX_PACKETS];
+  size_t count, old, i;
+  const uint8_t bike6[][6] = {{0x61,0x00,0x78,0x00,0x2c,0x01}, {0x01,0x08,0x85,0x03}, {0,0,1,0}};
+  const size_t bike6n[] = {6U,4U,4U};
+  const uint8_t tread4[][4] = {{0x61,0x00,0x2a,0x2b}, {0x01,0x04,0x85,0x03}, {0,0,0xe8,0x03}};
+  memset(&in, 0, sizeof in); in.kind = FTMS_MEASUREMENT_INDOOR_BIKE; in.flags = 0x860U;
+  in.present = BIT(FTMS_M_SPEED)|BIT(FTMS_M_RESISTANCE)|BIT(FTMS_M_POWER)|BIT(FTMS_M_ELAPSED_TIME);
+  in.value[FTMS_M_SPEED] = 1; in.value[FTMS_M_RESISTANCE] = 120; in.value[FTMS_M_POWER] = 300; in.value[FTMS_M_ELAPSED_TIME] = 901;
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 6U, NULL, 0U, &count) == FTMS_OK && count == 3U);
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 6U, packets, count, &count) == FTMS_OK && count == 3U);
+  for (i = 0U; i < count; ++i) assert(packets[i].length == bike6n[i] && memcmp(packets[i].value, bike6[i], bike6n[i]) == 0);
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 5U, NULL, 0U, &count) == FTMS_OK && count == 4U);
+  assert(ftms_measurement_plan(&in, 5U, NULL, 0U, &count) == FTMS_OK && count == 3U);
+
+  memset(&in, 0, sizeof in); in.kind = FTMS_MEASUREMENT_TREADMILL; in.flags = 0x460U;
+  in.present = BIT(FTMS_M_SPEED)|BIT(FTMS_M_INSTANTANEOUS_PACE)|BIT(FTMS_M_AVERAGE_PACE)|BIT(FTMS_M_ELAPSED_TIME);
+  in.value[FTMS_M_SPEED] = 1000; in.value[FTMS_M_INSTANTANEOUS_PACE] = 42; in.value[FTMS_M_AVERAGE_PACE] = 43; in.value[FTMS_M_ELAPSED_TIME] = 901;
+  assert(ftms_measurement_plan_with_format(&in, &legacy_pace, 4U, NULL, 0U, &count) == FTMS_OK && count == 3U);
+  assert(ftms_measurement_plan_with_format(&in, &legacy_pace, 4U, packets, count, &count) == FTMS_OK && count == 3U);
+  for (i = 0U; i < count; ++i) assert(packets[i].length == 4U && memcmp(packets[i].value, tread4[i], 4U) == 0);
+  assert(ftms_measurement_plan(&in, 4U, NULL, 0U, &count) == FTMS_OK && count == 4U);
+
+  memset(&in, 0, sizeof in); in.kind = FTMS_MEASUREMENT_TREADMILL; in.flags = 0x80U;
+  in.present = BIT(FTMS_M_SPEED)|BIT(FTMS_M_TOTAL_ENERGY)|BIT(FTMS_M_ENERGY_PER_HOUR)|BIT(FTMS_M_ENERGY_PER_MINUTE);
+  in.value[FTMS_M_SPEED] = 1; in.value[FTMS_M_TOTAL_ENERGY] = 1; in.value[FTMS_M_ENERGY_PER_HOUR] = 1; in.value[FTMS_M_ENERGY_PER_MINUTE] = 1;
+  assert(ftms_measurement_plan(&in, 6U, NULL, 0U, &count) == FTMS_ERROR_LENGTH);
+
+  memset(&in, 0, sizeof in); in.kind = FTMS_MEASUREMENT_INDOOR_BIKE; in.present = BIT(FTMS_M_SPEED); in.value[FTMS_M_SPEED] = 1;
+  for (i = 0U; i < 4U; ++i) {
+    ftms_measurement_format_options bad = {FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE, FTMS_TREADMILL_PACE_UINT16};
+    if (i < 2U) bad.resistance_format = (ftms_measurement_resistance_format)(i ? 256 : -1);
+    else bad.treadmill_pace_format = (ftms_treadmill_pace_format)(i == 3U ? 256 : -1);
+    memset(packets, 0xa5, sizeof packets); memcpy(saved, packets, sizeof packets); count = old = 99U;
+    assert(ftms_measurement_plan_with_format(&in, &bad, 4U, packets, 2U, &count) == FTMS_ERROR_KIND);
+    assert(count == old && memcmp(packets, saved, sizeof packets) == 0);
+    assert(ftms_measurement_plan_with_format(&in, &bad, 4U, NULL, 0U, &count) == FTMS_ERROR_KIND && count == old);
+  }
+  memset(packets, 0xa5, sizeof packets); memcpy(saved, packets, sizeof packets); count = old = 99U;
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 3U, packets, 2U, &count) == FTMS_ERROR_LENGTH);
+  assert(count == old && memcmp(packets, saved, sizeof packets) == 0);
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 4U, packets, 0U, &count) == FTMS_ERROR_LENGTH);
+  assert(count == old && memcmp(packets, saved, sizeof packets) == 0);
+  in.flags = 1U;
+  assert(ftms_measurement_plan_with_format(&in, &signed_resistance, 4U, packets, 2U, &count) == FTMS_ERROR_RANGE);
+  assert(count == old && memcmp(packets, saved, sizeof packets) == 0);
+}
+
 static void planner(void) {
   const ftms_measurement_kind kinds[] = {
     FTMS_MEASUREMENT_TREADMILL, FTMS_MEASUREMENT_CROSS_TRAINER,
@@ -177,6 +230,14 @@ static void planner(void) {
         if ((decoded.present & BIT(f)) != 0U) assert(decoded.value[f] == in.value[f]);
     }
     assert(present == in.present && unavailable == in.unavailable);
+    { ftms_measurement_packet old_packets[FTMS_MEASUREMENT_PLAN_MAX_PACKETS], null_packets[FTMS_MEASUREMENT_PLAN_MAX_PACKETS];
+      size_t old_count, null_count;
+      assert(ftms_measurement_plan(&in, 20U, old_packets, FTMS_MEASUREMENT_PLAN_MAX_PACKETS, &old_count) == FTMS_OK);
+      assert(ftms_measurement_plan_with_format(&in, NULL, 20U, null_packets, FTMS_MEASUREMENT_PLAN_MAX_PACKETS, &null_count) == FTMS_OK);
+      assert(old_count == null_count);
+      for (i = 0U; i < old_count; ++i) assert(old_packets[i].length == null_packets[i].length &&
+        memcmp(old_packets[i].value, null_packets[i].value, old_packets[i].length) == 0);
+    }
   }
   { /* A minimal record is one final notification, and too-small budgets are atomic. */
     ftms_measurement in; ftms_measurement_packet packets[2], saved[2]; size_t count = 7U, old = count;
@@ -206,6 +267,7 @@ static void planner(void) {
     assert(packets[1].length == sizeof last && memcmp(packets[1].value, last, sizeof last) == 0);
     assert(ftms_measurement_plan(&in, 64U, packets, 2U, &count) == FTMS_OK && count == 1U);
   }
+  formatted_planner_regressions();
 }
 
 static void record_assembly(void) {
@@ -295,6 +357,166 @@ static void record_assembly(void) {
   }
 }
 
+static void same_measurement(const ftms_measurement *left, const ftms_measurement *right) {
+  size_t i;
+  assert(left->kind == right->kind && left->flags == right->flags &&
+         left->present == right->present && left->unavailable == right->unavailable &&
+         left->more_data == right->more_data && left->backward == right->backward &&
+         left->truncated == right->truncated && left->trailing_bytes == right->trailing_bytes &&
+         left->reserved_flags == right->reserved_flags && left->bytes_read == right->bytes_read);
+  for (i = 0U; i < FTMS_MEASUREMENT_FIELD_COUNT; ++i)
+    assert(left->value[i] == right->value[i]);
+}
+
+static void default_format_context_equivalence(void) {
+  static const uint8_t treadmill[] = {0,0,1,0};
+  static const uint8_t cross[] = {0,0,0,1,0};
+  static const uint8_t step[] = {0,0,1,0,2,0};
+  static const uint8_t stair[] = {0,0,1,0};
+  static const uint8_t rower[] = {0,0,1,2,0};
+  static const uint8_t bike[] = {0,0,1,0};
+  const struct case_def { ftms_measurement_kind kind; const uint8_t *data; size_t size; } cases[] = {
+    {FTMS_MEASUREMENT_TREADMILL,treadmill,sizeof treadmill},
+    {FTMS_MEASUREMENT_CROSS_TRAINER,cross,sizeof cross},
+    {FTMS_MEASUREMENT_STEP_CLIMBER,step,sizeof step},
+    {FTMS_MEASUREMENT_STAIR_CLIMBER,stair,sizeof stair},
+    {FTMS_MEASUREMENT_ROWER,rower,sizeof rower},
+    {FTMS_MEASUREMENT_INDOOR_BIKE,bike,sizeof bike} };
+  size_t i;
+  for (i = 0U; i < sizeof cases / sizeof *cases; ++i) {
+    ftms_record_context old_context;
+    ftms_record_format_context new_context;
+    ftms_measurement old_out = {0}, new_out = {0};
+    assert(ftms_record_init(&old_context, cases[i].kind, 9U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_init_with_format(&new_context, cases[i].kind, NULL, 9U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed(&old_context, cases[i].data, cases[i].size, 9U, 1U, &old_out) == FTMS_RECORD_COMPLETE);
+    assert(ftms_record_feed_with_format(&new_context, cases[i].data, cases[i].size, 9U, 1U, &new_out) == FTMS_RECORD_COMPLETE);
+    same_measurement(&old_out, &new_out);
+  }
+}
+
+static void formatted_record_assembly(void) {
+  const ftms_measurement_format_options signed_resistance = {
+    FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS, FTMS_TREADMILL_PACE_UINT16};
+  const ftms_measurement_format_options legacy_pace = {
+    FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE, FTMS_TREADMILL_PACE_UINT8_LEGACY};
+  const uint8_t bike_first[] = {0x61,0x00,0x78,0x00,0x2c,0x01};
+  const uint8_t bike_second[] = {0x01,0x08,0x85,0x03};
+  const uint8_t bike_final[] = {0x00,0x00,0x01,0x00};
+  const uint8_t bike_complete[] = {0x60,0x08,0x01,0x00,0x78,0x00,0x2c,0x01,0x85,0x03};
+  const uint8_t tread_first[] = {0x61,0x00,0x2a,0x2b};
+  const uint8_t tread_second[] = {0x01,0x04,0x85,0x03};
+  const uint8_t tread_final[] = {0x00,0x00,0xe8,0x03};
+  const uint8_t tread_complete[] = {0x60,0x04,0xe8,0x03,0x2a,0x2b,0x85,0x03};
+  ftms_record_format_context context, other;
+  ftms_measurement out, saved, decoded;
+  uint8_t encoded[64]; size_t written;
+
+  memset(&context, 0xa5, sizeof context);
+  { ftms_record_format_context before = context;
+    ftms_measurement_format_options bad = {(ftms_measurement_resistance_format)-1,
+      FTMS_TREADMILL_PACE_UINT16};
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &bad, 1U, 5U) == FTMS_RECORD_INVALID);
+    assert(memcmp(&context, &before, sizeof context) == 0);
+    bad.resistance_format = FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE;
+    bad.treadmill_pace_format = (ftms_treadmill_pace_format)256;
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &bad, 1U, 5U) == FTMS_RECORD_INVALID);
+    assert(memcmp(&context, &before, sizeof context) == 0); }
+  assert(ftms_record_init_with_format(NULL, FTMS_MEASUREMENT_INDOOR_BIKE, &signed_resistance, 1U, 5U) == FTMS_RECORD_INVALID);
+  /* Copy before writing permits a source-options pointer into the destination. */
+  context.options = signed_resistance;
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &context.options, 1U, 5U) == FTMS_RECORD_PENDING);
+  assert(context.options.resistance_format == FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS);
+  { ftms_measurement_format_options mutable_options = signed_resistance;
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &mutable_options, 1U, 5U) == FTMS_RECORD_PENDING);
+    mutable_options.resistance_format = FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE; }
+  /* The context owns a copy, not the caller's option object. */
+  assert(ftms_record_init_with_format(&other, FTMS_MEASUREMENT_INDOOR_BIKE, NULL, 1U, 5U) == FTMS_RECORD_PENDING);
+  memset(&out, 0x5a, sizeof out); saved = out;
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 1U, 1U, &out) == FTMS_RECORD_PENDING);
+  assert(memcmp(&out, &saved, sizeof out) == 0);
+  assert(ftms_record_feed_with_format(&other, bike_first, sizeof bike_first, 1U, 1U, &out) == FTMS_RECORD_INVALID);
+  assert(ftms_record_feed_with_format(&context, bike_second, sizeof bike_second, 1U, 2U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_final, sizeof bike_final, 1U, 3U, &out) == FTMS_RECORD_COMPLETE);
+  assert(out.flags == 0x860U && out.present == (BIT(FTMS_M_SPEED)|BIT(FTMS_M_RESISTANCE)|BIT(FTMS_M_POWER)|BIT(FTMS_M_ELAPSED_TIME)) &&
+         out.value[FTMS_M_SPEED] == 1 && out.value[FTMS_M_RESISTANCE] == 120 &&
+         out.value[FTMS_M_POWER] == 300 && out.value[FTMS_M_ELAPSED_TIME] == 901 && out.bytes_read == 0U);
+  assert(ftms_encode_measurement_with_format(&out, &signed_resistance, encoded, sizeof encoded, &written) == FTMS_OK);
+  assert(written == sizeof bike_complete && memcmp(encoded, bike_complete, sizeof bike_complete) == 0);
+  assert(ftms_decode_measurement_with_format(FTMS_MEASUREMENT_INDOOR_BIKE, encoded, written, &signed_resistance, &decoded) == FTMS_OK);
+  assert(decoded.value[FTMS_M_RESISTANCE] == 120);
+  /* Default assembly rejects the alternate bytes; it never guesses a profile. */
+  { ftms_record_context old;
+    assert(ftms_record_init(&old, FTMS_MEASUREMENT_INDOOR_BIKE, 1U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed(&old, bike_first, sizeof bike_first, 1U, 1U, &decoded) == FTMS_RECORD_INVALID); }
+
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_TREADMILL, &legacy_pace, 2U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_init_with_format(&other, FTMS_MEASUREMENT_INDOOR_BIKE, &signed_resistance, 2U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, tread_first, sizeof tread_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&other, bike_first, sizeof bike_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+  ftms_record_reset_with_format(&context);
+  assert(ftms_record_feed_with_format(&context, tread_final, sizeof tread_final, 2U, 2U, &out) == FTMS_RECORD_COMPLETE);
+  assert(out.value[FTMS_M_SPEED] == 1000 && out.bytes_read == sizeof tread_final);
+  assert(ftms_record_feed_with_format(&other, bike_second, sizeof bike_second, 2U, 2U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&other, bike_final, sizeof bike_final, 2U, 3U, &out) == FTMS_RECORD_COMPLETE);
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_TREADMILL, &legacy_pace, 2U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, tread_first, sizeof tread_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, tread_second, sizeof tread_second, 2U, 2U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, tread_final, sizeof tread_final, 2U, 3U, &out) == FTMS_RECORD_COMPLETE);
+  assert(out.flags == 0x460U && out.value[FTMS_M_SPEED] == 1000 && out.value[FTMS_M_INSTANTANEOUS_PACE] == 42 &&
+         out.value[FTMS_M_AVERAGE_PACE] == 43 && out.value[FTMS_M_ELAPSED_TIME] == 901);
+  assert(ftms_encode_measurement_with_format(&out, &legacy_pace, encoded, sizeof encoded, &written) == FTMS_OK &&
+         written == sizeof tread_complete && memcmp(encoded, tread_complete, sizeof tread_complete) == 0);
+
+  /* Negative resistance is available in both remaining resistance families. */
+  { const uint8_t cross_first[] = {0x81,0x00,0x00,0xf4,0xff};
+    const uint8_t cross_final[] = {0x00,0x00,0x00,0x01,0x00};
+    const uint8_t rower_first[] = {0x81,0x00,0xf4,0xff};
+    const uint8_t rower_final[] = {0x00,0x00,0x02,0x03,0x00};
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_CROSS_TRAINER, &signed_resistance, 2U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, cross_first, sizeof cross_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, cross_final, sizeof cross_final, 2U, 2U, &out) == FTMS_RECORD_COMPLETE);
+    assert(out.value[FTMS_M_RESISTANCE] == -12 && out.unavailable == 0U && out.value[FTMS_M_SPEED] == 1);
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_ROWER, &signed_resistance, 2U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, rower_first, sizeof rower_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, rower_final, sizeof rower_final, 2U, 2U, &out) == FTMS_RECORD_COMPLETE);
+    assert(out.value[FTMS_M_RESISTANCE] == -12 && out.unavailable == 0U && out.value[FTMS_M_STROKE_COUNT] == 3);
+  }
+
+  /* Changing format by reinitialization must discard the old partial record. */
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &signed_resistance, 2U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 2U, 1U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, NULL, 2U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_final, sizeof bike_final, 2U, 2U, &out) == FTMS_RECORD_COMPLETE);
+  assert(out.present == BIT(FTMS_M_SPEED) && out.value[FTMS_M_RESISTANCE] == 0);
+
+  /* Rejected variants clear pending state and leave output canaries intact. */
+  memset(&out, 0x33, sizeof out); saved = out;
+  assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &signed_resistance, 3U, 5U) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 3U, UINT32_MAX - 2U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 3U, UINT32_MAX - 1U, &out) == FTMS_RECORD_INVALID);
+  assert(context.record.active == 0U && memcmp(&out, &saved, sizeof out) == 0);
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 3U, UINT32_MAX - 2U, &out) == FTMS_RECORD_PENDING);
+  assert(ftms_record_feed_with_format(&context, bike_final, sizeof bike_final, 3U, 2U, &out) == FTMS_RECORD_EXPIRED);
+  assert(memcmp(&out, &saved, sizeof out) == 0);
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first - 1U, 3U, 3U, &out) == FTMS_RECORD_INVALID);
+  { uint8_t trailing[sizeof bike_first + 1U];
+    memcpy(trailing, bike_first, sizeof bike_first); trailing[sizeof bike_first] = 0U;
+    assert(ftms_record_feed_with_format(&context, trailing, sizeof trailing, 3U, 3U, &out) == FTMS_RECORD_INVALID); }
+  assert(ftms_record_feed_with_format(&context, bike_first, sizeof bike_first, 4U, 3U, &out) == FTMS_RECORD_GENERATION);
+  assert(memcmp(&out, &saved, sizeof out) == 0);
+  { const uint8_t malformed[] = {0x01,0x20};
+    const uint8_t cross_optional[] = {0x03,0x00,0x00,0x01,0x00};
+    const uint8_t cross_backward[] = {0x00,0x80,0x00,0x02,0x00};
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_INDOOR_BIKE, &signed_resistance, 3U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, malformed, sizeof malformed, 3U, 3U, &out) == FTMS_RECORD_INVALID);
+    assert(memcmp(&out, &saved, sizeof out) == 0);
+    assert(ftms_record_init_with_format(&context, FTMS_MEASUREMENT_CROSS_TRAINER, &signed_resistance, 3U, 5U) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, cross_optional, sizeof cross_optional, 3U, 3U, &out) == FTMS_RECORD_PENDING);
+    assert(ftms_record_feed_with_format(&context, cross_backward, sizeof cross_backward, 3U, 4U, &out) == FTMS_RECORD_INVALID);
+    assert(context.record.active == 0U && memcmp(&out, &saved, sizeof out) == 0); }
+}
+
 int main(void) {
   one(FTMS_MEASUREMENT_CROSS_TRAINER, 0x101U, FTMS_M_POWER, 32767);
   one(FTMS_MEASUREMENT_ROWER, 0x21U, FTMS_M_POWER, 32767);
@@ -317,5 +539,6 @@ int main(void) {
   full_payload_prefixes(FTMS_MEASUREMENT_ROWER, 8190U, UINT64_C(0xe62ff84), 29U);
   full_payload_prefixes(FTMS_MEASUREMENT_INDOOR_BIKE, 8190U, UINT64_C(0x3062fe07), 29U);
   invalid_inputs(); sentinels_and_overlap(); format_overrides(); planner(); record_assembly();
+  default_format_context_equivalence(); formatted_record_assembly();
   return 0;
 }

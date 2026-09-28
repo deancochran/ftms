@@ -338,11 +338,84 @@ static int test_argument_and_buffer_contract(void) {
   return 0;
 }
 
+static int test_range_format_propagation(void) {
+  fixture f;
+  ftms_cap_requirements default_q, selected_q, before;
+  ftms_range_format_options selected = {FTMS_RESISTANCE_RANGE_SINT16_TENTHS};
+  const uint8_t resistance[] = {0,0,100,0,1,0};
+  unsigned i;
+  setup(&f);
+  /* This is a signed-tenths range: legacy UINT8 interpretation is malformed. */
+  f.chars[5].read_bytes = resistance; f.chars[5].read_size = sizeof resistance;
+  CHECK(ftms_capability_requirements(&f.snapshot, &default_q) == FTMS_OK);
+  CHECK(ftms_capability_requirements_with_format(&f.snapshot, &selected, &selected_q) == FTMS_OK);
+  CHECK(default_q.observation_count == selected_q.observation_count &&
+        default_q.diagnostic_count == selected_q.diagnostic_count + 1U);
+  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_OK);
+  CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].decode == FTMS_CAP_DECODE_MALFORMED &&
+        f.out.report.operations[4].reasons == FTMS_CAP_REASON_RANGE_INVALID &&
+        f.out.report.diagnostic_count == default_q.diagnostic_count);
+  CHECK(ftms_evaluate_capabilities_with_format(&f.snapshot, &selected, &f.out) == FTMS_OK);
+  CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].decode == FTMS_CAP_DECODE_VALID);
+  CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.minimum == 0 &&
+        f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.maximum == 100 &&
+        f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.increment == 1 &&
+        f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.scale_divisor == 10 &&
+        f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.unit == FTMS_UNIT_LEVEL);
+  CHECK(f.out.report.operations[4].declaration == FTMS_CAP_DECLARATION_SUPPORTED);
+  CHECK(f.out.report.operations[4].prerequisite == FTMS_CAP_PREREQUISITE_SATISFIED);
+  CHECK(f.out.report.operations[4].reasons == 0U); /* Evidence is not permission. */
+  CHECK(f.out.report.diagnostic_count == selected_q.diagnostic_count);
+  for (i = 0U; i < FTMS_CAP_RANGE_COUNT; ++i) {
+    if (i == FTMS_RANGE_RESISTANCE_LEVEL) continue;
+    CHECK(f.out.report.ranges[i].decode == FTMS_CAP_DECODE_VALID);
+  }
+  /* Query counts must agree with selected evaluation capacity checks. */
+  f.out.observation_capacity = selected_q.observation_count - 1U;
+  { ftms_cap_output saved = f.out; ftms_cap_observation observations[16];
+    ftms_cap_diagnostic diagnostics[64];
+    memset(observations, 0xa5, sizeof observations); memset(diagnostics, 0xa5, sizeof diagnostics);
+    memcpy(f.observations, observations, sizeof observations); memcpy(f.diagnostics, diagnostics, sizeof diagnostics);
+    CHECK(ftms_evaluate_capabilities_with_format(&f.snapshot, &selected, &f.out) == FTMS_ERROR_LENGTH);
+    CHECK(memcmp(&f.out, &saved, sizeof saved) == 0 &&
+          memcmp(f.observations, observations, sizeof observations) == 0 &&
+          memcmp(f.diagnostics, diagnostics, sizeof diagnostics) == 0);
+  }
+  f.out.observation_capacity = 16U;
+  f.out.diagnostic_capacity = 64U;
+  for (i = 0U; i < 2U; ++i) {
+    ftms_range_format_options bad = {(ftms_resistance_range_format)(i ? 256 : -1)};
+    uint8_t output_bytes[sizeof f.out], observations[sizeof f.observations], diagnostics[sizeof f.diagnostics];
+    memset(&f.out, 0xa5, sizeof f.out); memset(f.observations, 0xa5, sizeof f.observations);
+    memset(f.diagnostics, 0xa5, sizeof f.diagnostics);
+    memcpy(output_bytes, &f.out, sizeof f.out); memcpy(observations, f.observations, sizeof f.observations);
+    memcpy(diagnostics, f.diagnostics, sizeof f.diagnostics); memset(&before, 0xa5, sizeof before);
+    CHECK(ftms_capability_requirements_with_format(&f.snapshot, &bad, &before) == FTMS_ERROR_KIND);
+    for (size_t b = 0U; b < sizeof before; ++b) CHECK(((uint8_t *)&before)[b] == 0xa5U);
+    CHECK(ftms_evaluate_capabilities_with_format(&f.snapshot, &bad, &f.out) == FTMS_ERROR_KIND);
+    CHECK(memcmp(&f.out, output_bytes, sizeof f.out) == 0 &&
+          memcmp(f.observations, observations, sizeof f.observations) == 0 &&
+          memcmp(f.diagnostics, diagnostics, sizeof f.diagnostics) == 0);
+  }
+  setup(&f); f.snapshot.discovery = (ftms_cap_discovery)99; memset(&before, 0xa5, sizeof before);
+  CHECK(ftms_capability_requirements_with_format(&f.snapshot, &selected, &before) == FTMS_ERROR_KIND);
+  for (i = 0U; i < sizeof before; ++i) CHECK(((uint8_t *)&before)[i] == 0xa5U);
+  { ftms_cap_output saved = f.out; uint8_t observations[sizeof f.observations], diagnostics[sizeof f.diagnostics];
+    memset(f.observations, 0xa5, sizeof f.observations); memset(f.diagnostics, 0xa5, sizeof f.diagnostics);
+    memcpy(observations, f.observations, sizeof observations); memcpy(diagnostics, f.diagnostics, sizeof diagnostics);
+    CHECK(ftms_evaluate_capabilities_with_format(&f.snapshot, &selected, &f.out) == FTMS_ERROR_KIND);
+    CHECK(memcmp(&f.out, &saved, sizeof saved) == 0 && memcmp(f.observations, observations, sizeof observations) == 0 &&
+          memcmp(f.diagnostics, diagnostics, sizeof diagnostics) == 0);
+  }
+  return 0;
+}
+
 int test_capabilities(void) {
   CHECK(test_target_mapping() == 0);
   CHECK(test_feature_and_range_states() == 0);
   CHECK(test_discovery_and_properties() == 0);
   CHECK(test_argument_and_buffer_contract() == 0);
+  CHECK(test_range_format_propagation() == 0);
   puts("capability unit suites: mappings, read evidence, discovery/properties, API atomicity passed");
   return 0;
 }

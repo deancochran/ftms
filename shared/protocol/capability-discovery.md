@@ -6,6 +6,10 @@ described here. TypeScript accepts `Uint8Array`/`ArrayBuffer` read bytes and
 returns the corpus's normalized representation; neither API performs discovery
 or authorizes control.
 
+An optional caller-owned resistance-range format selection is applied consistently
+to requirements and evaluation. It changes only resistance wire decoding; it does
+not infer a device format or authorize an operation.
+
 ## Goal and scope
 
 Allow clients to establish what an FTMS device declares and what the available

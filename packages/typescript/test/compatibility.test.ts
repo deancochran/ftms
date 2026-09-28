@@ -4,8 +4,26 @@ import schema from "../../../shared/conformance/compatibility/v1/schema.json" wi
 import vectors from "../../../shared/conformance/compatibility/v1/vectors.json" with {
   type: "json",
 };
-import { decodeFtmsRangeRaw, encodeFtmsRangeRaw } from "../src/features.js";
-import { decodeFtmsMeasurementRaw, encodeFtmsMeasurementRaw } from "../src/parsers.js";
+import { FTMS_CHARACTERISTICS } from "../src/constants.js";
+import {
+  decodeFtmsRange,
+  decodeFtmsRangeRaw,
+  decodeSupportedResistanceRange,
+  encodeFtmsRangeRaw,
+  evaluateFtmsCapabilities,
+} from "../src/features.js";
+import {
+  decodeFtmsMeasurementRaw,
+  encodeFtmsMeasurementRaw,
+  parseFtmsCrossTrainerData,
+  parseFtmsIndoorBikeData,
+  parseFtmsIndoorBikeMeasurement,
+  parseFtmsRowerData,
+  parseFtmsStairClimberData,
+  parseFtmsStepClimberData,
+  parseFtmsTreadmillData,
+  parseRegisteredFtmsPayload,
+} from "../src/parsers.js";
 import type {
   FtmsMeasurementFormatOptions,
   FtmsMeasurementRaw,
@@ -36,6 +54,97 @@ type CompatibilityCase = MeasurementCase | RangeCase;
 const cases = (vectors as unknown as { cases: CompatibilityCase[] }).cases;
 
 describe("explicit wire-format compatibility corpus", () => {
+  it("preserves normalized range error results with explicit options", () => {
+    for (const options of [null, 1, "signed16Tenths", [], { typo: "signed16Tenths" }]) {
+      expect(() =>
+        decodeSupportedResistanceRange(
+          Uint8Array.of(0, 10, 1),
+          options as unknown as FtmsRangeFormatOptions,
+        ),
+      ).toThrow();
+    }
+    expect(() =>
+      decodeFtmsRange("speed", Uint8Array.of(0, 0, 100, 0, 1, 0), {
+        resistanceFormat: "signed16Tenths",
+      }),
+    ).toThrow();
+    for (const bytes of [Uint8Array.of(0), Uint8Array.of(10, 0, 1), Uint8Array.of(0, 10, 0)]) {
+      expect(
+        decodeSupportedResistanceRange(bytes, { resistanceFormat: "uint8Whole" }),
+      ).toStrictEqual(decodeSupportedResistanceRange(bytes));
+    }
+    for (const bytes of [
+      Uint8Array.of(0),
+      Uint8Array.of(10, 0, 0, 0, 1, 0),
+      Uint8Array.of(0, 0, 10, 0, 0, 0),
+    ]) {
+      expect(decodeSupportedResistanceRange(bytes, { resistanceFormat: "signed16Tenths" }).ok).toBe(
+        false,
+      );
+    }
+    expect(() =>
+      decodeSupportedResistanceRange(Uint8Array.of(0, 10, 1), {
+        resistanceFormat: "guess",
+      } as unknown as FtmsRangeFormatOptions),
+    ).toThrow();
+  });
+
+  it("propagates signed resistance through every affected family and registry", () => {
+    const options = { resistanceFormat: "signed16Tenths" } as const;
+    const rows = [
+      [
+        parseFtmsIndoorBikeMeasurement,
+        FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA,
+        [0x60, 8, 1, 0, 0xf4, 0xff, 0x9c, 0xff, 1, 0],
+      ],
+      [
+        parseFtmsCrossTrainerData,
+        FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA,
+        [0x81, 0x21, 0, 0xf4, 0xff, 0x9c, 0xff, 1, 0],
+      ],
+      [
+        parseFtmsRowerData,
+        FTMS_CHARACTERISTICS.ROWER_DATA,
+        [0xa1, 8, 0x9c, 0xff, 0xf4, 0xff, 1, 0],
+      ],
+    ] as const;
+    for (const [parse, uuid, values] of rows) {
+      const bytes = Uint8Array.from(values);
+      const parsed = parse(bytes, options);
+      expect(parsed.metrics).toMatchObject({
+        resistanceLevel: -1.2,
+        powerWatts: -100,
+        elapsedTimeSeconds: 1,
+      });
+      expect(parsed.diagnostics.bytesRead).toBe(bytes.length);
+      expect(parsed.diagnostics.truncated).toBe(false);
+      expect(parseRegisteredFtmsPayload(uuid, bytes, options)).toStrictEqual(parsed);
+      expect(parse(bytes.slice(0, -1), options).diagnostics.truncated).toBe(true);
+    }
+    expect(parseFtmsIndoorBikeData(Uint8Array.from(rows[0][2]), options)).toMatchObject({
+      powerWatts: -100,
+      truncated: false,
+    });
+  });
+
+  it("preserves explicit-default normalized parsing and validates unused selections", () => {
+    for (const parse of [
+      parseFtmsTreadmillData,
+      parseFtmsCrossTrainerData,
+      parseFtmsRowerData,
+      parseFtmsIndoorBikeMeasurement,
+      parseFtmsStepClimberData,
+      parseFtmsStairClimberData,
+    ]) {
+      const bytes = Uint8Array.of(1, 0, 0);
+      expect(
+        parse(bytes, { resistanceFormat: "uint8Whole", treadmillPaceFormat: "uint16" }),
+      ).toStrictEqual(parse(bytes));
+      expect(() =>
+        parse(bytes, { treadmillPaceFormat: "guess" } as unknown as FtmsMeasurementFormatOptions),
+      ).toThrow();
+    }
+  });
   function rejectsKind(action: () => unknown) {
     try {
       action();
@@ -110,6 +219,48 @@ describe("explicit wire-format compatibility corpus", () => {
       expect(() => decodeFtmsRangeRaw("resistance", captured, options)).toThrow();
       expect(() => decodeFtmsMeasurementRaw(5, new Uint8Array([1, 0]), options)).toThrow();
     }
+  });
+  it("propagates selected formats through normalized parsing and capability evidence", () => {
+    const resistance = { resistanceFormat: "signed16Tenths" } as const;
+    expect(decodeFtmsRange("resistance", Uint8Array.of(0, 0, 100, 0, 1, 0), resistance)).toEqual({
+      ok: true,
+      value: { kind: "resistance", min: 0, max: 10, increment: 0.1, unit: "level" },
+    });
+    const bike = parseFtmsIndoorBikeMeasurement(
+      Uint8Array.of(0x60, 8, 1, 0, 0x78, 0, 0x2c, 1, 0x85, 3),
+      { resistanceFormat: "signed16Tenths" },
+    );
+    expect(bike.metrics).toMatchObject({
+      resistanceLevel: 12,
+      powerWatts: 300,
+      elapsedTimeSeconds: 901,
+    });
+    const treadmill = parseFtmsTreadmillData(Uint8Array.of(0x60, 4, 0xe8, 3, 0x2a, 0x2b, 0x85, 3), {
+      treadmillPaceFormat: "uint8Legacy",
+    });
+    expect(treadmill.metrics).toMatchObject({
+      speedMps: 1000 / 360,
+      instantaneousPaceSecondsPer500m: null,
+      averagePaceSecondsPer500m: null,
+      elapsedTimeSeconds: 901,
+    });
+    const uuid = "00002ad600001000800000805f9b34fb";
+    const snapshot = {
+      discovery: 2 as const,
+      scope: 1 as const,
+      generation: 0,
+      characteristics: [
+        {
+          uuid,
+          properties: 2,
+          readState: 1 as const,
+          reason: 0 as const,
+          bytes: Uint8Array.of(0, 0, 100, 0, 1, 0),
+        },
+      ],
+    };
+    expect(evaluateFtmsCapabilities(snapshot, resistance).ranges[2]?.[1]).toBe(1);
+    expect(evaluateFtmsCapabilities(snapshot).ranges[2]?.[1]).toBe(2);
   });
 
   it("checks selected measurement bounds and preserves signed extrema", () => {

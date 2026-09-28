@@ -19,3 +19,13 @@ unit conversion. The KICKR CORE firmware 3.0.23 raw `2AD6` six-byte value
 `00 00 64 00 01 00` establishes width only, not a display-scale interpretation.
 Fixtures marked `capturedCharacteristic` therefore do not claim a validated
 display unit. Callers retain profile and normalization policy outside raw codecs.
+
+Normalized TypeScript measurement parsing accepts the same explicit measurement
+selection. Signed resistance is normalized from the selected signed-tenths wire
+integer. A selected legacy treadmill pace consumes its one raw byte but leaves the
+seconds-per-500m normalized fields null because its display unit is unknown; use
+the raw decoder to retain that number. C intentionally retains selected raw
+integers. C planning and its format-aware receive assembler apply one selected
+profile consistently for a record lifetime. The legacy C assembler APIs remain
+historical-layout only; separate format-context APIs copy an explicit profile at
+initialization and never infer one from fragment bytes.

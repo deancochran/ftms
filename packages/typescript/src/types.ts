@@ -350,7 +350,7 @@ export interface FtmsParserDefinition {
   name: string;
   kind: FtmsCharacteristicKind;
   machineType: FtmsMachineType;
-  parse(data: ArrayBuffer | Uint8Array): ParsedFtmsPayload;
+  parse(data: ArrayBuffer | Uint8Array, options?: FtmsMeasurementFormatOptions): ParsedFtmsPayload;
 }
 
 export interface ParsedFtmsIndoorBikeData {

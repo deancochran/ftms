@@ -90,7 +90,7 @@ unchanged-output error contracts are documented in each public header.
 
 ### Measurement packet planning
 
-`ftms_measurement_plan` turns one complete immutable measurement snapshot into
+`ftms_measurement_plan` (or `_with_format` for an explicit wire profile) turns one complete immutable measurement snapshot into
 caller-owned characteristic values. Supply a **value** byte budget, rather than
 an ambiguously named MTU (ordinary ATT notification values are commonly
 `ATT_MTU - 3`). Query the fixed packet count first with `packets == NULL` and
@@ -104,9 +104,13 @@ packets of 64 value bytes; actual FTMS 1.0 layouts require fewer than 32.
 ### Measurement record assembly
 
 `ftms_record_context` reassembles receive-side More Data fragments for one
-caller-owned equipment connection and generation. Initialize it with an
-explicit kind, generation, and caller-tick maximum age, then call
-`ftms_record_feed` with each complete characteristic value. It performs strict
+caller-owned equipment connection and generation using the historical layout.
+For an explicit alternate wire profile, use `ftms_record_format_context` with
+`ftms_record_init_with_format`, `ftms_record_reset_with_format`, and
+`ftms_record_feed_with_format`. Options are copied by value at initialization
+and remain fixed until reinitialization; `NULL` selects the historical layout.
+Initialize with an explicit kind, generation, and caller-tick maximum age, then
+feed each complete characteristic value under that one profile. It performs strict
 wire decoding and emits only `FTMS_RECORD_COMPLETE`; `out` is unchanged for
 pending, invalid, expired, and generation-mismatch results. Reset or initialize
 again at disconnect/generation change. It has no BLE lifecycle, clock, queue,
@@ -114,15 +118,17 @@ allocation, or lost-fragment detection: duplicate field groups and conflicting
 Cross Trainer direction are rejected and discard pending data. The deadline is
 measured by unsigned caller ticks from the first non-final fragment and does
 not slide; an expired incoming final is discarded rather than combined with old
-state. Inputs, context, and output must not overlap.
+state. Inputs, context, and output must not overlap. Do not mutate public context
+storage except through these APIs; reinitializing to change profile discards
+pending fragments rather than attempting to guess a format boundary.
 
 ## Capability API
 
 1. Build an `ftms_cap_snapshot` for **one** FTMS service instance/generation.
    UUIDs are full canonical display/network-order bytes; values are wire bytes.
    The caller owns raw data and decides discovery completeness and freshness.
-2. Call `ftms_capability_requirements` for exact observation/diagnostic counts.
-3. Supply caller-owned buffers and call `ftms_evaluate_capabilities`. Buffer
+2. Call `ftms_capability_requirements` (or `_with_format`) for exact observation/diagnostic counts, using the same explicit range profile for both passes.
+3. Supply caller-owned buffers and call `ftms_evaluate_capabilities` (or `_with_format`). Buffer
    capacities are element counts. A caller may use fixed arrays and reject a
    snapshot that exceeds them; the library imposes no arbitrary device limit.
 4. Read `out.report`; `operations[opcode]` separately reports declaration,
