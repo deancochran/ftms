@@ -1,78 +1,24 @@
 {
-  "name": "@deancochran/ftms",
-  "version": "0.2.0",
-  "description": "Runtime-neutral TypeScript codecs for Bluetooth Fitness Machine Service (FTMS)",
-  "private": false,
-  "license": "MIT",
-  "author": "Dean Cochran",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/deancochran/ftms.git"
-  },
-  "homepage": "https://github.com/deancochran/ftms#readme",
-  "bugs": {
-    "url": "https://github.com/deancochran/ftms/issues"
-  },
-  "keywords": [
-    "bluetooth",
-    "ble",
-    "ftms",
-    "fitness-machine-service",
-    "indoor-cycling",
-    "react-native",
-    "typescript"
-  ],
+  "name": "ftms-workspace",
+  "private": true,
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
-  "files": [
-    "conformance",
-    "dist",
-    "src",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md",
-    "SECURITY.md"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "react-native": "./dist/index.js",
-      "development": "./dist/index.js",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./conformance/schema": "./conformance/v1/schema.json",
-    "./conformance/v1": "./conformance/v1/vectors.json",
-    "./conformance/v1/schema": "./conformance/v1/schema.json"
-  },
   "scripts": {
-    "clean": "node ./scripts/clean.mjs",
+    "clean": "pnpm --filter @deancochran/ftms clean",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "test": "vitest run",
-    "check-types": "tsc --noEmit -p tsconfig.json",
-    "build": "pnpm run clean && tsc -p tsconfig.build.json",
-    "verify:package": "node ./scripts/verify-package.mjs",
-    "verify": "pnpm lint && pnpm check-types && pnpm test && pnpm verify:package",
-    "prepare": "lefthook install",
-    "prepack": "pnpm run build",
-    "prepublishOnly": "pnpm verify"
+    "test": "pnpm --filter @deancochran/ftms test",
+    "check-types": "pnpm --filter @deancochran/ftms check-types",
+    "build": "pnpm --filter @deancochran/ftms build",
+    "verify:package": "pnpm --filter @deancochran/ftms verify:package",
+    "verify": "pnpm --filter @deancochran/ftms verify",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.8",
-    "@types/node": "^20",
-    "ajv": "8.18.0",
-    "lefthook": "^2.1.10",
-    "typescript": "5.9.3",
-    "vite": "^8.1.5",
-    "vitest": "^4.1.9"
+    "lefthook": "^2.1.10"
   },
   "engines": {
     "node": ">=20"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "packageManager": "pnpm@10.33.0"
 }

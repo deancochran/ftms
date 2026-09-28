@@ -1,0 +1,873 @@
+{
+  "schemaVersion": 1,
+  "machine": [
+    {
+      "id": "machine-opcode-01",
+      "operation": "machine",
+      "bytes": [
+        1
+      ],
+      "decoded": {
+        "opcode": 1,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-02",
+      "operation": "machine",
+      "bytes": [
+        2,
+        1
+      ],
+      "decoded": {
+        "opcode": 2,
+        "action": 1,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-03",
+      "operation": "machine",
+      "bytes": [
+        3
+      ],
+      "decoded": {
+        "opcode": 3,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-04",
+      "operation": "machine",
+      "bytes": [
+        4
+      ],
+      "decoded": {
+        "opcode": 4,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-05",
+      "operation": "machine",
+      "bytes": [
+        5,
+        210,
+        4
+      ],
+      "decoded": {
+        "opcode": 5,
+        "action": 0,
+        "parameter": {
+          "opcode": 2,
+          "operands": [
+            1234
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-06",
+      "operation": "machine",
+      "bytes": [
+        6,
+        244,
+        255
+      ],
+      "decoded": {
+        "opcode": 6,
+        "action": 0,
+        "parameter": {
+          "opcode": 3,
+          "operands": [
+            -12
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-07",
+      "operation": "machine",
+      "bytes": [
+        7,
+        249,
+        255
+      ],
+      "decoded": {
+        "opcode": 7,
+        "action": 0,
+        "parameter": {
+          "opcode": 4,
+          "operands": [
+            -7
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-08",
+      "operation": "machine",
+      "bytes": [
+        8,
+        250,
+        0
+      ],
+      "decoded": {
+        "opcode": 8,
+        "action": 0,
+        "parameter": {
+          "opcode": 5,
+          "operands": [
+            250
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-09",
+      "operation": "machine",
+      "bytes": [
+        9,
+        155
+      ],
+      "decoded": {
+        "opcode": 9,
+        "action": 0,
+        "parameter": {
+          "opcode": 6,
+          "operands": [
+            155
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0a",
+      "operation": "machine",
+      "bytes": [
+        10,
+        244,
+        1
+      ],
+      "decoded": {
+        "opcode": 10,
+        "action": 0,
+        "parameter": {
+          "opcode": 9,
+          "operands": [
+            500
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0b",
+      "operation": "machine",
+      "bytes": [
+        11,
+        88,
+        2
+      ],
+      "decoded": {
+        "opcode": 11,
+        "action": 0,
+        "parameter": {
+          "opcode": 10,
+          "operands": [
+            600
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0c",
+      "operation": "machine",
+      "bytes": [
+        12,
+        188,
+        2
+      ],
+      "decoded": {
+        "opcode": 12,
+        "action": 0,
+        "parameter": {
+          "opcode": 11,
+          "operands": [
+            700
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0d",
+      "operation": "machine",
+      "bytes": [
+        13,
+        86,
+        52,
+        18
+      ],
+      "decoded": {
+        "opcode": 13,
+        "action": 0,
+        "parameter": {
+          "opcode": 12,
+          "operands": [
+            1193046
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0e",
+      "operation": "machine",
+      "bytes": [
+        14,
+        16,
+        14
+      ],
+      "decoded": {
+        "opcode": 14,
+        "action": 0,
+        "parameter": {
+          "opcode": 13,
+          "operands": [
+            3600
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-0f",
+      "operation": "machine",
+      "bytes": [
+        15,
+        10,
+        0,
+        20,
+        0
+      ],
+      "decoded": {
+        "opcode": 15,
+        "action": 0,
+        "parameter": {
+          "opcode": 14,
+          "operands": [
+            10,
+            20
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-10",
+      "operation": "machine",
+      "bytes": [
+        16,
+        10,
+        0,
+        20,
+        0,
+        30,
+        0
+      ],
+      "decoded": {
+        "opcode": 16,
+        "action": 0,
+        "parameter": {
+          "opcode": 15,
+          "operands": [
+            10,
+            20,
+            30
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-11",
+      "operation": "machine",
+      "bytes": [
+        17,
+        1,
+        0,
+        2,
+        0,
+        3,
+        0,
+        4,
+        0,
+        5,
+        0
+      ],
+      "decoded": {
+        "opcode": 17,
+        "action": 0,
+        "parameter": {
+          "opcode": 16,
+          "operands": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-12",
+      "operation": "machine",
+      "bytes": [
+        18,
+        156,
+        255,
+        250,
+        0,
+        10,
+        20
+      ],
+      "decoded": {
+        "opcode": 18,
+        "action": 0,
+        "parameter": {
+          "opcode": 17,
+          "operands": [
+            -100,
+            250,
+            10,
+            20
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-13",
+      "operation": "machine",
+      "bytes": [
+        19,
+        52,
+        8
+      ],
+      "decoded": {
+        "opcode": 19,
+        "action": 0,
+        "parameter": {
+          "opcode": 18,
+          "operands": [
+            2100
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-14",
+      "operation": "machine",
+      "bytes": [
+        20,
+        1
+      ],
+      "decoded": {
+        "opcode": 20,
+        "action": 1,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-15",
+      "operation": "machine",
+      "bytes": [
+        21,
+        180,
+        0
+      ],
+      "decoded": {
+        "opcode": 21,
+        "action": 0,
+        "parameter": {
+          "opcode": 20,
+          "operands": [
+            180
+          ]
+        },
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-opcode-ff",
+      "operation": "machine",
+      "bytes": [
+        255
+      ],
+      "decoded": {
+        "opcode": 255,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": true
+    },
+    {
+      "id": "machine-unknown",
+      "operation": "machine",
+      "bytes": [
+        35
+      ],
+      "decoded": {
+        "opcode": 35,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 1,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": false
+    },
+    {
+      "id": "machine-empty",
+      "operation": "machine",
+      "bytes": [],
+      "decoded": {
+        "opcode": 0,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 1,
+        "reservedValue": 0,
+        "truncated": 1,
+        "trailingBytes": 0
+      },
+      "encode": false
+    },
+    {
+      "id": "machine-short",
+      "operation": "machine",
+      "bytes": [
+        5,
+        1
+      ],
+      "decoded": {
+        "opcode": 5,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 1,
+        "trailingBytes": 0
+      },
+      "encode": false
+    },
+    {
+      "id": "machine-trailing",
+      "operation": "machine",
+      "bytes": [
+        1,
+        0
+      ],
+      "decoded": {
+        "opcode": 1,
+        "action": 0,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 0,
+        "truncated": 0,
+        "trailingBytes": 1
+      },
+      "encode": false
+    },
+    {
+      "id": "stop-invalid",
+      "operation": "machine",
+      "bytes": [
+        2,
+        3
+      ],
+      "decoded": {
+        "opcode": 2,
+        "action": 3,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 1,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": false
+    },
+    {
+      "id": "spin-invalid",
+      "operation": "machine",
+      "bytes": [
+        20,
+        5
+      ],
+      "decoded": {
+        "opcode": 20,
+        "action": 5,
+        "parameter": null,
+        "unknownOpcode": 0,
+        "reservedValue": 1,
+        "truncated": 0,
+        "trailingBytes": 0
+      },
+      "encode": false
+    }
+  ],
+  "training": [
+    {
+      "id": "training-valid-0",
+      "operation": "training",
+      "bytes": [
+        0,
+        1
+      ],
+      "decoded": {
+        "flags": 0,
+        "code": 1,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": true
+    },
+    {
+      "id": "training-valid-1",
+      "operation": "training",
+      "bytes": [
+        1,
+        13,
+        109,
+        97,
+        110,
+        117,
+        97,
+        108
+      ],
+      "decoded": {
+        "flags": 1,
+        "code": 13,
+        "textOffset": 2,
+        "textSize": 6,
+        "textPresent": 1,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": "6d616e75616c"
+      },
+      "encode": true
+    },
+    {
+      "id": "training-valid-2",
+      "operation": "training",
+      "bytes": [
+        3,
+        2,
+        195,
+        169
+      ],
+      "decoded": {
+        "flags": 3,
+        "code": 2,
+        "textOffset": 2,
+        "textSize": 2,
+        "textPresent": 1,
+        "extendedString": 1,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": "c3a9"
+      },
+      "encode": true
+    },
+    {
+      "id": "training-invalid-flags",
+      "operation": "training",
+      "bytes": [
+        134,
+        1
+      ],
+      "decoded": {
+        "flags": 134,
+        "code": 1,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 1,
+        "reservedFlags": 132,
+        "reservedValue": 0,
+        "invalidFlags": 1,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": false
+    },
+    {
+      "id": "training-reserved-code",
+      "operation": "training",
+      "bytes": [
+        0,
+        16
+      ],
+      "decoded": {
+        "flags": 0,
+        "code": 16,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 1,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": false
+    },
+    {
+      "id": "training-reserved-flags",
+      "operation": "training",
+      "bytes": [
+        128,
+        1
+      ],
+      "decoded": {
+        "flags": 128,
+        "code": 1,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 128,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": false
+    },
+    {
+      "id": "training-trailing",
+      "operation": "training",
+      "bytes": [
+        0,
+        1,
+        170
+      ],
+      "decoded": {
+        "flags": 0,
+        "code": 1,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 0,
+        "trailingBytes": 1,
+        "textHex": ""
+      },
+      "encode": false
+    },
+    {
+      "id": "training-utf8",
+      "operation": "training",
+      "bytes": [
+        1,
+        1,
+        195
+      ],
+      "decoded": {
+        "flags": 1,
+        "code": 1,
+        "textOffset": 2,
+        "textSize": 1,
+        "textPresent": 1,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 1,
+        "truncated": 0,
+        "trailingBytes": 0,
+        "textHex": "c3"
+      },
+      "encode": false
+    },
+    {
+      "id": "training-short",
+      "operation": "training",
+      "bytes": [],
+      "decoded": {
+        "flags": 0,
+        "code": 0,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 1,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": false
+    },
+    {
+      "id": "training-one",
+      "operation": "training",
+      "bytes": [
+        1
+      ],
+      "decoded": {
+        "flags": 1,
+        "code": 0,
+        "textOffset": 0,
+        "textSize": 0,
+        "textPresent": 0,
+        "extendedString": 0,
+        "reservedFlags": 0,
+        "reservedValue": 0,
+        "invalidFlags": 0,
+        "invalidUtf8": 0,
+        "truncated": 1,
+        "trailingBytes": 0,
+        "textHex": ""
+      },
+      "encode": false
+    }
+  ]
+}

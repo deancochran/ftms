@@ -5,3 +5,8 @@ coverage/
 .DS_Store
 .turbo/
 .context/
+
+# Generated TypeScript snapshots; edit shared corpus or root policy assets.
+/packages/typescript/conformance/
+/packages/typescript/LICENSE
+/packages/typescript/SECURITY.md

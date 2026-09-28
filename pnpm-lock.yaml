@@ -11,15 +11,18 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.8
         version: 2.4.8
+      lefthook:
+        specifier: ^2.1.10
+        version: 2.1.10
+
+  packages/typescript:
+    devDependencies:
       '@types/node':
         specifier: ^20
         version: 20.19.43
       ajv:
         specifier: 8.18.0
         version: 8.18.0
-      lefthook:
-        specifier: ^2.1.10
-        version: 2.1.10
       typescript:
         specifier: 5.9.3
         version: 5.9.3

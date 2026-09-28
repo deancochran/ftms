@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deancochran.dev/ftms/compatibility/v1/schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "cases"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "area",
+              "options",
+              "bytes",
+              "expected",
+              "encode",
+              "provenance"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "area": {
+                "enum": [
+                  "measurement",
+                  "range"
+                ]
+              },
+              "bytes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                }
+              },
+              "encode": {
+                "type": "boolean"
+              },
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "classification",
+                  "source",
+                  "note"
+                ],
+                "properties": {
+                  "classification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "kind": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 5
+              },
+              "options": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "resistanceFormat",
+                  "treadmillPaceFormat"
+                ],
+                "properties": {
+                  "resistanceFormat": {
+                    "enum": [
+                      "uint8Whole",
+                      "signed16Tenths"
+                    ]
+                  },
+                  "treadmillPaceFormat": {
+                    "enum": [
+                      "uint16",
+                      "uint8Legacy"
+                    ]
+                  }
+                }
+              },
+              "expected": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "flags",
+                  "present",
+                  "unavailable",
+                  "values",
+                  "moreData",
+                  "backward",
+                  "truncated",
+                  "trailingBytes",
+                  "reservedFlags",
+                  "bytesRead"
+                ],
+                "properties": {
+                  "kind": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 5
+                  },
+                  "flags": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "present": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unavailable": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "values": {
+                    "type": "array",
+                    "minItems": 30,
+                    "maxItems": 30,
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "moreData": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "backward": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "truncated": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "trailingBytes": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "reservedFlags": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "bytesRead": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "properties": {
+                  "area": {
+                    "const": "measurement"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "area",
+              "options",
+              "bytes",
+              "expected",
+              "encode",
+              "provenance"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "area": {
+                "enum": [
+                  "measurement",
+                  "range"
+                ]
+              },
+              "bytes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                }
+              },
+              "encode": {
+                "type": "boolean"
+              },
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "classification",
+                  "source",
+                  "note"
+                ],
+                "properties": {
+                  "classification": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "kind": {
+                "const": "resistance"
+              },
+              "options": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "resistanceFormat"
+                ],
+                "properties": {
+                  "resistanceFormat": {
+                    "enum": [
+                      "uint8Whole",
+                      "signed16Tenths"
+                    ]
+                  }
+                }
+              },
+              "expected": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "minimum",
+                  "maximum",
+                  "increment",
+                  "scaleDivisor",
+                  "unit",
+                  "kind"
+                ],
+                "properties": {
+                  "minimum": {
+                    "type": "integer"
+                  },
+                  "maximum": {
+                    "type": "integer"
+                  },
+                  "increment": {
+                    "type": "integer"
+                  },
+                  "scaleDivisor": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "unit": {
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "const": "resistance"
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "properties": {
+                  "area": {
+                    "const": "range"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

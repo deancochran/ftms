@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!coverage", "!dist"]
+    "includes": [
+      "**",
+      "!**/coverage",
+      "!**/dist",
+      "!shared/conformance",
+      "!packages/typescript/conformance",
+      "!packages/typescript/LICENSE",
+      "!packages/typescript/SECURITY.md"
+    ]
   },
   "formatter": {
     "enabled": true,

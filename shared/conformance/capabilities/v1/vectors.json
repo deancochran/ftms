@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "specificationBasis": "FTMS 1.0 Tables 4.1, 4.4, 4.15; ESR11; EC23224",
+  "snapshots": {
+    "full": {"discovery":2,"scope":1,"generation":7,"characteristics":[
+      {"uuid":"00002acc00001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"00000000ffff0100"},
+      {"uuid":"00002ad900001000800000805f9b34fb","properties":40,"readState":0,"reason":0,"bytes":""},
+      {"uuid":"00002ada00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""},
+      {"uuid":"00002ad400001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"6400b80b3200"},
+      {"uuid":"00002ad500001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"9cff96000500"},
+      {"uuid":"00002ad600001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"006401"},
+      {"uuid":"00002ad700001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"3cc801"},
+      {"uuid":"00002ad800001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"9cffdc050500"}
+    ]},
+    "telemetry": {"discovery":2,"scope":1,"generation":7,"characteristics":[
+      {"uuid":"00002acc00001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"0000000000000000"}
+    ]},
+    "empty": {"discovery":2,"scope":1,"generation":7,"characteristics":[]},
+    "unknown": {"discovery":0,"scope":0,"generation":7,"characteristics":[]}
+  },
+  "reports": {
+    "full": {"generation":7,"discovery":2,"scope":1,"observationCount":8,"diagnosticCount":0,
+      "presence":[0,2,1,1,1,1,1,1,1,2,2,2,2,2,2,2],
+      "feature":[2,1,0,0,131071,0,0],
+      "ranges":[[2,1,3,[0,100,3000,50,100,0]],[2,1,4,[1,-100,150,5,10,1]],[2,1,5,[2,0,100,1,1,2]],[2,1,6,[3,60,200,1,1,3]],[2,1,7,[4,-100,1500,5,1,4]]],
+      "operations":[[0,255,0,2,1,0],[1,255,0,2,1,0],[2,0,0,2,1,0],[3,1,0,2,1,0],[4,2,0,2,1,0],[5,3,0,2,1,0],[6,4,0,2,1,0],[7,255,0,2,1,0],[8,255,0,2,1,0],[9,5,0,2,1,0],[10,6,0,2,1,0],[11,7,0,2,1,0],[12,8,0,2,1,0],[13,9,0,2,1,0],[14,10,0,2,1,0],[15,11,0,2,1,0],[16,12,0,2,1,0],[17,13,0,2,1,0],[18,14,1,2,1,0],[19,15,1,2,1,0],[20,16,0,2,1,0]],
+      "observations":[[0,"00002acc00001000800000805f9b34fb",2,1,1,0,8],[1,"00002ad900001000800000805f9b34fb",40,14,0,0,0],[2,"00002ada00001000800000805f9b34fb",16,15,0,0,0],[3,"00002ad400001000800000805f9b34fb",2,9,1,0,6],[4,"00002ad500001000800000805f9b34fb",2,10,1,0,6],[5,"00002ad600001000800000805f9b34fb",2,11,1,0,3],[6,"00002ad700001000800000805f9b34fb",2,12,1,0,3],[7,"00002ad800001000800000805f9b34fb",2,13,1,0,6]],
+      "diagnostics":[]},
+    "telemetry": {"generation":7,"discovery":2,"scope":1,"observationCount":1,"diagnosticCount":0,
+      "presence":[0,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"feature":[2,1,0,0,0,0,0],
+      "ranges":[[1,0,null,null],[1,0,null,null],[1,0,null,null],[1,0,null,null],[1,0,null,null]],
+      "operations":[[0,255,0,1,0,0],[1,255,0,1,0,0],[2,0,0,1,0,0],[3,1,0,1,0,0],[4,2,0,1,0,0],[5,3,0,1,0,0],[6,4,0,1,0,0],[7,255,0,1,0,0],[8,255,0,1,0,0],[9,5,0,1,0,0],[10,6,0,1,0,0],[11,7,0,1,0,0],[12,8,0,1,0,0],[13,9,0,1,0,0],[14,10,0,1,0,0],[15,11,0,1,0,0],[16,12,0,1,0,0],[17,13,0,1,0,0],[18,14,1,1,0,0],[19,15,1,1,0,0],[20,16,0,1,0,0]],
+      "observations":[[0,"00002acc00001000800000805f9b34fb",2,1,1,0,8]],"diagnostics":[]},
+    "empty": {"generation":7,"discovery":2,"scope":1,"observationCount":0,"diagnosticCount":1,
+      "presence":[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"feature":[1,0,null,0,0,0,0],
+      "ranges":[[1,0,null,null],[1,0,null,null],[1,0,null,null],[1,0,null,null],[1,0,null,null]],
+      "operations":[[0,255,0,1,0,0],[1,255,0,1,0,0],[2,0,0,0,3,168],[3,1,0,0,3,168],[4,2,0,0,3,168],[5,3,0,0,3,168],[6,4,0,0,3,168],[7,255,0,1,0,0],[8,255,0,1,0,0],[9,5,0,0,3,168],[10,6,0,0,3,168],[11,7,0,0,3,168],[12,8,0,0,3,168],[13,9,0,0,3,168],[14,10,0,0,3,168],[15,11,0,0,3,168],[16,12,0,0,3,168],[17,13,0,0,3,168],[18,14,1,0,3,168],[19,15,1,0,3,168],[20,16,0,0,3,168]],
+      "observations":[],"diagnostics":[[4,1,null]]},
+    "unknown": {"generation":7,"discovery":0,"scope":0,"observationCount":0,"diagnosticCount":2,
+      "presence":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"feature":[0,0,null,0,0,0,0],
+      "ranges":[[0,0,null,null],[0,0,null,null],[0,0,null,null],[0,0,null,null],[0,0,null,null]],
+      "operations":[[0,255,0,0,2,1],[1,255,0,0,2,1],[2,0,0,0,2,1],[3,1,0,0,2,1],[4,2,0,0,2,1],[5,3,0,0,2,1],[6,4,0,0,2,1],[7,255,0,0,2,1],[8,255,0,0,2,1],[9,5,0,0,2,1],[10,6,0,0,2,1],[11,7,0,0,2,1],[12,8,0,0,2,1],[13,9,0,0,2,1],[14,10,0,0,2,1],[15,11,0,0,2,1],[16,12,0,0,2,1],[17,13,0,0,2,1],[18,14,1,0,2,1],[19,15,1,0,2,1],[20,16,0,0,2,1]],
+      "observations":[],"diagnostics":[[0,0,null],[1,0,null]]}
+  },
+  "cases": [
+    {"id":"all-static-prerequisites","category":"operations","input":{"template":"full","edits":[]},"expected":{"template":"full","edits":[]}},
+    {"id":"multiple-measurement-families","category":"measurements","input":{"template":"telemetry","edits":[
+      {"path":["characteristics"],"op":"append","value":{"uuid":"00002acd00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}},
+      {"path":["characteristics"],"op":"append","value":{"uuid":"00002ad100001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}
+    ]},"expected":{"template":"telemetry","edits":[
+      {"path":["presence",[2,6]],"value":2},{"path":["observationCount"],"value":3},
+      {"path":["observations"],"op":"append","value":[1,"00002acd00001000800000805f9b34fb",16,2,0,0,0]},
+      {"path":["observations"],"op":"append","value":[2,"00002ad100001000800000805f9b34fb",16,6,0,0,0]}
+    ]}},
+    {"id":"measurement-missing-notify","category":"properties","input":{"template":"telemetry","edits":[
+      {"path":["characteristics"],"op":"append","value":{"uuid":"00002ad100001000800000805f9b34fb","properties":0,"readState":0,"reason":0,"bytes":""}}
+    ]},"expected":{"template":"telemetry","edits":[
+      {"path":["presence",6],"value":2},{"path":["observationCount"],"value":2},
+      {"path":["observations"],"op":"append","value":[1,"00002ad100001000800000805f9b34fb",0,6,0,0,0]},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,6,1]]}
+    ]}},
+    {"id":"duplicate-feature-no-first-win","category":"duplicates","input":{"template":"full","edits":[
+      {"path":["characteristics"],"op":"append","value":{"uuid":"00002acc00001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"0000000000000000"}}
+    ]},"expected":{"template":"full","edits":[
+      {"path":["presence",1],"value":3},{"path":["feature"],"value":[3,0,null,0,0,0,0]},
+      {"path":["observationCount"],"value":9},{"path":["observations"],"op":"append","value":[8,"00002acc00001000800000805f9b34fb",2,1,1,0,8]},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[3,1,0]]},
+      {"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],3],"value":0},
+      {"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":8}
+    ]}},
+    {"id":"wrong-service-scope-no-derived-support","category":"discovery","input":{"template":"full","edits":[{"path":["scope"],"value":0}]},"expected":{"template":"full","edits":[
+      {"path":["scope"],"value":0},{"path":["presence",[2,3,4,5,6,7,8]],"value":0},
+      {"path":["feature"],"value":[2,0,null,0,0,0,0]},
+      {"path":["ranges","*"],"value":[2,0,null,null]},
+      {"path":["operations","*",3],"value":0},{"path":["operations","*",4],"value":2},{"path":["operations","*",5],"value":1},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[0,0,null]]}
+    ]}},
+    {"id":"absent-service-with-observations","category":"discovery","input":{"template":"full","edits":[{"path":["scope"],"value":2}]},"expected":{"template":"full","edits":[
+      {"path":["scope"],"value":2},{"path":["presence",[2,3,4,5,6,7,8]],"value":0},
+      {"path":["feature"],"value":[2,0,null,0,0,0,0]},
+      {"path":["ranges","*"],"value":[2,0,null,null]},
+      {"path":["operations","*",3],"value":0},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":1},
+      {"path":["diagnosticCount"],"value":2},{"path":["diagnostics"],"value":[[0,0,null],[11,0,null]]}
+    ]}},
+    {"id":"partial-empty-does-not-prove-absence","category":"discovery","input":{"template":"unknown","edits":[{"path":["scope"],"value":1},{"path":["discovery"],"value":1}]},"expected":{"template":"unknown","edits":[
+      {"path":["scope"],"value":1},{"path":["discovery"],"value":1},
+      {"path":["operations","*",5],"value":86},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[1,0,null]]}
+    ]}},
+    {"id":"resistance-reversed-range","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",5,"bytes"],"value":"640001"}]},"expected":{"template":"full","edits":[
+      {"path":["ranges",2],"value":[2,2,5,null]},
+      {"path":["operations",4,4],"value":3},{"path":["operations",4,5],"value":512},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[9,11,5]]}
+    ]}},
+    {"id":"speed-range-security-required","category":"ranges","input":{"template":"full","edits":[
+      {"path":["characteristics",3,"readState"],"value":2},{"path":["characteristics",3,"reason"],"value":2},{"path":["characteristics",3,"bytes"],"value":""}
+    ]},"expected":{"template":"full","edits":[
+      {"path":["ranges",0],"value":[2,3,3,null]},{"path":["observations",3,4],"value":2},{"path":["observations",3,5],"value":2},{"path":["observations",3,6],"value":0},
+      {"path":["operations",2,4],"value":2},{"path":["operations",2,5],"value":256},
+      {"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[8,9,3]]}
+    ]}},
+    {"id":"base-controls-only-with-zero-targets","category":"operations","input":{"template":"full","edits":[
+      {"path":["characteristics",0,"bytes"],"value":"0000000000000000"},
+      {"path":["characteristics",7],"op":"remove"},{"path":["characteristics",6],"op":"remove"},{"path":["characteristics",5],"op":"remove"},{"path":["characteristics",4],"op":"remove"},{"path":["characteristics",3],"op":"remove"}
+    ]},"expected":{"template":"telemetry","edits":[
+      {"path":["presence",[14,15]],"value":2},{"path":["observationCount"],"value":3},
+      {"path":["observations"],"op":"append","value":[1,"00002ad900001000800000805f9b34fb",40,14,0,0,0]},
+      {"path":["observations"],"op":"append","value":[2,"00002ada00001000800000805f9b34fb",16,15,0,0,0]},
+      {"path":["operations",[0,1,7,8],3],"value":2},{"path":["operations",[0,1,7,8],4],"value":1}
+    ]}},
+    {"id":"zero-features-telemetry","category":"features","input":{"template":"telemetry","edits":[]},"expected":{"template":"telemetry","edits":[]}},
+    {"id":"mandatory-feature-absent","category":"discovery","input":{"template":"empty","edits":[]},"expected":{"template":"empty","edits":[]}},
+    {"id":"discovery-not-attempted","category":"discovery","input":{"template":"unknown","edits":[]},"expected":{"template":"unknown","edits":[]}},
+    {"id":"discovery-failed","category":"discovery","input":{"template":"unknown","edits":[{"path":["discovery"],"value":3}]},"expected":{"template":"unknown","edits":[{"path":["discovery"],"value":3},{"path":["diagnostics",1,0],"value":2}]}},
+    {"id":"scope-ambiguous","category":"discovery","input":{"template":"unknown","edits":[{"path":["scope"],"value":3}]},"expected":{"template":"unknown","edits":[{"path":["scope"],"value":3}]}},
+    {"id":"service-confirmed-absent","category":"discovery","input":{"template":"unknown","edits":[{"path":["scope"],"value":2},{"path":["discovery"],"value":2}]},"expected":{"template":"unknown","edits":[{"path":["scope"],"value":2},{"path":["discovery"],"value":2},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[0,0,null]]},{"path":["operations","*",3],"value":1},{"path":["operations","*",4],"value":0}]}},
+    {"id":"absent-with-partial-discovery","category":"discovery","input":{"template":"unknown","edits":[{"path":["scope"],"value":2},{"path":["discovery"],"value":1}]},"expected":{"template":"unknown","edits":[{"path":["scope"],"value":2},{"path":["discovery"],"value":1},{"path":["diagnosticCount"],"value":3},{"path":["diagnostics"],"value":[[0,0,null],[11,0,null],[1,0,null]]},{"path":["operations","*",4],"value":3}]}},
+    {"id":"partial-with-all-observed-prerequisites","category":"discovery","input":{"template":"full","edits":[{"path":["discovery"],"value":1}]},"expected":{"template":"full","edits":[{"path":["discovery"],"value":1},{"path":["presence",[2,3,4,5,6,7,8]],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[1,0,null]]},{"path":["operations","*",4],"value":2},{"path":["operations","*",5],"value":2}]}},
+    {"id":"new-generation-no-cache","category":"discovery","input":{"template":"telemetry","edits":[{"path":["generation"],"value":4294967295}]},"expected":{"template":"telemetry","edits":[{"path":["generation"],"value":4294967295}]}},
+    {"id":"treadmill-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002acd00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",2],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002acd00001000800000805f9b34fb",16,2,0,0,0]}]}},
+    {"id":"cross-trainer-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ace00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",3],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002ace00001000800000805f9b34fb",16,3,0,0,0]}]}},
+    {"id":"step-climber-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002acf00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",4],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002acf00001000800000805f9b34fb",16,4,0,0,0]}]}},
+    {"id":"stair-climber-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad000001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",5],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002ad000001000800000805f9b34fb",16,5,0,0,0]}]}},
+    {"id":"rower-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad100001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",6],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002ad100001000800000805f9b34fb",16,6,0,0,0]}]}},
+    {"id":"indoor-bike-data","category":"measurements","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad200001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",7],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002ad200001000800000805f9b34fb",16,7,0,0,0]}]}},
+    {"id":"unknown-uuid-lookalike","category":"forward-compatibility","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"12342acc00001000800000805f9b34fb","properties":65535,"readState":1,"reason":0,"bytes":"abcdef"}}]},"expected":{"template":"telemetry","edits":[{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"12342acc00001000800000805f9b34fb",65535,0,1,0,3]}]}},
+    {"id":"unknown-feature-bits-retained","category":"forward-compatibility","input":{"template":"full","edits":[{"path":["characteristics",0,"bytes"],"value":"00000080ffff0180"}]},"expected":{"template":"full","edits":[{"path":["feature"],"value":[2,1,0,2147483648,2147614719,2147483648,2147483648]}]}},
+    {"id":"measurement-support-not-control","category":"features","input":{"template":"telemetry","edits":[{"path":["characteristics",0,"bytes"],"value":"ffffffff00000000"}]},"expected":{"template":"telemetry","edits":[{"path":["feature"],"value":[2,1,0,4294967295,0,4294836224,0]}]}},
+    {"id":"feature-unread-base-procedures-independent","category":"features","input":{"template":"full","edits":[{"path":["characteristics",0,"readState"],"value":0},{"path":["characteristics",0,"bytes"],"value":""}]},"expected":{"template":"full","edits":[{"path":["feature"],"value":[2,0,0,0,0,0,0]},{"path":["observations",0,4],"value":0},{"path":["observations",0,6],"value":0},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],3],"value":0},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],4],"value":2},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],5],"value":4}]}},
+    {"id":"feature-security-failure","category":"features","input":{"template":"full","edits":[{"path":["characteristics",0,"readState"],"value":2},{"path":["characteristics",0,"reason"],"value":2},{"path":["characteristics",0,"bytes"],"value":""}]},"expected":{"template":"full","edits":[{"path":["feature"],"value":[2,3,0,0,0,0,0]},{"path":["observations",0,4],"value":2},{"path":["observations",0,5],"value":2},{"path":["observations",0,6],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[8,1,0]]},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],3],"value":0},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],4],"value":2},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],5],"value":4}]}},
+    {"id":"feature-malformed","category":"features","input":{"template":"full","edits":[{"path":["characteristics",0,"bytes"],"value":"00"}]},"expected":{"template":"full","edits":[{"path":["feature"],"value":[2,2,0,0,0,0,0]},{"path":["observations",0,6],"value":1},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[9,1,0]]},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],3],"value":0},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],4],"value":3},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],5],"value":8}]}},
+    {"id":"feature-without-read","category":"properties","input":{"template":"full","edits":[{"path":["characteristics",0,"properties"],"value":0}]},"expected":{"template":"full","edits":[{"path":["observations",0,2],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,1,0]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":8}]}},
+    {"id":"control-point-missing-indicate","category":"properties","input":{"template":"full","edits":[{"path":["characteristics",1,"properties"],"value":8}]},"expected":{"template":"full","edits":[{"path":["observations",1,2],"value":8},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,14,1]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":32}]}},
+    {"id":"partial-does-not-hide-contradiction","category":"discovery","input":{"template":"full","edits":[{"path":["discovery"],"value":1},{"path":["characteristics",1,"properties"],"value":8}]},"expected":{"template":"full","edits":[{"path":["discovery"],"value":1},{"path":["presence",[2,3,4,5,6,7,8]],"value":0},{"path":["observations",1,2],"value":8},{"path":["diagnosticCount"],"value":2},{"path":["diagnostics"],"value":[[1,0,null],[5,14,1]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":34}]}},
+    {"id":"control-point-extra-properties","category":"properties","input":{"template":"full","edits":[{"path":["characteristics",1,"properties"],"value":42}]},"expected":{"template":"full","edits":[{"path":["observations",1,2],"value":42},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[6,14,1]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":32}]}},
+    {"id":"status-without-notify","category":"properties","input":{"template":"full","edits":[{"path":["characteristics",2,"properties"],"value":0}]},"expected":{"template":"full","edits":[{"path":["observations",2,2],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,15,2]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":128}]}},
+    {"id":"machine-status-absent","category":"properties","input":{"template":"full","edits":[{"path":["characteristics",2,"uuid"],"value":"ffffffffffffffffffffffffffffffff"}]},"expected":{"template":"full","edits":[{"path":["observations",2,1],"value":"ffffffffffffffffffffffffffffffff"},{"path":["observations",2,3],"value":0},{"path":["presence",15],"value":1},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[4,15,null]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":128}]}},
+    {"id":"control-point-absent-with-targets","category":"operations","input":{"template":"full","edits":[{"path":["characteristics",1,"uuid"],"value":"ffffffffffffffffffffffffffffffff"}]},"expected":{"template":"full","edits":[{"path":["observations",1,1],"value":"ffffffffffffffffffffffffffffffff"},{"path":["observations",1,3],"value":0},{"path":["presence",14],"value":1},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[4,14,null]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":32},{"path":["operations",[0,1,7,8],3],"value":1},{"path":["operations",[0,1,7,8],4],"value":0},{"path":["operations",[0,1,7,8],5],"value":0}]}},
+    {"id":"speed-range-unread","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",3,"readState"],"value":0},{"path":["characteristics",3,"bytes"],"value":""}]},"expected":{"template":"full","edits":[{"path":["ranges",0],"value":[2,0,3,null]},{"path":["observations",3,4],"value":0},{"path":["observations",3,6],"value":0},{"path":["operations",2,4],"value":2},{"path":["operations",2,5],"value":256}]}},
+    {"id":"inclination-range-malformed","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",4,"bytes"],"value":""}]},"expected":{"template":"full","edits":[{"path":["ranges",1],"value":[2,2,4,null]},{"path":["observations",4,6],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[9,10,4]]},{"path":["operations",3,4],"value":3},{"path":["operations",3,5],"value":512}]}},
+    {"id":"resistance-read-failed","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",5,"readState"],"value":2},{"path":["characteristics",5,"reason"],"value":4},{"path":["characteristics",5,"bytes"],"value":""}]},"expected":{"template":"full","edits":[{"path":["ranges",2],"value":[2,3,5,null]},{"path":["observations",5,4],"value":2},{"path":["observations",5,5],"value":4},{"path":["observations",5,6],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[7,11,5]]},{"path":["operations",4,4],"value":2},{"path":["operations",4,5],"value":256}]}},
+    {"id":"power-range-absent-not-heart-rate","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",7],"op":"remove"}]},"expected":{"template":"full","edits":[{"path":["presence",13],"value":1},{"path":["ranges",4],"value":[1,0,null,null]},{"path":["observations",7],"op":"remove"},{"path":["observationCount"],"value":7},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[10,13,null]]},{"path":["operations",5,4],"value":3},{"path":["operations",5,5],"value":512}]}},
+    {"id":"heart-rate-without-read-not-power","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",6,"properties"],"value":0}]},"expected":{"template":"full","edits":[{"path":["observations",6,2],"value":0},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,12,6]]},{"path":["operations",6,4],"value":3},{"path":["operations",6,5],"value":512}]}},
+    {"id":"ranges-do-not-grant-support","category":"ranges","input":{"template":"full","edits":[{"path":["characteristics",0,"bytes"],"value":"0000000000000000"}]},"expected":{"template":"full","edits":[{"path":["feature",4],"value":0},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],3],"value":1},{"path":["operations",[2,3,4,5,6,9,10,11,12,13,14,15,16,17,18,19,20],4],"value":0}]}},
+    {"id":"wheel-no-range-required","category":"operations","input":{"template":"telemetry","edits":[{"path":["characteristics",0,"bytes"],"value":"0000000000400000"},{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad900001000800000805f9b34fb","properties":40,"readState":0,"reason":0,"bytes":""}},{"path":["characteristics"],"op":"append","value":{"uuid":"00002ada00001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["feature",4],"value":16384},{"path":["presence",[14,15]],"value":2},{"path":["observationCount"],"value":3},{"path":["observations"],"op":"append","value":[1,"00002ad900001000800000805f9b34fb",40,14,0,0,0]},{"path":["observations"],"op":"append","value":[2,"00002ada00001000800000805f9b34fb",16,15,0,0,0]},{"path":["operations",[0,1,7,8,18],3],"value":2},{"path":["operations",[0,1,7,8,18],4],"value":1}]}},
+    {"id":"duplicate-control-point","category":"duplicates","input":{"template":"full","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad900001000800000805f9b34fb","properties":40,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"full","edits":[{"path":["presence",14],"value":3},{"path":["observationCount"],"value":9},{"path":["observations"],"op":"append","value":[8,"00002ad900001000800000805f9b34fb",40,14,0,0,0]},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[3,14,1]]},{"path":["operations","*",4],"value":3},{"path":["operations","*",5],"value":32},{"path":["operations",[0,1,7,8],3],"value":0}]}},
+    {"id":"duplicate-power-range","category":"duplicates","input":{"template":"full","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad800001000800000805f9b34fb","properties":2,"readState":1,"reason":0,"bytes":"000001000100"}}]},"expected":{"template":"full","edits":[{"path":["presence",13],"value":3},{"path":["ranges",4],"value":[3,0,null,null]},{"path":["observationCount"],"value":9},{"path":["observations"],"op":"append","value":[8,"00002ad800001000800000805f9b34fb",2,13,1,0,6]},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[3,13,7]]},{"path":["operations",5,4],"value":3},{"path":["operations",5,5],"value":512}]}},
+    {"id":"optional-training-status-invalid","category":"properties","input":{"template":"full","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad300001000800000805f9b34fb","properties":16,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"full","edits":[{"path":["presence",8],"value":2},{"path":["observationCount"],"value":9},{"path":["observations"],"op":"append","value":[8,"00002ad300001000800000805f9b34fb",16,8,0,0,0]},{"path":["diagnosticCount"],"value":1},{"path":["diagnostics"],"value":[[5,8,8]]}]}},
+    {"id":"optional-training-status-valid","category":"properties","input":{"template":"telemetry","edits":[{"path":["characteristics"],"op":"append","value":{"uuid":"00002ad300001000800000805f9b34fb","properties":18,"readState":0,"reason":0,"bytes":""}}]},"expected":{"template":"telemetry","edits":[{"path":["presence",8],"value":2},{"path":["observationCount"],"value":2},{"path":["observations"],"op":"append","value":[1,"00002ad300001000800000805f9b34fb",18,8,0,0,0]}]}}
+  ]
+}
