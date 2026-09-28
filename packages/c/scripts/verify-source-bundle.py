@@ -117,7 +117,10 @@ def main():
         consume(temp / "vendored consumer", f'add_subdirectory("{source.as_posix()}" ftms-build)', cmake, ctest)
         consume(temp / "fetched consumer",
                 'include(FetchContent)\nFetchContent_Declare(ftms\n'
-                f'  URL "{archive.resolve().as_uri()}"\n  URL_HASH SHA256={before})\n'
+                # CMake accepts absolute local archive paths. On Windows its
+                # file-URI parser can retain the slash in file:///D:/..., making
+                # a valid archive look like a nonexistent /D:/... path.
+                f'  URL "{archive.resolve().as_posix()}"\n  URL_HASH SHA256={before})\n'
                 'FetchContent_MakeAvailable(ftms)', cmake, ctest)
     if hashlib.sha256(archive.read_bytes()).hexdigest() != before:
         raise RuntimeError("verification changed the release artifact")
