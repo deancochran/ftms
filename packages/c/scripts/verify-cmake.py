@@ -36,7 +36,7 @@ def write_installed_consumer(directory: pathlib.Path) -> None:
     (directory / "CMakeLists.txt").write_text(
         "cmake_minimum_required(VERSION 3.16)\n"
         "project(ftms_installed_consumer LANGUAGES C CXX)\n"
-        "find_package(ftms 0.1 CONFIG REQUIRED)\n"
+        f"find_package(ftms {(ROOT / 'VERSION').read_text().strip()} CONFIG REQUIRED)\n"
         "add_executable(c_consumer c_consumer.c)\n"
         "target_link_libraries(c_consumer PRIVATE ftms::ftms)\n"
         "add_executable(cxx_consumer cxx_consumer.cpp)\n"
