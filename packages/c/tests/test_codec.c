@@ -30,6 +30,25 @@ int main(void) {
   CHECK(ftms_decode_range(FTMS_RANGE_SPEED,NULL,6U,&r)==FTMS_ERROR_NULL); CHECK(ftms_decode_range(FTMS_RANGE_SPEED,speed,6U,NULL)==FTMS_ERROR_NULL);
   r=rs; CHECK(ftms_decode_range(FTMS_RANGE_POWER,reverse,6U,&r)==FTMS_ERROR_RANGE); CHECK(same(&r,&rs,sizeof r));
   CHECK(ftms_decode_range(FTMS_RANGE_SPEED,zero,6U,&r)==FTMS_ERROR_RANGE);
+  {
+    ftms_range_inspection inspection;
+    ftms_range_inspection saved_inspection;
+    ftms_range_format_options signed_format = {FTMS_RESISTANCE_RANGE_SINT16_TENTHS};
+    uint8_t alternate[6] = {0U,0U,100U,0U,1U,0U};
+    CHECK(ftms_inspect_range(FTMS_RANGE_RESISTANCE_LEVEL,alternate,6U,&inspection)==FTMS_OK);
+    CHECK(inspection.selected_profile==FTMS_RANGE_PROFILE_UINT8_WHOLE && inspection.observed_size==6U);
+    CHECK(inspection.expected_size==3U && inspection.status==FTMS_RANGE_INSPECTION_LENGTH);
+    CHECK(inspection.candidate_count==2U && inspection.candidates[1].profile==FTMS_RANGE_PROFILE_SINT16_TENTHS);
+    CHECK(inspection.candidates[1].status==FTMS_RANGE_INSPECTION_VALID && inspection.candidates[1].value.maximum==100);
+    CHECK(ftms_inspect_range_with_format(FTMS_RANGE_RESISTANCE_LEVEL,alternate,6U,&signed_format,&inspection)==FTMS_OK);
+    CHECK(inspection.selected_profile==FTMS_RANGE_PROFILE_SINT16_TENTHS && inspection.status==FTMS_RANGE_INSPECTION_VALID);
+    saved_inspection=inspection;
+    CHECK(ftms_inspect_range_with_format(FTMS_RANGE_SPEED,alternate,6U,&signed_format,&inspection)==FTMS_ERROR_KIND);
+    CHECK(same(&inspection,&saved_inspection,sizeof inspection));
+    CHECK(ftms_inspect_range(FTMS_RANGE_SPEED,NULL,6U,&inspection)==FTMS_ERROR_NULL);
+    CHECK(ftms_inspect_range(FTMS_RANGE_SPEED,alternate,SIZE_MAX,&inspection)==FTMS_OK);
+    CHECK(inspection.status==FTMS_RANGE_INSPECTION_LENGTH && inspection.observed_size==SIZE_MAX);
+  }
   { uint8_t extrema[6]={0U,128U,255U,127U,1U,0U}; CHECK(ftms_decode_range(FTMS_RANGE_POWER,extrema,6U,&r)==FTMS_OK); CHECK(r.minimum==-32768 && r.maximum==32767); }
   {
     uint8_t encoded[8] = {0U}; size_t written = 99U;

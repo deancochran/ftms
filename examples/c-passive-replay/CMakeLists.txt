@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+project(ftms_passive_replay LANGUAGES C)
+find_package(ftms CONFIG REQUIRED)
+add_executable(ftms_passive_replay main.c)
+target_compile_features(ftms_passive_replay PRIVATE c_std_99)
+target_link_libraries(ftms_passive_replay PRIVATE ftms::ftms)
+include(CTest)
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME passive_replay_boundaries COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_replay.py $<TARGET_FILE:ftms_passive_replay>)
+endif()

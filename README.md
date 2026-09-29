@@ -8,26 +8,26 @@ own Bluetooth discovery, connections, control permission, and physical safety.
 
 Start with the [released-package status and examples](docs/released-packages.md).
 The [TypeScript example](examples/typescript-client/README.md) works with the
-published npm 0.2.0 package; the [C example](examples/c-client/README.md) currently
-uses a clearly labelled local source candidate. There are **no recorded
-real-equipment interoperability results**; see the [test procedure and evidence
-requirements](docs/equipment-testing.md).
+published npm 0.2.0 compatibility baseline; the [C example](examples/c-client/README.md)
+uses an installed source archive. A [limited passive KICKR CORE pilot](docs/equipment-results/2026-09-29-kickr-core-linux.md)
+records 55 telemetry packets across two connections. It does not establish
+universal device compatibility, physical accuracy or safe control execution.
 
-[TypeScript / JavaScript](packages/typescript/README.md) is the only published
-package, released as `@deancochran/ftms` (currently `0.2.0`). It provides codecs
+[TypeScript / JavaScript](packages/typescript/README.md) is distributed as
+`@deancochran/ftms`; the current source version is **0.4.0**. It provides codecs
 for all six FTMS machine-data families, features, supported ranges, statuses,
 and Control Point requests/responses. See its README for installation and API
 usage and its [changelog](packages/typescript/CHANGELOG.md) for releases.
 
-C/C++ has unreleased bidirectional C99 codecs for Features, ranges, all six
-measurement families, Control Point and statuses, plus static
-capability evidence interpretation. Swift and Kotlin/Java remain README-only
-design scaffolds. No native package is
-released. Native CI and release workflows are configured in source; remote runs
-and publication are separate gates. See the C [verification record](packages/c/docs/verification.md).
-Aggregate capability interpretation remains unreleased and static-only. Unit tests and shared
-regression vectors do not establish real-device interoperability, PTS results,
-or Bluetooth qualification.
+C/C++ has independently released bidirectional C99 codecs for Features, ranges,
+all six measurement families, Control Point and statuses, plus static capability
+interpretation. Its current source version is **0.2.0**. Both ports add explicit
+range-inspection diagnostics without changing existing defaults or automatically
+selecting device formats. Swift and Kotlin/Java remain README-only scaffolds.
+See [verified releases](docs/released-packages.md) for actual publication status
+and [compatibility verification](docs/compatibility-verification.md) for scope and
+test accounting. Neither regression tests nor one trainer pilot establish
+universal interoperability, PTS results or Bluetooth qualification.
 
 ## Layout and dependencies
 
@@ -35,11 +35,11 @@ or Bluetooth qualification.
 | --- | --- |
 | [shared/](shared/README.md) | Language-neutral protocol definitions/design and versioned conformance fixtures |
 | [packages/typescript/](packages/typescript/README.md) | npm API docs, changelog, sources, tests, compiler configs, and npm-specific scripts |
-| [packages/c/](packages/c/README.md) | Unreleased C99 feature/range decoding and static capability evidence, consumable from C++ |
+| [packages/c/](packages/c/README.md) | Portable bidirectional C99 codecs and static capability evidence, consumable from C++ |
 | [packages/swift/](packages/swift/README.md) | Future independent native Apple package |
 | [packages/kotlin/](packages/kotlin/README.md) | Future independent Kotlin/JVM package, consumable from Java/Android |
 | [docs/](docs/architecture.md) | Repository-wide [architecture](docs/architecture.md), [coverage](docs/coverage.md), and [versioning](docs/versioning.md) guidance |
-| [examples/](examples/README.md) | Future integration examples outside protocol cores |
+| [examples/](examples/README.md) | Installed consumers and passive capture/replay examples outside protocol cores |
 | Root configs and workflows | Repository orchestration, formatting, hooks, and release gates |
 
 Ports and their build/test tools consume `shared/`; shared definitions and
@@ -85,5 +85,5 @@ C/C++ consumers. pnpm success does not validate native code or devices.
 The TypeScript build stages those policies into the npm package. npm release
 metadata and history belong to `packages/typescript/package.json` and
 `packages/typescript/CHANGELOG.md`; existing tag, verification, and trusted
-publishing gates apply only to that package. Native publishing requires a
- separate implementation and release design.
+publishing gates apply only to that package. C uses the independently gated
+`c-vVERSION` source-release workflow; registry submissions are separate.

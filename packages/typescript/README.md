@@ -114,8 +114,11 @@ const resistance = tryEncodeFtmsControlRequest(
 
 Omitted/empty options preserve the ESR11 E8991 signed16-tenths default
 (`04 7b 00` for 12.3). The explicit `uint8Tenths` alternative permits 0–25.5
-normalized levels, or integer 0–255 raw tenths. Normalized rounding policy is
-unchanged; raw codecs reject fractional operands. Invalid options, including
+normalized levels, or integer 0–255 raw tenths. Version 0.4.0
+checks original normalized bounds before grid alignment, tolerating only binary64
+representation noise: `2 * Number.EPSILON * max(1, abs(value * scale))` in raw units.
+There is no arbitrary rounding or clamping. Raw codecs reject fractional operands.
+The source-only `shared/protocol/numeric-inputs.md` specifies the policy. Invalid options, including
 null, are rejected (a result error from `tryEncode`, otherwise a thrown error).
 Only resistance opcode `0x04` changes; other requests are unaffected. Selection
 is never inferred from packet length, measurements, ranges, status or device
@@ -123,6 +126,12 @@ identity. Status resistance remains signed16 tenths. The literal 1.0.1 table
 conflicts with E8991; this alternative is not a claim that the signed correction
 was revoked. The source-checkout-only `docs/specification-audit.md` records the
 reconciliation; it is not part of the installed npm package.
+
+Version 0.4.0 requires format selections and C.7 evidence to
+be own data properties. Inherited selections and getters are rejected rather
+than silently changing defaults or manufacturing evidence. Empty, null-prototype
+and foreign-realm records remain supported. Configuration is not a sandbox for
+untrusted Proxy objects.
 
 For simulation opcode `0x11`, the legacy `cwKgPerM` property keeps its public
 name, but E10187 / FTMS 1.0.1 Table 4.20 defines Cw as **unitless**. The wire
@@ -203,7 +212,7 @@ as `parseFtmsIndoorBikeData` remain available. Application policy, transport
 lifecycle, machine inference, and presentation contracts intentionally remain
 outside this package. Prefer complete `ParsedFtmsPayload` parsers for new code.
 
-## Bidirectional protocol APIs (unreleased source additions)
+## Bidirectional protocol APIs
 
 The working source now matches the C port's protocol directions. Existing
 normalized parsers, human-unit control encoders and validated response decoder
@@ -211,6 +220,7 @@ remain compatible. Additive raw APIs are exported from the package root:
 
 - `decodeFtmsFeaturesRaw` / `encodeFtmsFeaturesRaw`
 - `decodeFtmsRangeRaw` / `encodeFtmsRangeRaw`
+- `inspectFtmsRangeRaw`
 - `decodeFtmsControlRequestRaw` / `encodeFtmsControlRequestRaw`
 - `decodeFtmsControlResponseRaw` / `encodeFtmsControlResponseRaw`
 - `decodeFtmsMeasurementRaw` / `encodeFtmsMeasurementRaw`
@@ -246,6 +256,14 @@ text is a `Uint8Array`, retaining invalid UTF-8 evidence on decode and requiring
 valid UTF-8 on encode. Raw APIs intentionally do not silently convert display
 units or aggregate More Data fragments.
 
+`inspectFtmsRangeRaw(kind, bytes, options?)` is additive diagnostic evidence for
+Supported Ranges. It returns the selected caller-owned profile, actual/expected
+length, selected `valid`/`length`/`range` status, and bounded structural
+candidates (both resistance layouts; one canonical layout for other ranges).
+It never selects an alternative from bytes: an alternate candidate can be valid
+while the selected result remains malformed. Candidate success is neither proof
+of a physical unit or device conformance nor permission to control equipment.
+
 Capability evaluation takes a pure protocol snapshot: uint32 generation, numeric
 discovery/scope/read states, canonical 32-lowercase-hex UUIDs, uint16 properties,
 and byte read evidence. Its report follows the shared capability contract,
@@ -268,11 +286,12 @@ and `shared/protocol/capability-discovery.md` in the repository.
 
 ## Embedded and native mobile roadmap
 
-The TypeScript package above is the only published package. The repository
-places it in `packages/typescript` alongside [native port locations](https://github.com/deancochran/ftms/tree/main/packages)
-for embedded C/C++, Swift, and Kotlin/Java. C now has an unreleased bidirectional source
-implementation; Swift and Kotlin remain design scaffolds. No native release or
-real-device compatibility claim is made.
+TypeScript is distributed through npm; C is independently distributed as a
+versioned source archive through GitHub releases. The repository places them in
+[language-owned packages](https://github.com/deancochran/ftms/tree/main/packages).
+Swift and Kotlin remain design scaffolds. Limited passive KICKR CORE telemetry
+evidence is documented in the repository; it does not establish compatibility
+with every device, physical accuracy or safe control execution.
 
 The [cross-language architecture](https://github.com/deancochran/ftms/blob/main/docs/architecture.md)
 preserves the npm package identity and the canonical `shared/conformance/v1` corpus. The

@@ -38,3 +38,26 @@ integers. C planning and its format-aware receive assembler apply one selected
 profile consistently for a record lifetime. The legacy C assembler APIs remain
 historical-layout only; separate format-context APIs copy an explicit profile at
 initialization and never infer one from fragment bytes.
+
+## Preserving capability interpretation context
+
+Range inspection is an additive companion, not a replacement for capability
+evaluation. Save the range kind, explicit options and inspection alongside the
+unchanged capability report; pass the same options to both APIs. Inspect only
+bytes from a successful read, not fabricated empty values for failed reads.
+Discovery absence, read failure and selected-layout incompatibility are different
+observations. Candidate success must not silently override the selected profile
+or change a capability-v1 report. New inspection results do not retain input byte
+buffers; retain original bytes separately if needed for diagnostic replay.
+
+## Additive range inspection diagnostics
+
+`inspectFtmsRangeRaw` and C `ftms_inspect_range[_with_format]` report the
+caller-selected profile, observed and expected byte counts, selected structural
+result, and raw candidate values. Resistance reports its two bounded layout
+candidates (`uint8Whole`, `signed16Tenths`); other ranges report their one
+canonical layout. A valid candidate does **not** select a profile, prove a
+physical unit, prove device conformance, or grant control permission. The
+selected decode remains malformed when its length or range check fails, even if
+the other resistance candidate succeeds. Inputs remain caller-owned and the
+inspection result contains no retained byte pointer.

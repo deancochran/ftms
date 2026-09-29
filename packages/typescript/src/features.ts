@@ -1,5 +1,5 @@
 // biome-ignore-all lint/style/noNonNullAssertion: fixed-size internal tables are initialized before indexed use.
-import { isByteSource, toDataView } from "./binary.js";
+import { isByteSource, toDataView, validateOwnSettings } from "./binary.js";
 import {
   type FTMSFeatures,
   type FtmsCapabilityDecode,
@@ -13,6 +13,9 @@ import {
   type FtmsCapabilitySnapshot,
   type FtmsFeaturesRaw,
   type FtmsRangeFormatOptions,
+  type FtmsRangeInspection,
+  type FtmsRangeInspectionCandidate,
+  type FtmsRangeProfile,
   type FtmsRangeRaw,
   RawCodecError,
 } from "./types.js";
@@ -86,6 +89,7 @@ const rawRangeMetadata: Record<FtmsRangeRaw["kind"], readonly [number, number, n
 };
 
 function validateRangeOptions(options?: FtmsRangeFormatOptions): void {
+  validateOwnSettings(options, ["resistanceFormat"]);
   if (
     options !== undefined &&
     (options === null ||
@@ -99,6 +103,68 @@ function validateRangeOptions(options?: FtmsRangeFormatOptions): void {
     !["uint8Whole", "signed16Tenths"].includes(options.resistanceFormat)
   )
     throw new RawCodecError("kind", "Unsupported resistance range format");
+}
+
+function rangeProfile(
+  kind: FtmsRangeRaw["kind"],
+  options?: FtmsRangeFormatOptions,
+): FtmsRangeProfile {
+  if (kind === "resistance")
+    return options?.resistanceFormat === "signed16Tenths" ? "signed16Tenths" : "uint8Whole";
+  return (
+    {
+      speed: "uint16Hundredths",
+      inclination: "signed16Tenths",
+      heartRate: "uint8Bpm",
+      power: "signed16Watts",
+    } as const
+  )[kind];
+}
+
+/**
+ * Inspect a Supported Range without inferring a format from its bytes. Malformed
+ * packets are returned as diagnostics; invalid API arguments still throw.
+ */
+export function inspectFtmsRangeRaw(
+  kind: FtmsRangeRaw["kind"],
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsRangeFormatOptions,
+): FtmsRangeInspection {
+  validateRangeOptions(options);
+  if (!Object.hasOwn(rawRangeMetadata, kind))
+    throw new RawCodecError("kind", `Unsupported FTMS range kind: ${String(kind)}`);
+  if (options?.resistanceFormat === "signed16Tenths" && kind !== "resistance")
+    throw new RawCodecError("kind", "Signed resistance format applies only to resistance");
+  const view = rawView(data);
+  const profiles: readonly FtmsRangeFormatOptions[] =
+    kind === "resistance"
+      ? [{ resistanceFormat: "uint8Whole" }, { resistanceFormat: "signed16Tenths" }]
+      : [{}];
+  const candidates: FtmsRangeInspectionCandidate[] = profiles.map((candidateOptions) => {
+    const profile = rangeProfile(kind, candidateOptions);
+    const expectedLength = profile === "uint8Whole" || profile === "uint8Bpm" ? 3 : 6;
+    try {
+      return {
+        profile,
+        expectedLength,
+        status: "valid",
+        value: decodeFtmsRangeRaw(kind, data, candidateOptions),
+      };
+    } catch (error) {
+      const status = error instanceof RawCodecError && error.code === "range" ? "range" : "length";
+      return { profile, expectedLength, status, value: null };
+    }
+  });
+  const selectedProfile = rangeProfile(kind, options);
+  const selected = candidates.find((candidate) => candidate.profile === selectedProfile)!;
+  return {
+    selectedProfile,
+    actualLength: view.byteLength,
+    expectedLength: selected.expectedLength,
+    status: selected.status,
+    value: selected.value === null ? null : { ...selected.value },
+    candidates,
+  };
 }
 
 /** Decode a Supported Range into its exact raw integer numerators and metadata. */
@@ -437,6 +503,8 @@ function capabilityBytes(value: Uint8Array | ArrayBuffer): Uint8Array {
 function validateSnapshot(snapshot: FtmsCapabilitySnapshot): void {
   if (!snapshot || typeof snapshot !== "object")
     throw new RawCodecError("null", "Capability snapshot is required");
+  validateOwnSettings(snapshot, ["c7"], true);
+  validateOwnSettings(snapshot.c7, ["bondingSupported", "featureMayChangeOverLifetime"]);
   if (
     ![0, 1, 2, 3].includes(snapshot.discovery) ||
     ![0, 1, 2, 3].includes(snapshot.scope) ||

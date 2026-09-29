@@ -1,9 +1,31 @@
 # Embedded C / C++ port
 
+## Additive range inspection in 0.2.0
+
+`ftms_inspect_range` and `ftms_inspect_range_with_format` report the caller's
+selected layout, observed/expected byte counts, selected decode status and up to
+two structural candidates. They do not select a profile from received bytes.
+Malformed lengths/ranges produce `FTMS_OK` with diagnostic status; invalid API
+arguments produce an error and leave output untouched. Read `value` only when
+its corresponding status is `FTMS_RANGE_INSPECTION_VALID`.
+
+Successful candidates do not prove physical units, device conformance or control
+permission. Existing decoders and capability reports are unchanged. When retaining
+a capability report, retain its input kind and explicit range options alongside
+the inspection and pass those same options to capability evaluation. A failed
+selected decode is not proof that the device lacks the characteristic.
+
+The shared inspection corpus compares all report fields in both ports. The
+measurement structural matrix additionally exercises 181,760 layout cases,
+46 sentinel positions, 47 reserved bits and 650 C planning budgets. See source
+checkout `shared/conformance/{inspection,measurement-matrix}/v1/README.md` for
+contract identities, accounting and limitations. These assets are test-only,
+not dependencies of installed C consumers.
+
 ## Local source candidate
 
 `python3 packages/c/scripts/source-bundle.py` (from the repository root) builds
-`packages/c/build/source-candidate/ftms-c-0.1.0.tar.gz` and its SHA-256 sidecar.
+`packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz` and its SHA-256 sidecar.
 This is an **unreleased local artifact**, not a published version or Git tag.
 `SOURCE.json` distinguishes a release candidate from an archive built at a tagged
 source commit and always records `released: false`: building an archive does not
@@ -17,7 +39,7 @@ See `docs/device-readiness.md` for the implemented improvements and the remainin
 SDK/hardware gates. Neither CMake packaging nor Cortex-M0 compilation proves a
 BLE firmware image works.
 
-**Status: implemented protocol surface, unreleased.** This portable C99 library implements:
+**Status: implemented protocol surface.** This portable C99 library implements:
 
 - Feature encoding/decoding with all 17 machine and 17 target masks and raw unknown bits;
 - all five Supported Range encoders/decoders, using fixed-point integers;
@@ -49,7 +71,7 @@ provide. The tested Cortex-M0 build does so. Compatible C/C++ compiler ABI is
 required; no universal vendor-toolchain compatibility is implied.
 
 The package has a CMake 3.16+ manifest for ordinary C99 builds and installs. Its
-source-only package candidate is `0.1.0` (`VERSION` is the sole version
+source-only package version is `0.2.0` (`VERSION` is the sole version
 authority); it is not a tag, publication, or release claim. The CMake package
 config and `ftms.pc` metadata read that file; no public version header is added.
 `find_package(ftms CONFIG REQUIRED)`
@@ -233,7 +255,7 @@ first. A compatible compiler builds the library for the consumer's CPU/ABI.
 The bundled Conan 2 recipe supports `conan create . --no-remote`; repository test
 consumers build and run C and C++ against `ftms::ftms`. The vcpkg overlay accepts an explicit,
 verified local archive and SHA-512 for validation. After an immutable release URL
-exists, `prepare-registry-recipes.py ARCHIVE --tag c-v0.1.0 --output NEW_DIRECTORY`
+exists, `prepare-registry-recipes.py ARCHIVE --tag c-v0.2.0 --output NEW_DIRECTORY`
 generates a public vcpkg recipe with its real SHA-512 for separate review. It
 requires a clean tagged release artifact and never submits or publishes anything.
 

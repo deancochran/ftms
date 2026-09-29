@@ -2,7 +2,11 @@
 
 ## Current evidence — 2026-09-28
 
-**No real-equipment interoperability result has been recorded for this project.**
+**A limited passive KICKR CORE result is now recorded in local work:**
+[2026-09-29 Linux pilot](equipment-results/2026-09-29-kickr-core-linux.md).
+It covers one authorized telemetry session and offline cross-port replay, not
+live controls, physical accuracy, reconnect behavior or MCU execution. The table
+below is historical evidence from before that session.
 Do not interpret codec fixtures, literal example packets, simulated equipment,
 compiler checks or successful package installation as Bluetooth device testing.
 

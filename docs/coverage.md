@@ -13,7 +13,7 @@ capability interpretation; Swift and Kotlin have no implementation yet.
 | Statuses | Training and Machine Status, normalized and raw | Both raw codecs | Original vectors plus 38 raw cases / 63 assertions | Implemented, unreleased addition |
 | Features | Normalized and raw words | Raw words | Original 35 vectors plus raw value corpus | Implemented, unreleased addition |
 | C Features | Raw machine/target words | Raw machine/target words | Original 35 vectors plus bidirectional value corpus | Implemented |
-| Supported ranges | All five, normalized and raw | All five, raw | Original 7 vectors plus raw value corpus | Implemented, unreleased addition |
+| Supported ranges | All five, normalized/raw and caller-profile inspection | All five, raw and caller-profile inspection | Original 7 vectors plus raw value and separate synthetic inspection corpus | Implemented, unreleased addition |
 | C Supported ranges | All five ranges, fixed-point | All five ranges, fixed-point | Original 7 vectors plus bidirectional value corpus | Implemented |
 | C Measurements | All six families, raw fixed-point and diagnostics | All six families | 26 raw cases / 47 directional assertions plus original corpus | Implemented |
 | C Statuses | Training and all 22 Machine Status opcodes | Training and all 22 Machine Status opcodes | 38 raw cases / 63 directional assertions plus original corpus | Implemented |
@@ -61,11 +61,18 @@ Those test-suite counts are not additional shared vectors or device evidence.
 
 ## Evidence and future gates
 
-### Authoritative current local evidence
+Latest local additive milestone: [compatibility diagnostics and structural
+coverage](compatibility-verification.md), including inspection corpus identity,
+181,760 generated layout cases per port, 650 C planner budgets and completed
+package/native verification. Existing historical run records below are retained
+for provenance, not presented as the newest run.
 
-This section is the sole current-run record for this dirty branch. It is updated
-only after the listed commands complete; it does not hash this document or its
-own narrative.
+### Historical pre-merge local evidence
+
+This section records the earlier audit branch, not the current release or HEAD.
+See [released packages](released-packages.md) for verified publication identity and
+[boundary hardening](hardening-verification.md) for the newer local verification.
+Historical input hashes below identify their recorded run, not future changes.
 
 - Base: `2b5ff79b81639e8beeea8bc9b219cbf78c2c7194`; branch
   `audit/ftms-1-0-1`; dirty local checkout (no commit, package publication, or

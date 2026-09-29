@@ -1,4 +1,4 @@
-import { isByteSource, toBytes } from "./binary.js";
+import { isByteSource, toBytes, validateOwnSettings } from "./binary.js";
 import { FTMS_OPCODES, FTMS_RESULT_CODES } from "./constants.js";
 import {
   type FTMSResponse,
@@ -34,6 +34,7 @@ const rawRequestLengths = [1, 1, 3, 3, 3, 3, 2, 1, 2, 3, 3, 3, 4, 3, 5, 7, 11, 7
 const rawOperandCounts = [0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 2, 3, 5, 4, 1, 1, 1] as const;
 
 function validateControlFormatOptions(options?: FtmsControlFormatOptions): void {
+  validateOwnSettings(options, ["resistanceFormat"]);
   if (
     options !== undefined &&
     (options === null ||
@@ -324,8 +325,22 @@ function encodeNumber(
     return encodeError("invalid_number", field, "Value must be a finite number", value);
   }
 
-  const raw = Math.round(value / resolution);
-  if (Math.abs(raw * resolution - value) > 1e-9) {
+  // FTMS resolutions here have integer reciprocal scales. Bounds are checked
+  // against the original value, not a rounded candidate.
+  const scale = 1 / resolution;
+  if (value < minimumRaw / scale || value > maximumRaw / scale) {
+    return encodeError(
+      "out_of_range",
+      field,
+      `Value must be between ${minimumRaw / scale} and ${maximumRaw / scale}`,
+      value,
+    );
+  }
+  const scaled = value * scale;
+  const raw = Math.round(scaled);
+  // Representation/multiplication noise only, never arbitrary quantization.
+  const tolerance = 2 * Number.EPSILON * Math.max(1, Math.abs(scaled));
+  if (Math.abs(raw - scaled) > tolerance) {
     return encodeError(
       "invalid_resolution",
       field,

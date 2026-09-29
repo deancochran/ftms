@@ -94,6 +94,37 @@ typedef struct ftms_range_format_options {
   ftms_resistance_range_format resistance_format;
 } ftms_range_format_options;
 
+typedef enum ftms_range_profile {
+  FTMS_RANGE_PROFILE_UINT16_HUNDREDTHS,
+  FTMS_RANGE_PROFILE_SINT16_TENTHS,
+  FTMS_RANGE_PROFILE_UINT8_WHOLE,
+  FTMS_RANGE_PROFILE_UINT8_BPM,
+  FTMS_RANGE_PROFILE_SINT16_WATTS
+} ftms_range_profile;
+typedef enum ftms_range_inspection_status {
+  FTMS_RANGE_INSPECTION_VALID,
+  FTMS_RANGE_INSPECTION_LENGTH,
+  FTMS_RANGE_INSPECTION_RANGE
+} ftms_range_inspection_status;
+/* For both candidate and top-level inspection, value is meaningful ONLY when
+ * status == FTMS_RANGE_INSPECTION_VALID. Otherwise it is zeroed storage, not a
+ * valid zero-valued range. JSON/report adapters represent that absence as null. */
+typedef struct ftms_range_inspection_candidate {
+  ftms_range_profile profile;
+  size_t expected_size;
+  ftms_range_inspection_status status;
+  ftms_range value;
+} ftms_range_inspection_candidate;
+typedef struct ftms_range_inspection {
+  ftms_range_profile selected_profile;
+  size_t observed_size;
+  size_t expected_size;
+  ftms_range_inspection_status status;
+  ftms_range value;
+  size_t candidate_count;
+  ftms_range_inspection_candidate candidates[2];
+} ftms_range_inspection;
+
 /* Inputs and outputs may overlap: all input bytes are read before *out is written.
  * On any error *out is untouched. The library retains no pointers and allocates
  * no memory. */
@@ -107,6 +138,14 @@ ftms_result ftms_decode_range_with_format(ftms_range_kind kind, const uint8_t *d
                                            size_t size,
                                            const ftms_range_format_options *options,
                                            ftms_range *out);
+/* Inspection is diagnostic: malformed lengths/ranges return FTMS_OK and are
+ * represented in `status`. It never selects an alternative from bytes. */
+ftms_result ftms_inspect_range(ftms_range_kind kind, const uint8_t *data,
+                               size_t size, ftms_range_inspection *out);
+ftms_result ftms_inspect_range_with_format(ftms_range_kind kind, const uint8_t *data,
+                                           size_t size,
+                                           const ftms_range_format_options *options,
+                                           ftms_range_inspection *out);
 
 /* Encode the raw FTMS Feature characteristic (machine word then target word,
  * little-endian). Defined and reserved bits are both retained verbatim.
