@@ -109,6 +109,31 @@ Bluetooth transport reliability, device interoperability or qualification.
 Host tests, installed-consumer checks and embedded compilation remain separate
 evidence streams.
 
+### Implementation verification
+
+Verified locally against base `77d2c6f4e2ebcb374ddbbd43e5b807d1e2e61f5b`:
+
+- `env -u TMPDIR pnpm verify`: **536 tests / 13 files**, lint, types, build and
+  packed-package checks passed, with unchanged published API/export boundaries.
+- `make BUILD=build/simulation-clean-final test`: a fresh native build passed the
+  existing corpora, strict/sanitized suites, installed consumers and source-bundle
+  checks. Normal and ASan/UBSan simulation replay each passed **37/37 scenarios,
+  75/75 steps**, with no unsupported/skipped outcomes or runner errors.
+- TypeScript and native simulation report traces and per-file identities matched
+  exactly. This comparison supplements each runner's independently specified
+  expected values.
+- Independent review found no blocking defect. Its null-input validation gap
+  was corrected by distinguishing omitted Python input from explicit JSON null.
+
+Simulation schema SHA-256:
+`6b9bad8d085a93b439fd6d6d89be63f913004932908aaad8700a70a942fe1072`.
+Scenario content SHA-256:
+`ca1eb8867dc65853f03178b420ac9bc2b7b93a034db2f00771ef84103cb19662`.
+Comparison contract SHA-256:
+`352982b78454110b204b15065179d38c66185ff8de1dd818e519b1eba5732384`.
+The report also includes exact referenced capability/control identities. No
+canonical conformance vectors or schemas were altered.
+
 Optional future extensions: seeded fault exploration with shrinkable replay
 traces; stateful command ownership/queue policies; an Open Trainer adapter; virtual
 BLE; physical-device validation; and Swift/Kotlin ports. None is required to run

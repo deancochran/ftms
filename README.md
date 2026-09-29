@@ -56,7 +56,7 @@ See the [architecture](docs/architecture.md) and
 The [conformance runner contract](shared/conformance/README.md) records the
 language-neutral v1 comparison and reporting rules.
 The [deterministic simulation contract](docs/simulation.md) is separate,
-host-only lifecycle evidence and is not Bluetooth qualification.
+host-only protocol/session evidence and is not Bluetooth qualification.
 
 ## Repository commands
 
