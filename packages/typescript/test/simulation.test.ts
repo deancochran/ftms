@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import corpus from "../../../shared/simulation/v1/scenarios.json" with { type: "json" };
+import * as controlCodec from "../src/control.js";
 import { runCorpus, runSimulation, validateCorpus } from "./simulation/runner.js";
 import type { Corpus, Feed } from "./simulation/types.js";
 
@@ -39,6 +40,35 @@ describe("deterministic simulation v1", () => {
     expect(report.failedSteps).toBe(1);
     expect(report.trace[0]?.outcome).toBe("failed");
     expect(report.steps).toBe(corpus.scenarios.reduce((n, s) => n + s.steps.length, 0));
+  });
+
+  it("fails selected-command references if format is ignored or encoded bytes are wrong", () => {
+    const decode = controlCodec.decodeFtmsControlRequestRaw;
+    const encode = controlCodec.encodeFtmsControlRequestRaw;
+    for (const fault of ["ignore-format", "wrong-bytes"]) {
+      if (fault === "ignore-format") {
+        vi.spyOn(controlCodec, "decodeFtmsControlRequestRaw").mockImplementation((bytes) =>
+          decode(bytes),
+        );
+      } else {
+        vi.spyOn(controlCodec, "encodeFtmsControlRequestRaw").mockImplementation(
+          (value, options) => {
+            const bytes = encode(value, options);
+            if (options?.resistanceFormat === "uint8Tenths") bytes[1] = (bytes[1] ?? 0) ^ 1;
+            return bytes;
+          },
+        );
+      }
+      try {
+        const report = runSimulation();
+        expect(report.complete).toBe(false);
+        expect(report.failed).toBe(1);
+        expect(report.failedSteps).toBe(3);
+        expect(report.steps).toBe(corpus.scenarios.reduce((n, s) => n + s.steps.length, 0));
+      } finally {
+        vi.restoreAllMocks();
+      }
+    }
   });
 
   it("rejects malformed inputs, unknown keys and unresolved references", () => {

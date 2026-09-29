@@ -72,6 +72,14 @@ enum {
 #define FTMS_CAP_REASON_STATUS_INVALID UINT32_C(0x080)
 #define FTMS_CAP_REASON_RANGE_UNAVAILABLE UINT32_C(0x100)
 #define FTMS_CAP_REASON_RANGE_INVALID UINT32_C(0x200)
+#define FTMS_CAP_REASON_C7_EVIDENCE_UNAVAILABLE UINT32_C(0x400)
+typedef enum ftms_cap_truth {
+  FTMS_CAP_TRUTH_UNKNOWN, FTMS_CAP_TRUTH_FALSE, FTMS_CAP_TRUTH_TRUE
+} ftms_cap_truth;
+typedef struct ftms_cap_c7_evidence {
+  ftms_cap_truth bonding_supported;
+  ftms_cap_truth feature_may_change_over_lifetime;
+} ftms_cap_c7_evidence;
 
 typedef struct ftms_cap_characteristic {
   uint8_t uuid[FTMS_CAP_UUID_BYTES];
@@ -104,7 +112,7 @@ typedef enum ftms_cap_diagnostic_code {
   FTMS_CAP_DIAG_REQUIRED_PROPERTY_MISSING, FTMS_CAP_DIAG_EXCLUDED_PROPERTY_PRESENT,
   FTMS_CAP_DIAG_READ_FAILED, FTMS_CAP_DIAG_READ_SECURITY_REQUIRED,
   FTMS_CAP_DIAG_MALFORMED_BYTES, FTMS_CAP_DIAG_REQUIRED_RANGE_MISSING,
-  FTMS_CAP_DIAG_SCOPE_CONTRADICTION
+  FTMS_CAP_DIAG_SCOPE_CONTRADICTION, FTMS_CAP_DIAG_C7_EVIDENCE_INSUFFICIENT
 } ftms_cap_diagnostic_code;
 typedef struct ftms_cap_diagnostic {
   ftms_cap_diagnostic_code code;
@@ -179,7 +187,16 @@ ftms_result ftms_capability_requirements_with_format(const ftms_cap_snapshot *sn
                                         ftms_cap_requirements *out);
 ftms_result ftms_evaluate_capabilities_with_format(const ftms_cap_snapshot *snapshot,
                                       const ftms_range_format_options *options,
-                                      ftms_cap_output *out);
+                                       ftms_cap_output *out);
+/* C.7 facts are explicit: keeping snapshot unchanged preserves source/ABI use of
+ * existing initializers and avoids interpreting uninitialized appended storage.
+ * NULL means unknown. */
+ftms_result ftms_capability_requirements_with_c7(const ftms_cap_snapshot *snapshot,
+                                        const ftms_range_format_options *options,
+                                        const ftms_cap_c7_evidence *c7, ftms_cap_requirements *out);
+ftms_result ftms_evaluate_capabilities_with_c7(const ftms_cap_snapshot *snapshot,
+                                       const ftms_range_format_options *options,
+                                       const ftms_cap_c7_evidence *c7, ftms_cap_output *out);
 
 #ifdef __cplusplus
 } /* extern "C" */

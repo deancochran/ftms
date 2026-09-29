@@ -85,7 +85,8 @@ def validate_vectors(vectors, schema):
 
 
 def line(snapshot):
-    rows = [f'{snapshot["discovery"]} {snapshot["scope"]} {snapshot["generation"]} {len(snapshot["characteristics"])}']
+    c7 = snapshot.get("c7", {"bondingSupported": 0, "featureMayChangeOverLifetime": 0})
+    rows = [f'{snapshot["discovery"]} {snapshot["scope"]} {snapshot["generation"]} {len(snapshot["characteristics"])} {c7["bondingSupported"]} {c7["featureMayChangeOverLifetime"]}']
     for c in snapshot["characteristics"]:
         rows.append(f'{c["uuid"]} {c["properties"]} {c["readState"]} {c["reason"]} {c["bytes"] or "-"}')
     return "\n".join(rows) + "\n"

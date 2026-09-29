@@ -24,10 +24,13 @@ static uint8_t kind_of(const uint8_t uuid[FTMS_CAP_UUID_BYTES]) {
   return (uint8_t)(FTMS_CAP_KIND_FEATURE + value - 0x2accU);
 }
 
-static uint16_t required_props(uint8_t kind) {
+static uint16_t required_props(uint8_t kind, const ftms_cap_c7_evidence *c7) {
   if (kind == FTMS_CAP_KIND_FEATURE ||
       (kind >= FTMS_CAP_KIND_SPEED_RANGE && kind <= FTMS_CAP_KIND_POWER_RANGE)) {
-    return FTMS_CAP_PROP_READ;
+    return (kind == FTMS_CAP_KIND_FEATURE && c7 != NULL &&
+      c7->bonding_supported == FTMS_CAP_TRUTH_TRUE &&
+      c7->feature_may_change_over_lifetime == FTMS_CAP_TRUTH_TRUE)
+      ? FTMS_CAP_PROP_READ | FTMS_CAP_PROP_INDICATE : FTMS_CAP_PROP_READ;
   }
   if (kind == FTMS_CAP_KIND_TRAINING_STATUS) {
     return FTMS_CAP_PROP_READ | FTMS_CAP_PROP_NOTIFY;
@@ -45,11 +48,11 @@ static ftms_result validate(const ftms_cap_snapshot *s) {
       (unsigned)s->service_scope > (unsigned)FTMS_CAP_SERVICE_AMBIGUOUS) {
     return FTMS_ERROR_KIND;
   }
-  /* At most three per-observation diagnostics plus fewer than 64 fixed ones.
+  /* At most four per-observation diagnostics plus fewer than 64 fixed ones.
    * Check representable buffer sizes before walking any caller array. */
   if (s->characteristic_count > SIZE_MAX / sizeof(ftms_cap_characteristic) ||
       s->characteristic_count > SIZE_MAX / sizeof(ftms_cap_observation) ||
-      s->characteristic_count > (SIZE_MAX / sizeof(ftms_cap_diagnostic) - 64U) / 3U) {
+       s->characteristic_count > (SIZE_MAX / sizeof(ftms_cap_diagnostic) - 64U) / 4U) {
     return FTMS_ERROR_LENGTH;
   }
   if (s->characteristic_count != 0U && s->characteristics == NULL) return FTMS_ERROR_NULL;
@@ -69,6 +72,15 @@ static ftms_result validate(const ftms_cap_snapshot *s) {
 }
 static int valid_range_options(const ftms_range_format_options *options) {
   return options == NULL || (unsigned)options->resistance_format <= FTMS_RESISTANCE_RANGE_SINT16_TENTHS;
+}
+static int valid_c7(const ftms_cap_c7_evidence *c7) {
+  return c7 == NULL || ((unsigned)c7->bonding_supported <= FTMS_CAP_TRUTH_TRUE &&
+    (unsigned)c7->feature_may_change_over_lifetime <= FTMS_CAP_TRUTH_TRUE);
+}
+static int c7_unknown(const ftms_cap_c7_evidence *c7) {
+  return c7 == NULL || (c7->bonding_supported != FTMS_CAP_TRUTH_FALSE &&
+    c7->feature_may_change_over_lifetime != FTMS_CAP_TRUTH_FALSE &&
+    !(c7->bonding_supported == FTMS_CAP_TRUTH_TRUE && c7->feature_may_change_over_lifetime == FTMS_CAP_TRUTH_TRUE));
 }
 
 static void add_diag(ftms_cap_diagnostic *diags, ftms_cap_report *r,
@@ -112,11 +124,18 @@ static ftms_cap_decode decode_range(const ftms_cap_characteristic *c,
 /* Missing confirmed evidence, duplicates, and invalid properties are contradictions.
  * Read/decode state is checked separately for Feature and range prerequisites. */
 static uint32_t characteristic_reasons(const ftms_cap_snapshot *s, const ftms_cap_report *r,
-                                      const size_t first[FTMS_CAP_KIND_COUNT], uint8_t kind,
-                                      uint32_t unavailable, uint32_t invalid) {
+                                       const size_t first[FTMS_CAP_KIND_COUNT], uint8_t kind,
+                                       uint32_t unavailable, uint32_t invalid, const ftms_cap_c7_evidence *c7) {
   if (r->presence[kind] == FTMS_CAP_PRESENCE_UNKNOWN) return unavailable;
   if (r->presence[kind] != FTMS_CAP_PRESENCE_UNIQUE) return invalid;
-  if (s->characteristics[first[kind]].properties != required_props(kind)) return invalid;
+  if (kind == FTMS_CAP_KIND_FEATURE && c7_unknown(c7)) {
+    uint16_t properties = s->characteristics[first[kind]].properties;
+    uint32_t reasons = FTMS_CAP_REASON_C7_EVIDENCE_UNAVAILABLE;
+    if ((properties & FTMS_CAP_PROP_READ) == 0U ||
+        (properties & (uint16_t)~(FTMS_CAP_PROP_READ | FTMS_CAP_PROP_INDICATE)) != 0U) reasons |= invalid;
+    return reasons;
+  }
+  if (s->characteristics[first[kind]].properties != required_props(kind, c7)) return invalid;
   return 0U;
 }
 
@@ -126,7 +145,7 @@ static uint32_t decode_reasons(ftms_cap_decode state, uint32_t unavailable, uint
 }
 
 static void evaluate_operations(const ftms_cap_snapshot *s, ftms_cap_report *r,
-                                const size_t first[FTMS_CAP_KIND_COUNT]) {
+                                 const size_t first[FTMS_CAP_KIND_COUNT], const ftms_cap_c7_evidence *c7) {
   size_t opcode;
   const uint32_t invalid_mask = FTMS_CAP_REASON_FEATURE_INVALID |
     FTMS_CAP_REASON_CONTROL_POINT_INVALID | FTMS_CAP_REASON_STATUS_INVALID |
@@ -169,21 +188,21 @@ static void evaluate_operations(const ftms_cap_snapshot *s, ftms_cap_report *r,
     }
     if (s->discovery != FTMS_CAP_DISCOVERY_COMPLETE) o->reasons |= FTMS_CAP_REASON_DISCOVERY_INCOMPLETE;
     o->reasons |= characteristic_reasons(s, r, first, FTMS_CAP_KIND_FEATURE,
-      FTMS_CAP_REASON_FEATURE_UNAVAILABLE, FTMS_CAP_REASON_FEATURE_INVALID);
+      FTMS_CAP_REASON_FEATURE_UNAVAILABLE, FTMS_CAP_REASON_FEATURE_INVALID, c7);
     if (bit != FTMS_CAP_NO_TARGET && r->feature.presence == FTMS_CAP_PRESENCE_UNIQUE) {
       o->reasons |= decode_reasons(r->feature.decode,
         FTMS_CAP_REASON_FEATURE_UNAVAILABLE, FTMS_CAP_REASON_FEATURE_INVALID);
     }
     o->reasons |= characteristic_reasons(s, r, first, FTMS_CAP_KIND_CONTROL_POINT,
-      FTMS_CAP_REASON_CONTROL_POINT_UNAVAILABLE, FTMS_CAP_REASON_CONTROL_POINT_INVALID);
+      FTMS_CAP_REASON_CONTROL_POINT_UNAVAILABLE, FTMS_CAP_REASON_CONTROL_POINT_INVALID, c7);
     o->reasons |= characteristic_reasons(s, r, first, FTMS_CAP_KIND_MACHINE_STATUS,
-      FTMS_CAP_REASON_STATUS_UNAVAILABLE, FTMS_CAP_REASON_STATUS_INVALID);
+      FTMS_CAP_REASON_STATUS_UNAVAILABLE, FTMS_CAP_REASON_STATUS_INVALID, c7);
     /* Unknown declarations must not invent required ranges. */
     if (bit < 5U && o->declaration == FTMS_CAP_DECLARATION_SUPPORTED) {
       uint8_t range = range_for_target[bit];
       uint8_t kind = (uint8_t)(FTMS_CAP_KIND_SPEED_RANGE + range);
       o->reasons |= characteristic_reasons(s, r, first, kind,
-        FTMS_CAP_REASON_RANGE_UNAVAILABLE, FTMS_CAP_REASON_RANGE_INVALID);
+        FTMS_CAP_REASON_RANGE_UNAVAILABLE, FTMS_CAP_REASON_RANGE_INVALID, c7);
       if (r->ranges[range].presence == FTMS_CAP_PRESENCE_UNIQUE) {
         o->reasons |= decode_reasons(r->ranges[range].decode,
           FTMS_CAP_REASON_RANGE_UNAVAILABLE, FTMS_CAP_REASON_RANGE_INVALID);
@@ -195,8 +214,8 @@ static void evaluate_operations(const ftms_cap_snapshot *s, ftms_cap_report *r,
 }
 
 static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observations,
-                      ftms_cap_diagnostic *diags, const ftms_range_format_options *options,
-                      ftms_cap_report *r) {
+                       ftms_cap_diagnostic *diags, const ftms_range_format_options *options,
+                       const ftms_cap_c7_evidence *c7, ftms_cap_report *r) {
   size_t i;
   uint8_t counts[FTMS_CAP_KIND_COUNT] = {0};
   size_t first[FTMS_CAP_KIND_COUNT] = {0};
@@ -247,14 +266,16 @@ static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observati
   for (i = 0; i < s->characteristic_count; ++i) {
     const ftms_cap_characteristic *c = &s->characteristics[i];
     uint8_t kind = kind_of(c->uuid);
-    uint16_t required = required_props(kind);
+    uint16_t required = required_props(kind, c7);
     if (kind == FTMS_CAP_KIND_UNKNOWN || !scope_ok) continue;
     if ((c->properties & required) != required) {
       add_diag(diags, r, FTMS_CAP_DIAG_REQUIRED_PROPERTY_MISSING, kind, i);
     }
-    if ((c->properties & (uint16_t)~required) != 0U) {
+    if ((c->properties & (uint16_t)~(required | (kind == FTMS_CAP_KIND_FEATURE && c7_unknown(c7)
+        ? FTMS_CAP_PROP_INDICATE : 0U))) != 0U) {
       add_diag(diags, r, FTMS_CAP_DIAG_EXCLUDED_PROPERTY_PRESENT, kind, i);
     }
+    if (kind == FTMS_CAP_KIND_FEATURE && c7_unknown(c7)) add_diag(diags, r, FTMS_CAP_DIAG_C7_EVIDENCE_INSUFFICIENT, kind, i);
     if (c->read_state == FTMS_CAP_READ_FAILED) {
       add_diag(diags, r, c->read_reason == FTMS_CAP_READ_REASON_SECURITY_REQUIRED
         ? FTMS_CAP_DIAG_READ_SECURITY_REQUIRED : FTMS_CAP_DIAG_READ_FAILED, kind, i);
@@ -306,45 +327,55 @@ static void evaluate(const ftms_cap_snapshot *s, ftms_cap_observation *observati
       }
     }
   }
-  evaluate_operations(s, r, first);
+  evaluate_operations(s, r, first, c7);
 }
 
 ftms_result ftms_capability_requirements(const ftms_cap_snapshot *s, ftms_cap_requirements *out) {
-  return ftms_capability_requirements_with_format(s, NULL, out);
+  return ftms_capability_requirements_with_c7(s, NULL, NULL, out);
 }
 ftms_result ftms_capability_requirements_with_format(const ftms_cap_snapshot *s,
                                                      const ftms_range_format_options *options,
                                                      ftms_cap_requirements *out) {
+  return ftms_capability_requirements_with_c7(s, options, NULL, out);
+}
+ftms_result ftms_capability_requirements_with_c7(const ftms_cap_snapshot *s,
+                                                      const ftms_range_format_options *options,
+                                                      const ftms_cap_c7_evidence *c7, ftms_cap_requirements *out) {
   ftms_cap_report report;
   ftms_result result;
   if (out == NULL) return FTMS_ERROR_NULL;
-  if (!valid_range_options(options)) return FTMS_ERROR_KIND;
+  if (!valid_range_options(options) || !valid_c7(c7)) return FTMS_ERROR_KIND;
   result = validate(s);
   if (result != FTMS_OK) return result;
-  evaluate(s, NULL, NULL, options, &report);
+  evaluate(s, NULL, NULL, options, c7, &report);
   out->observation_count = report.observation_count;
   out->diagnostic_count = report.diagnostic_count;
   return FTMS_OK;
 }
 
 ftms_result ftms_evaluate_capabilities(const ftms_cap_snapshot *s, ftms_cap_output *out) {
-  return ftms_evaluate_capabilities_with_format(s, NULL, out);
+  return ftms_evaluate_capabilities_with_c7(s, NULL, NULL, out);
 }
 ftms_result ftms_evaluate_capabilities_with_format(const ftms_cap_snapshot *s,
                                                    const ftms_range_format_options *options,
                                                    ftms_cap_output *out) {
+  return ftms_evaluate_capabilities_with_c7(s, options, NULL, out);
+}
+ftms_result ftms_evaluate_capabilities_with_c7(const ftms_cap_snapshot *s,
+                                                    const ftms_range_format_options *options,
+                                                    const ftms_cap_c7_evidence *c7, ftms_cap_output *out) {
   ftms_cap_report report;
   ftms_result result;
   if (out == NULL) return FTMS_ERROR_NULL;
-  if (!valid_range_options(options)) return FTMS_ERROR_KIND;
+  if (!valid_range_options(options) || !valid_c7(c7)) return FTMS_ERROR_KIND;
   result = validate(s);
   if (result != FTMS_OK) return result;
-  evaluate(s, NULL, NULL, options, &report);
+  evaluate(s, NULL, NULL, options, c7, &report);
   if (out->observation_capacity < report.observation_count || out->diagnostic_capacity < report.diagnostic_count) {
     return FTMS_ERROR_LENGTH;
   }
   if ((report.observation_count != 0U && out->observations == NULL) ||
       (report.diagnostic_count != 0U && out->diagnostics == NULL)) return FTMS_ERROR_NULL;
-  evaluate(s, out->observations, out->diagnostics, options, &out->report);
+  evaluate(s, out->observations, out->diagnostics, options, c7, &out->report);
   return FTMS_OK;
 }

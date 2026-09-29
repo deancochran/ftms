@@ -43,7 +43,9 @@ actual traces, counts, runner errors, source identity, and SHA-256 input identit
   `shared/conformance/controls/v1`. Decode compares to the authored value; encode
   takes that authored value, **not** the decoder's result, and compares to literal
   bytes. A response with `encode: false` is a decode-only diagnostic case.
-  Scripted success/rejection is not proof of physical command execution.
+  The request case's optional explicit format is passed to both independently
+  authored decode and encode calls. Scripted success/rejection is not proof of
+  physical command execution.
 
 All objects and arrays compare recursively and exactly; object key order is not
 significant. Booleans are not numeric values, and missing/extra fields fail.
@@ -62,7 +64,7 @@ schema, comparison contract and all referenced corpus/schema/contract files.
 tests. Only canonical JSON inputs are accepted; Git metadata and hashes are report
 metadata, not event scheduling inputs.
 
-The current matrix has **10 profiles, 37 scenarios and 75 scheduled steps**.
+The current matrix has **10 profiles, 38 scenarios and 79 scheduled steps**.
 Every runner emits scenario and step totals, individual outcomes, a stable trace
 with source index, relative and wrapped ticks, actual/expected values, failure
 reasons, unsupported/skipped counts and runner errors. `complete` requires all

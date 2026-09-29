@@ -90,9 +90,23 @@ function expand(templates: Record<string, Json>, expansion: Expansion): Json {
   return result;
 }
 function snapshot(value: Json): Parameters<typeof evaluateFtmsCapabilities>[0] {
-  const input = value as { characteristics: { bytes: string }[] };
+  const input = value as {
+    c7?: { bondingSupported: 0 | 1 | 2; featureMayChangeOverLifetime: 0 | 1 | 2 };
+    characteristics: { bytes: string }[];
+  };
+  const { c7, ...rest } = input;
   return {
-    ...(input as object),
+    ...rest,
+    ...(c7 === undefined
+      ? {}
+      : {
+          c7: {
+            ...(c7.bondingSupported === 0 ? {} : { bondingSupported: c7.bondingSupported === 2 }),
+            ...(c7.featureMayChangeOverLifetime === 0
+              ? {}
+              : { featureMayChangeOverLifetime: c7.featureMayChangeOverLifetime === 2 }),
+          },
+        }),
     characteristics: input.characteristics.map((item) => ({
       ...item,
       bytes: Uint8Array.from(
@@ -136,9 +150,13 @@ export function reference(
         actual: null,
         expected: { decoded: entry.decoded, encoded: entry.bytes },
       } as unknown as Json;
-    const decoded = decodeFtmsControlRequestRaw(Uint8Array.from(entry.bytes));
+    const options =
+      entry.format === "signed16Tenths" || entry.format === "uint8Tenths"
+        ? ({ resistanceFormat: entry.format } as const)
+        : undefined;
+    const decoded = decodeFtmsControlRequestRaw(Uint8Array.from(entry.bytes), options);
     return {
-      actual: { decoded, encoded: Array.from(encodeFtmsControlRequestRaw(entry.decoded)) },
+      actual: { decoded, encoded: Array.from(encodeFtmsControlRequestRaw(entry.decoded, options)) },
       expected: { decoded: entry.decoded, encoded: entry.bytes },
     } as unknown as Json;
   }

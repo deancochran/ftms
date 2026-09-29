@@ -73,7 +73,15 @@ description of its current return type.
 
 ### Measurements and targets are separate
 
-Feature (`0x2ACC`) is mandatory and readable. It contains separate measurement
+Feature (`0x2ACC`) is mandatory and readable. Under Table 4.1 C.7, Indicate is
+also mandatory exactly when caller-owned evidence says both that the device
+supports bonding and that the Feature value may change over the device lifetime;
+it is excluded when either fact is known false. If either needed fact is unknown
+(unless the other is known false), only Indicate is neither accepted nor rejected
+as a property contradiction: every other excluded Feature property remains
+invalid. Report insufficient C.7 evidence and leave applicable
+operation prerequisites incomplete. This does not alter decoded Feature words or
+assert encryption, bonding, subscription, or authorization. It contains separate measurement
 feature and target-setting feature words. A measured value being supported does
 not prove that the corresponding value can be controlled. Optional feature bits
 are not a complete inventory of mandatory fields in every measurement layout.
@@ -218,14 +226,16 @@ In present scope:
    set/clear bits mean supported/not supported, otherwise unknown.
 2. A not-supported declaration has not-applicable prerequisites and zero reason
    flags. Other contradictory observations remain in the report and diagnostics.
-3. Every applicable operation needs a unique Feature with exactly Read, a unique
+3. Every applicable operation needs a unique Feature with exactly Read (plus
+   Indicate only when known C.7 evidence requires it; unknown C.7 permits only
+   the Read/Indicate ambiguity and still rejects all other extra properties), a unique
    Control Point with exactly Write + Indicate, and a unique Machine Status with
    exactly Notify. A **base** procedure does not require a successful Feature
    read: its declaration is independent of Feature bits. Target procedures do.
 4. Only a **known supported** target among bits 0–4 requires its corresponding
    unique, readable, successfully decoded range. Unknown declarations do not
    invent range requirements; no range is required for bits 5–16.
-5. Unknown presence, unread/failed required values, and incomplete discovery
+5. Unknown presence, unread/failed required values, incomplete C.7 evidence, and incomplete discovery
    produce unavailable/incomplete reasons. Confirmed missing prerequisites,
    duplicate prerequisites, invalid required properties, and malformed required
    values produce invalid/inconsistent reasons. **Inconsistency takes precedence**
@@ -269,6 +279,7 @@ those host results from untested devices and the still-partial codec surface.
 | Target bit set; Control Point absent | Contradictory control evidence reported |
 | Control Point lacks Write/Indicate, or Machine Status missing | Required properties/characteristics diagnosed |
 | Feature/range lacks Read; measurement/status lacks Notify | Invalid property evidence reported |
+| Feature Indicate under C.7 | Required only for known bonding=true and lifetime-mutability=true; excluded for a known false input; otherwise report insufficient caller evidence, not a property contradiction |
 | Optional Training Status present without Read or Notify | Invalid properties reported; its absence alone is not an error |
 | Target-setting feature with no defined range characteristic | Do not invent a range requirement |
 | Base Control Point procedure without a dedicated target bit | Evaluate its own protocol prerequisites |

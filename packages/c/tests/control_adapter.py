@@ -25,6 +25,17 @@ def call(driver, *args):
     return json.loads(subprocess.check_output([str(driver), *map(str, args)], text=True, timeout=10))
 
 
+def request_actions(case):
+    format_args = [case["format"]] if "format" in case else []
+    suffix = "-format" if format_args else ""
+    decoded = case["decoded"]
+    return [
+        ("decode", ["decode-request" + suffix, *format_args, bytes(case["bytes"]).hex()], decoded),
+        ("encode", ["encode-request" + suffix, *format_args, decoded["opcode"], *decoded["operands"]],
+         {"bytes": bytes(case["bytes"]).hex()}),
+    ]
+
+
 def validate():
     import jsonschema
     schema = json.loads((CORPUS / "schema.json").read_text())
@@ -44,12 +55,21 @@ def run(driver):
         counts = {category: len(vectors[category]) for category in ("requests", "responses", "invalid")}
         for category in counts:
             for case in vectors[category]:
-                actions = [("decode", ["decode-" + case["operation"], bytes(case["bytes"]).hex()],
-                            {"error": ERR[case["error"]]} if category == "invalid" else case["decoded"])]
-                if category != "invalid" and case.get("encode", True):
+                if category == "invalid":
+                    if case["operation"] == "request":
+                        format_args = [case["format"]] if "format" in case else []
+                        suffix = "-format" if format_args else ""
+                        args = ["decode-request" + suffix, *format_args, bytes(case["bytes"]).hex()]
+                    else:
+                        args = ["decode-response", bytes(case["bytes"]).hex()]
+                    actions = [("decode", args, {"error": ERR[case["error"]]})]
+                elif case["operation"] == "request":
+                    actions = request_actions(case)
+                else:
+                    actions = [("decode", ["decode-response", bytes(case["bytes"]).hex()], case["decoded"])]
+                if category == "responses" and case.get("encode", True):
                     value = case["decoded"]
-                    args = (["encode-request", value["opcode"], *value["operands"]] if case["operation"] == "request"
-                            else ["encode-response", value["requestOpcode"], value["resultCode"], value["parameter"], value["low"], value["high"]])
+                    args = ["encode-response", value["requestOpcode"], value["resultCode"], value["parameter"], value["low"], value["high"]]
                     actions.append(("encode", args, {"bytes": bytes(case["bytes"]).hex()}))
                 for direction, args, expected in actions:
                     item = {"id": case["id"], "direction": direction, "category": category}

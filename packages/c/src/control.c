@@ -22,7 +22,13 @@ static int is_request_opcode(ftms_control_opcode opcode) {
          opcode <= FTMS_CONTROL_SET_TARGETED_CADENCE;
 }
 
-static size_t request_length(uint8_t opcode) {
+static int valid_options(const ftms_control_format_options *options) {
+  return options == NULL || (unsigned)options->resistance_format <= FTMS_CONTROL_RESISTANCE_UINT8_TENTHS;
+}
+
+static size_t request_length(uint8_t opcode, const ftms_control_format_options *options) {
+  if (opcode == FTMS_CONTROL_SET_TARGET_RESISTANCE && options != NULL &&
+      options->resistance_format == FTMS_CONTROL_RESISTANCE_UINT8_TENTHS) return 2U;
   switch (opcode) {
     case FTMS_CONTROL_REQUEST_CONTROL:
     case FTMS_CONTROL_RESET:
@@ -49,16 +55,20 @@ static size_t request_length(uint8_t opcode) {
 static int is_action_value(int value) { return value == 1 || value == 2; }
 static int is_result_value(uint8_t value) { return value >= 1U && value <= 5U; }
 
-ftms_result ftms_encode_control_request(const ftms_control_request *request,
-                                        uint8_t *out, size_t capacity,
-                                        size_t *written) {
+ftms_result ftms_encode_control_request_with_format(const ftms_control_request *request,
+                                                     const ftms_control_format_options *options,
+                                                     uint8_t *out, size_t capacity,
+                                                     size_t *written) {
   uint8_t local[11] = {0U};
   size_t length;
   size_t index;
 
   if (request == NULL || out == NULL || written == NULL) return FTMS_ERROR_NULL;
-  if (!is_request_opcode(request->opcode)) return FTMS_ERROR_KIND;
-  length = request_length((uint8_t)request->opcode);
+  if (!is_request_opcode(request->opcode) || !valid_options(options)) return FTMS_ERROR_KIND;
+  if (request->opcode == FTMS_CONTROL_SET_TARGET_RESISTANCE && options != NULL &&
+      options->resistance_format == FTMS_CONTROL_RESISTANCE_UINT8_TENTHS &&
+      (request->value.resistance_tenth_level < 0 || request->value.resistance_tenth_level > 255)) return FTMS_ERROR_RANGE;
+  length = request_length((uint8_t)request->opcode, options);
   if (request->opcode == FTMS_CONTROL_STOP_PAUSE &&
       !is_action_value((int)request->value.stop_pause)) return FTMS_ERROR_RANGE;
   if (request->opcode == FTMS_CONTROL_SPIN_DOWN &&
@@ -71,7 +81,10 @@ ftms_result ftms_encode_control_request(const ftms_control_request *request,
   switch (request->opcode) {
     case FTMS_CONTROL_SET_TARGET_SPEED: write_u16le(local + 1U, request->value.speed_centikph); break;
     case FTMS_CONTROL_SET_TARGET_INCLINATION: write_u16le(local + 1U, (uint16_t)request->value.inclination_tenth_percent); break;
-    case FTMS_CONTROL_SET_TARGET_RESISTANCE: write_u16le(local + 1U, (uint16_t)request->value.resistance_tenth_level); break;
+    case FTMS_CONTROL_SET_TARGET_RESISTANCE:
+      if (options != NULL && options->resistance_format == FTMS_CONTROL_RESISTANCE_UINT8_TENTHS) local[1] = (uint8_t)request->value.resistance_tenth_level;
+      else write_u16le(local + 1U, (uint16_t)request->value.resistance_tenth_level);
+      break;
     case FTMS_CONTROL_SET_TARGET_POWER: write_u16le(local + 1U, (uint16_t)request->value.power_watts); break;
     case FTMS_CONTROL_SET_TARGET_HEART_RATE: local[1] = request->value.heart_rate_bpm; break;
     case FTMS_CONTROL_STOP_PAUSE: local[1] = (uint8_t)request->value.stop_pause; break;
@@ -105,21 +118,29 @@ ftms_result ftms_encode_control_request(const ftms_control_request *request,
   return FTMS_OK;
 }
 
-ftms_result ftms_decode_control_request(const uint8_t *data, size_t size,
-                                        ftms_control_request *out) {
+ftms_result ftms_encode_control_request(const ftms_control_request *request,
+                                         uint8_t *out, size_t capacity,
+                                         size_t *written) {
+  return ftms_encode_control_request_with_format(request, NULL, out, capacity, written);
+}
+
+ftms_result ftms_decode_control_request_with_format(const uint8_t *data, size_t size,
+                                                     const ftms_control_format_options *options,
+                                                     ftms_control_request *out) {
   ftms_control_request local = {0};
   size_t length;
   size_t index;
+  if (!valid_options(options)) return FTMS_ERROR_KIND;
   if (data == NULL || out == NULL) return FTMS_ERROR_NULL;
   if (size < 1U) return FTMS_ERROR_LENGTH;
   if (!is_known_opcode(data[0])) return FTMS_ERROR_KIND;
-  length = request_length(data[0]);
+  length = request_length(data[0], options);
   if (size != length) return FTMS_ERROR_LENGTH;
   local.opcode = (ftms_control_opcode)data[0];
   switch (data[0]) {
     case 2: local.value.speed_centikph = read_u16le(data + 1U); break;
     case 3: local.value.inclination_tenth_percent = read_i16le(data + 1U); break;
-    case 4: local.value.resistance_tenth_level = read_i16le(data + 1U); break;
+    case 4: local.value.resistance_tenth_level = options != NULL && options->resistance_format == FTMS_CONTROL_RESISTANCE_UINT8_TENTHS ? (int16_t)data[1] : read_i16le(data + 1U); break;
     case 5: local.value.power_watts = read_i16le(data + 1U); break;
     case 6: local.value.heart_rate_bpm = data[1]; break;
     case 8: if (!is_action_value((int)data[1])) return FTMS_ERROR_RANGE; local.value.stop_pause = (ftms_stop_pause_action)data[1]; break;
@@ -137,6 +158,11 @@ ftms_result ftms_decode_control_request(const uint8_t *data, size_t size,
   }
   *out = local;
   return FTMS_OK;
+}
+
+ftms_result ftms_decode_control_request(const uint8_t *data, size_t size,
+                                         ftms_control_request *out) {
+  return ftms_decode_control_request_with_format(data, size, NULL, out);
 }
 
 ftms_result ftms_encode_control_response(const ftms_control_response *response,

@@ -85,11 +85,13 @@ def reference(step, directory, references):
     driver = directory / "control-driver"
     operation = "request" if kind == "control" else "response"
     value = case["decoded"]
-    actual = {"decoded": control_adapter.call(driver, "decode-" + operation, bytes(case["bytes"]).hex())}
+    format_args = [case["format"]] if kind == "control" and "format" in case else []
+    command = "decode-" + operation + ("-format" if format_args else "")
+    actual = {"decoded": control_adapter.call(driver, command, *format_args, bytes(case["bytes"]).hex())}
     expected = {"decoded": value}
     if case.get("encode", True):
         # Encode the authored value, NOT the result of decoding the same bytes.
-        args = (["encode-request", value["opcode"], *value["operands"]] if kind == "control"
+        args = (["encode-request" + ("-format" if format_args else ""), *format_args, value["opcode"], *value["operands"]] if kind == "control"
                 else ["encode-response", value["requestOpcode"], value["resultCode"],
                       value["parameter"], value["low"], value["high"]])
         encoded = control_adapter.call(driver, *args)

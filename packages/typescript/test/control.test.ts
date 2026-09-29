@@ -115,6 +115,34 @@ const controlVectors: readonly ControlVector[] = [
 ];
 
 describe("FTMS Control Point request encoding", () => {
+  it("encodes normalized resistance with an explicit UINT8 tenths format", () => {
+    const options = { resistanceFormat: "uint8Tenths" } as const;
+    expect(
+      Array.from(
+        encodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: 0 }, options),
+      ),
+    ).toEqual([0x04, 0x00]);
+    expect(
+      Array.from(
+        encodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: 12.3 }, options),
+      ),
+    ).toEqual([0x04, 0x7b]);
+    expect(
+      Array.from(
+        encodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: 25.5 }, options),
+      ),
+    ).toEqual([0x04, 0xff]);
+    expect(
+      tryEncodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: -0.1 }, options),
+    ).toMatchObject({ ok: false, error: { code: "out_of_range" } });
+    expect(
+      tryEncodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: 25.6 }, options),
+    ).toMatchObject({ ok: false, error: { code: "out_of_range" } });
+    expect(
+      tryEncodeFtmsControlRequest({ op: "setTargetResistance", resistanceLevel: 12.34 }, options),
+    ).toMatchObject({ ok: false, error: { code: "invalid_resolution" } });
+  });
+
   it.each(controlVectors)("encodes $name with exact bytes", ({ request, expected }) => {
     expect(Array.from(encodeFtmsControlRequest(request))).toEqual(expected);
   });

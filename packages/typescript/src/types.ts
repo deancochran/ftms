@@ -47,6 +47,15 @@ export interface FtmsMeasurementFormatOptions {
 export interface FtmsRangeFormatOptions {
   readonly resistanceFormat?: "uint8Whole" | "signed16Tenths";
 }
+/** Caller-owned C.7 facts. Undefined means unknown; false is distinct from unknown. */
+export interface FtmsCapabilityC7Evidence {
+  readonly bondingSupported?: boolean;
+  readonly featureMayChangeOverLifetime?: boolean;
+}
+/** Caller-selected Control Point resistance wire format; it is never inferred. */
+export interface FtmsControlFormatOptions {
+  readonly resistanceFormat?: "signed16Tenths" | "uint8Tenths";
+}
 
 /** A pure, caller-owned FTMS service-discovery snapshot. UUIDs are 32 lowercase
  * hexadecimal digits in Bluetooth display/network byte order. */
@@ -89,6 +98,8 @@ export interface FtmsCapabilitySnapshot {
   /** An opaque unsigned 32-bit discovery generation; it is not ordered here. */
   readonly generation: number;
   readonly characteristics: readonly FtmsCapabilityCharacteristic[];
+  /** C.7 compatibility evidence; this does not assert security or authorization. */
+  readonly c7?: FtmsCapabilityC7Evidence;
 }
 export type FtmsCapabilityFeature = readonly [
   FtmsCapabilityPresence,

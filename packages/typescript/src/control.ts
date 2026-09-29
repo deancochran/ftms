@@ -2,6 +2,7 @@ import { isByteSource, toBytes } from "./binary.js";
 import { FTMS_OPCODES, FTMS_RESULT_CODES } from "./constants.js";
 import {
   type FTMSResponse,
+  type FtmsControlFormatOptions,
   type FtmsControlRequestRaw,
   type FtmsControlResponseRaw,
   RawCodecError,
@@ -32,20 +33,53 @@ function rawInteger(value: unknown, field: string, minimum: number, maximum: num
 const rawRequestLengths = [1, 1, 3, 3, 3, 3, 2, 1, 2, 3, 3, 3, 4, 3, 5, 7, 11, 7, 3, 2, 3] as const;
 const rawOperandCounts = [0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 2, 3, 5, 4, 1, 1, 1] as const;
 
+function validateControlFormatOptions(options?: FtmsControlFormatOptions): void {
+  if (
+    options !== undefined &&
+    (options === null ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some((key) => key !== "resistanceFormat"))
+  )
+    throw new RawCodecError("kind", "Control format options must be an options object");
+  if (
+    options?.resistanceFormat !== undefined &&
+    !["signed16Tenths", "uint8Tenths"].includes(options.resistanceFormat)
+  )
+    throw new RawCodecError("kind", "Unsupported Control Point resistance format");
+}
+
+function controlRequestLength(
+  opcode: number,
+  options?: FtmsControlFormatOptions,
+): number | undefined {
+  return opcode === 4 && options?.resistanceFormat === "uint8Tenths"
+    ? 2
+    : rawRequestLengths[opcode];
+}
+
 /** Decode an exact-length Control Point request to raw opcode and operands. */
-export function decodeFtmsControlRequestRaw(data: ArrayBuffer | Uint8Array): FtmsControlRequestRaw {
+export function decodeFtmsControlRequestRaw(
+  data: ArrayBuffer | Uint8Array,
+  options?: FtmsControlFormatOptions,
+): FtmsControlRequestRaw {
+  validateControlFormatOptions(options);
   const bytes = rawBytes(data);
   if (bytes.length < 1)
     throw new RawCodecError("length", "Control Point request requires an opcode");
   const opcode = bytes[0] as number;
-  const length = rawRequestLengths[opcode];
+  const length = controlRequestLength(opcode, options);
   if (length === undefined) throw new RawCodecError("kind", "Unknown Control Point request opcode");
   if (bytes.length !== length)
     throw new RawCodecError("length", `Opcode ${opcode} requires exactly ${length} bytes`);
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let operands: number[] = [];
   if ([2, 9, 10, 11, 13, 18, 20].includes(opcode)) operands = [view.getUint16(1, true)];
-  else if ([3, 4, 5].includes(opcode)) operands = [view.getInt16(1, true)];
+  else if ([3, 5].includes(opcode)) operands = [view.getInt16(1, true)];
+  else if (opcode === 4)
+    operands = [
+      options?.resistanceFormat === "uint8Tenths" ? (bytes[1] as number) : view.getInt16(1, true),
+    ];
   else if ([6, 8, 19].includes(opcode)) operands = [bytes[1] as number];
   else if (opcode === 12)
     operands = [(bytes[1] as number) | ((bytes[2] as number) << 8) | ((bytes[3] as number) << 16)];
@@ -66,11 +100,15 @@ export function decodeFtmsControlRequestRaw(data: ArrayBuffer | Uint8Array): Ftm
 }
 
 /** Encode a raw Control Point request after strict integer, opcode, and arity validation. */
-export function encodeFtmsControlRequestRaw(request: FtmsControlRequestRaw): Uint8Array {
+export function encodeFtmsControlRequestRaw(
+  request: FtmsControlRequestRaw,
+  options?: FtmsControlFormatOptions,
+): Uint8Array {
+  validateControlFormatOptions(options);
   if (typeof request !== "object" || request === null)
     throw new RawCodecError("null", "Raw Control Point request is required");
   const opcode = rawInteger(request?.opcode, "opcode", 0, 0xff);
-  const length = rawRequestLengths[opcode];
+  const length = controlRequestLength(opcode, options);
   if (length === undefined) throw new RawCodecError("kind", "Unknown Control Point request opcode");
   if (!Array.isArray(request.operands) || request.operands.length !== rawOperandCounts[opcode])
     throw new RawCodecError("length", "Control Point request has the wrong operand count");
@@ -85,11 +123,17 @@ export function encodeFtmsControlRequestRaw(request: FtmsControlRequestRaw): Uin
         ]
       : opcode === 12
         ? [[0, 0xffffff]]
-        : [3, 4, 5].includes(opcode)
-          ? [[-0x8000, 0x7fff]]
-          : [6, 8, 19].includes(opcode)
-            ? [[0, 0xff]]
-            : Array.from({ length: operands.length }, () => [0, 0xffff] as const);
+        : opcode === 4
+          ? [
+              options?.resistanceFormat === "uint8Tenths"
+                ? ([0, 0xff] as const)
+                : ([-0x8000, 0x7fff] as const),
+            ]
+          : [3, 5].includes(opcode)
+            ? [[-0x8000, 0x7fff]]
+            : [6, 8, 19].includes(opcode)
+              ? [[0, 0xff]]
+              : Array.from({ length: operands.length }, () => [0, 0xffff] as const);
   const values = operands.map((value, index) =>
     rawInteger(value, `operands[${index}]`, ...(ranges[index] as [number, number])),
   );
@@ -99,7 +143,10 @@ export function encodeFtmsControlRequestRaw(request: FtmsControlRequestRaw): Uin
   bytes[0] = opcode;
   const view = new DataView(bytes.buffer);
   if ([2, 9, 10, 11, 13, 18, 20].includes(opcode)) view.setUint16(1, values[0] as number, true);
-  else if ([3, 4, 5].includes(opcode)) view.setInt16(1, values[0] as number, true);
+  else if ([3, 5].includes(opcode)) view.setInt16(1, values[0] as number, true);
+  else if (opcode === 4 && options?.resistanceFormat === "uint8Tenths")
+    bytes[1] = values[0] as number;
+  else if (opcode === 4) view.setInt16(1, values[0] as number, true);
   else if ([6, 8, 19].includes(opcode)) bytes[1] = values[0] as number;
   else if (opcode === 12) {
     bytes[1] = values[0] as number;
@@ -370,7 +417,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function encodeUnknownControlRequest(request: unknown): FtmsEncodeResult {
+function encodeUnknownControlRequest(
+  request: unknown,
+  options?: FtmsControlFormatOptions,
+): FtmsEncodeResult {
+  try {
+    validateControlFormatOptions(options);
+  } catch (error) {
+    return encodeError("invalid_request", "options", (error as Error).message, options);
+  }
   if (!isRecord(request) || typeof request.op !== "string") {
     return encodeError("invalid_request", "op", "Expected an FTMS control request", request);
   }
@@ -397,12 +452,22 @@ function encodeUnknownControlRequest(request: unknown): FtmsEncodeResult {
         0.1,
       );
     case "setTargetResistance":
-      return encodeInt16Request(
-        FTMS_OPCODES.SET_TARGET_RESISTANCE,
-        request.resistanceLevel,
-        "resistanceLevel",
-        0.1,
-      );
+      return options?.resistanceFormat === "uint8Tenths"
+        ? (() => {
+            const encoded = encodeNumber(request.resistanceLevel, "resistanceLevel", 0, 0xff, 0.1);
+            return encoded.ok
+              ? {
+                  ok: true as const,
+                  value: Uint8Array.of(FTMS_OPCODES.SET_TARGET_RESISTANCE, encoded.value),
+                }
+              : encoded;
+          })()
+        : encodeInt16Request(
+            FTMS_OPCODES.SET_TARGET_RESISTANCE,
+            request.resistanceLevel,
+            "resistanceLevel",
+            0.1,
+          );
     case "setTargetPower":
       return encodeInt16Request(FTMS_OPCODES.SET_TARGET_POWER, request.powerWatts, "powerWatts");
     case "setTargetHeartRate": {
@@ -523,12 +588,18 @@ function encodeUnknownControlRequest(request: unknown): FtmsEncodeResult {
   }
 }
 
-export function tryEncodeFtmsControlRequest(request: unknown): FtmsEncodeResult {
-  return encodeUnknownControlRequest(request);
+export function tryEncodeFtmsControlRequest(
+  request: unknown,
+  options?: FtmsControlFormatOptions,
+): FtmsEncodeResult {
+  return encodeUnknownControlRequest(request, options);
 }
 
-export function encodeFtmsControlRequest(request: FtmsControlRequest): Uint8Array {
-  const result = tryEncodeFtmsControlRequest(request);
+export function encodeFtmsControlRequest(
+  request: FtmsControlRequest,
+  options?: FtmsControlFormatOptions,
+): Uint8Array {
+  const result = tryEncodeFtmsControlRequest(request, options);
   if (result.ok) {
     return result.value;
   }

@@ -57,11 +57,80 @@ static void setup(fixture *f) {
 
 static int evaluate(fixture *f) {
   ftms_cap_requirements q;
-  CHECK(ftms_capability_requirements(&f->snapshot, &q) == FTMS_OK);
-  CHECK(ftms_evaluate_capabilities(&f->snapshot, &f->out) == FTMS_OK);
+  const ftms_cap_c7_evidence c7 = {FTMS_CAP_TRUTH_FALSE, FTMS_CAP_TRUTH_FALSE};
+  CHECK(ftms_capability_requirements_with_c7(&f->snapshot, NULL, &c7, &q) == FTMS_OK);
+  CHECK(ftms_evaluate_capabilities_with_c7(&f->snapshot, NULL, &c7, &f->out) == FTMS_OK);
   CHECK(q.observation_count == f->snapshot.characteristic_count);
   CHECK(q.observation_count == f->out.report.observation_count);
   CHECK(q.diagnostic_count == f->out.report.diagnostic_count);
+  return 0;
+}
+
+static int test_c7_evidence(void) {
+  fixture f;
+  ftms_cap_c7_evidence true_true = {FTMS_CAP_TRUTH_TRUE, FTMS_CAP_TRUTH_TRUE};
+  ftms_cap_c7_evidence unknown = {FTMS_CAP_TRUTH_UNKNOWN, FTMS_CAP_TRUTH_UNKNOWN};
+  ftms_cap_c7_evidence bad = {(ftms_cap_truth)99, FTMS_CAP_TRUTH_FALSE};
+  ftms_cap_requirements q, before;
+  setup(&f);
+  CHECK(ftms_evaluate_capabilities_with_c7(&f.snapshot, NULL, &true_true, &f.out) == FTMS_OK);
+  CHECK(f.diagnostics[0].code == FTMS_CAP_DIAG_REQUIRED_PROPERTY_MISSING);
+  CHECK(f.out.report.operations[2].reasons == FTMS_CAP_REASON_FEATURE_INVALID);
+  f.chars[0].properties = FTMS_CAP_PROP_READ | FTMS_CAP_PROP_INDICATE;
+  CHECK(ftms_evaluate_capabilities_with_c7(&f.snapshot, NULL, &true_true, &f.out) == FTMS_OK);
+  CHECK(f.out.report.diagnostic_count == 0 && f.out.report.operations[2].prerequisite == FTMS_CAP_PREREQUISITE_SATISFIED);
+  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_OK);
+  CHECK(f.diagnostics[0].code == FTMS_CAP_DIAG_C7_EVIDENCE_INSUFFICIENT);
+  CHECK(f.out.report.operations[2].reasons == FTMS_CAP_REASON_C7_EVIDENCE_UNAVAILABLE);
+  f.chars[0].properties = FTMS_CAP_PROP_READ | FTMS_CAP_PROP_WRITE;
+  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_OK);
+  CHECK(f.diagnostics[0].code == FTMS_CAP_DIAG_EXCLUDED_PROPERTY_PRESENT &&
+        f.diagnostics[1].code == FTMS_CAP_DIAG_C7_EVIDENCE_INSUFFICIENT);
+  CHECK(f.out.report.operations[2].reasons ==
+        (FTMS_CAP_REASON_FEATURE_INVALID | FTMS_CAP_REASON_C7_EVIDENCE_UNAVAILABLE));
+  memset(&before, 0xa5, sizeof before);
+  CHECK(ftms_capability_requirements_with_c7(&f.snapshot, NULL, &bad, &before) == FTMS_ERROR_KIND);
+  for (size_t i = 0U; i < sizeof before; ++i) CHECK(((uint8_t *)&before)[i] == 0xa5U);
+  CHECK(ftms_capability_requirements_with_c7(&f.snapshot, NULL, &unknown, &q) == FTMS_OK);
+  return 0;
+}
+
+static int test_c7_diagnostic_capacity(void) {
+  fixture f;
+  ftms_cap_requirements q, before;
+  ftms_cap_output saved;
+  ftms_cap_observation observations[16];
+  ftms_cap_diagnostic diagnostics[64];
+  setup(&f);
+  /* One Feature observation can be missing Read, have an excluded property,
+   * lack C.7 evidence, and report a failed read. */
+  f.chars[0].properties = FTMS_CAP_PROP_WRITE;
+  f.chars[0].read_state = FTMS_CAP_READ_FAILED;
+  f.chars[0].read_reason = FTMS_CAP_READ_REASON_GENERIC;
+  f.chars[0].read_bytes = NULL;
+  f.chars[0].read_size = 0;
+  CHECK(ftms_capability_requirements(&f.snapshot, &q) == FTMS_OK);
+  CHECK(q.diagnostic_count == 4U);
+  f.out.diagnostic_capacity = 4U;
+  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_OK);
+  CHECK(f.out.report.diagnostic_count == 4U);
+  CHECK(f.diagnostics[0].code == FTMS_CAP_DIAG_REQUIRED_PROPERTY_MISSING);
+  CHECK(f.diagnostics[1].code == FTMS_CAP_DIAG_EXCLUDED_PROPERTY_PRESENT);
+  CHECK(f.diagnostics[2].code == FTMS_CAP_DIAG_C7_EVIDENCE_INSUFFICIENT);
+  CHECK(f.diagnostics[3].code == FTMS_CAP_DIAG_READ_FAILED);
+  setup(&f);
+  f.snapshot.characteristic_count = (SIZE_MAX / sizeof(ftms_cap_diagnostic) - 64U) / 4U + 1U;
+  f.snapshot.characteristics = NULL; /* The bound must reject before array access/null handling. */
+  memset(&before, 0xa5, sizeof before);
+  CHECK(ftms_capability_requirements(&f.snapshot, &before) == FTMS_ERROR_LENGTH);
+  for (size_t i = 0U; i < sizeof before; ++i) CHECK(((uint8_t *)&before)[i] == 0xa5U);
+  memcpy(&saved, &f.out, sizeof saved);
+  memcpy(observations, f.observations, sizeof observations);
+  memcpy(diagnostics, f.diagnostics, sizeof diagnostics);
+  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_ERROR_LENGTH);
+  CHECK(memcmp(&f.out, &saved, sizeof saved) == 0);
+  CHECK(memcmp(f.observations, observations, sizeof observations) == 0);
+  CHECK(memcmp(f.diagnostics, diagnostics, sizeof diagnostics) == 0);
   return 0;
 }
 
@@ -342,20 +411,21 @@ static int test_range_format_propagation(void) {
   fixture f;
   ftms_cap_requirements default_q, selected_q, before;
   ftms_range_format_options selected = {FTMS_RESISTANCE_RANGE_SINT16_TENTHS};
+  const ftms_cap_c7_evidence c7 = {FTMS_CAP_TRUTH_FALSE, FTMS_CAP_TRUTH_FALSE};
   const uint8_t resistance[] = {0,0,100,0,1,0};
   unsigned i;
   setup(&f);
   /* This is a signed-tenths range: legacy UINT8 interpretation is malformed. */
   f.chars[5].read_bytes = resistance; f.chars[5].read_size = sizeof resistance;
-  CHECK(ftms_capability_requirements(&f.snapshot, &default_q) == FTMS_OK);
-  CHECK(ftms_capability_requirements_with_format(&f.snapshot, &selected, &selected_q) == FTMS_OK);
+  CHECK(ftms_capability_requirements_with_c7(&f.snapshot, NULL, &c7, &default_q) == FTMS_OK);
+  CHECK(ftms_capability_requirements_with_c7(&f.snapshot, &selected, &c7, &selected_q) == FTMS_OK);
   CHECK(default_q.observation_count == selected_q.observation_count &&
         default_q.diagnostic_count == selected_q.diagnostic_count + 1U);
-  CHECK(ftms_evaluate_capabilities(&f.snapshot, &f.out) == FTMS_OK);
+  CHECK(ftms_evaluate_capabilities_with_c7(&f.snapshot, NULL, &c7, &f.out) == FTMS_OK);
   CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].decode == FTMS_CAP_DECODE_MALFORMED &&
         f.out.report.operations[4].reasons == FTMS_CAP_REASON_RANGE_INVALID &&
         f.out.report.diagnostic_count == default_q.diagnostic_count);
-  CHECK(ftms_evaluate_capabilities_with_format(&f.snapshot, &selected, &f.out) == FTMS_OK);
+  CHECK(ftms_evaluate_capabilities_with_c7(&f.snapshot, &selected, &c7, &f.out) == FTMS_OK);
   CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].decode == FTMS_CAP_DECODE_VALID);
   CHECK(f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.minimum == 0 &&
         f.out.report.ranges[FTMS_RANGE_RESISTANCE_LEVEL].value.maximum == 100 &&
@@ -416,6 +486,8 @@ int test_capabilities(void) {
   CHECK(test_discovery_and_properties() == 0);
   CHECK(test_argument_and_buffer_contract() == 0);
   CHECK(test_range_format_propagation() == 0);
+  CHECK(test_c7_evidence() == 0);
+  CHECK(test_c7_diagnostic_capacity() == 0);
   puts("capability unit suites: mappings, read evidence, discovery/properties, API atomicity passed");
   return 0;
 }

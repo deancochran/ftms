@@ -39,6 +39,21 @@ class ControlAdapterTest(unittest.TestCase):
         self.assertEqual((report["cases"], report["assertions"], report["passed"], report["failed"]), (1, 2, 1, 1))
         self.assertEqual(report["outcomes"][1]["direction"], "encode")
 
+    def test_schema_rejects_invalid_or_response_format(self):
+        cases = adapter.validate()
+        for category, index, format in (("requests", 0, "uint8Whole"),
+                                        ("requests", 0, "uint8Tenths"),
+                                        ("requests", 2, "uint8Tenths"),
+                                        ("responses", 0, "uint8Tenths"),
+                                        ("invalid", 4, "uint8Tenths")):
+            changed = copy.deepcopy(cases)
+            changed[category][index]["format"] = format
+            # Validate the changed literal through the same Draft 2020-12 schema.
+            import jsonschema
+            schema = json.loads((adapter.CORPUS / "schema.json").read_text())
+            with self.assertRaises(jsonschema.ValidationError):
+                jsonschema.validate(changed, schema)
+
     def test_legacy_scaling_and_comparison(self):
         self.assertEqual(legacy.control_arguments({"op": "setTargetResistance", "resistanceLevel": -1.2}),
                          ["encode-request", 4, -12])

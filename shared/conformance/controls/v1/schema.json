@@ -30,10 +30,15 @@
         "unexpectedParameters": {"$ref": "#/$defs/flag"}
       }
     },
+    "requestFormat": {"enum": ["signed16Tenths", "uint8Tenths"]},
+    "formattedResistance": {
+      "type": "object", "if": {"required": ["format"], "properties": {"format": {}}},
+      "then": {"properties": {"decoded": {"type": "object", "properties": {"opcode": {"const": 4}}}}}
+    },
     "requestCase": {
-      "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded"],
+      "type": "object", "allOf": [{"$ref": "#/$defs/formattedResistance"}], "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded"],
       "properties": {"id": {"$ref": "#/$defs/id"}, "operation": {"const": "request"},
-        "bytes": {"$ref": "#/$defs/bytes"}, "decoded": {"$ref": "#/$defs/request"}, "encode": {"const": true}}
+        "bytes": {"$ref": "#/$defs/bytes"}, "decoded": {"$ref": "#/$defs/request"}, "encode": {"const": true}, "format": {"$ref": "#/$defs/requestFormat"}}
     },
     "responseCase": {
       "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "decoded"],
@@ -43,7 +48,9 @@
     "invalidCase": {
       "type": "object", "additionalProperties": false, "required": ["id", "operation", "bytes", "error"],
       "properties": {"id": {"$ref": "#/$defs/id"}, "operation": {"enum": ["request", "response"]},
-        "bytes": {"$ref": "#/$defs/bytes"}, "error": {"enum": ["kind", "length", "range"]}}
+        "bytes": {"$ref": "#/$defs/bytes"}, "error": {"enum": ["kind", "length", "range"]}, "format": {"$ref": "#/$defs/requestFormat"}},
+      "allOf": [{"if": {"properties": {"operation": {"const": "response"}}, "required": ["operation"]},
+        "then": {"not": {"required": ["format"], "properties": {"format": {}}}}}]
     }
   }
 }

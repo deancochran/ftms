@@ -4,6 +4,7 @@ import os
 import subprocess
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from . import simulation_adapter as adapter
 
@@ -46,6 +47,29 @@ class SimulationContract(unittest.TestCase):
         commands, indexes = adapter.bridge_commands(scenario, DATA["profiles"][0], 0xffffffff)
         self.assertEqual(commands[1:], ["feed 7 0 01", "feed 7 0 02", "feed 7 1 00"])
         self.assertEqual(indexes, {1: 1, 2: 2, 0: 3})
+
+    @unittest.skipUnless(os.environ.get("FTMS_SIMULATION_DRIVER"), "run via make test for compiled bridge")
+    def test_selected_command_faults_and_bridge_arguments(self):
+        driver = Path(os.environ["FTMS_SIMULATION_DRIVER"])
+        call = adapter.control_adapter.call
+        for fault in ("ignore-format", "wrong-bytes"):
+            def broken(path, *args):
+                if fault == "ignore-format" and args[0].endswith("-format"):
+                    return call(path, args[0].removesuffix("-format"), *args[2:])
+                result = call(path, *args)
+                if fault == "wrong-bytes" and args[:2] == ("encode-request-format", "uint8Tenths"):
+                    result = {"bytes": "0401"}
+                return result
+            with mock.patch.object(adapter.control_adapter, "call", side_effect=broken):
+                report = adapter.runCorpus(driver, DATA)
+            self.assertFalse(report["complete"])
+            self.assertEqual(report["failed"], 1)
+            self.assertEqual(report["failedSteps"], 3)
+            self.assertEqual(report["steps"], sum(len(s["steps"]) for s in DATA["scenarios"]))
+        for args in (("encode-request-format", "uint8Tenths"),
+                     ("encode-request-format", "bogus", "4", "123"),
+                     ("decode-request-format", "uint8Tenths")):
+            self.assertEqual(call(driver.with_name("control-driver"), *args), {"bridgeError": True})
 
     @unittest.skipUnless(os.environ.get("FTMS_SIMULATION_DRIVER"), "run via make test for compiled bridge")
     def test_execution_and_mutation_accounting(self):

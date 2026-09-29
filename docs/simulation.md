@@ -52,7 +52,7 @@ Port-local runners do not depend on the other language's implementation.
 
 ## Coverage
 
-The shared suite currently contains **10 profiles / 37 scenarios / 75 scheduled
+The shared suite currently contains **10 profiles / 38 scenarios / 79 scheduled
 steps**. Coverage includes:
 
 - All six measurement families, standalone records and split records.
@@ -62,7 +62,9 @@ steps**. Coverage includes:
   malformed/empty/truncated/trailing inputs and Cross Trainer direction changes.
 - Fixed expiry, unsigned tick wrap, stale generations, disconnect and reconnect.
 - Complete/partial/contradictory capability observations and scripted control
-  request/response codecs, including unsupported and unknown-result responses.
+  request/response codecs, including explicit uint8-tenths resistance profiles,
+  unsupported and unknown-result responses. These are codec scripts, not control
+  authorization or stateful transactions.
 - Metatests that deliberately corrupt expectations and schema/reference inputs,
   fail bridge execution, and verify that failures cannot be counted as passes.
 
@@ -109,16 +111,20 @@ Bluetooth transport reliability, device interoperability or qualification.
 Host tests, installed-consumer checks and embedded compilation remain separate
 evidence streams.
 
-### Implementation verification
+### Historical implementation verification
 
-Verified locally against base `77d2c6f4e2ebcb374ddbbd43e5b807d1e2e61f5b`:
+The following records the pre-C.7 audit run and its then-current corpus bytes.
+It is superseded for the current checkout by the authoritative local verification
+and input hashes in [coverage.md](coverage.md#authoritative-current-local-evidence).
 
-- `env -u TMPDIR pnpm verify`: **536 tests / 13 files**, lint, types, build and
+Verified locally against base `2b5ff79b81639e8beeea8bc9b219cbf78c2c7194`:
+
+- `env -u TMPDIR pnpm verify`: **551 tests / 13 files**, lint, types, build and
   packed-package checks passed, with unchanged published API/export boundaries.
-- `make BUILD=build/simulation-clean-final test`: a fresh native build passed the
+- `make BUILD=build/audit-reconcile test`: a fresh native build passed the
   existing corpora, strict/sanitized suites, installed consumers and source-bundle
-  checks. Normal and ASan/UBSan simulation replay each passed **37/37 scenarios,
-  75/75 steps**, with no unsupported/skipped outcomes or runner errors.
+  checks. Normal and ASan/UBSan simulation replay each passed **38/38 scenarios,
+  79/79 steps**, with no unsupported/skipped outcomes or runner errors.
 - TypeScript and native simulation report traces and per-file identities matched
   exactly. This comparison supplements each runner's independently specified
   expected values.
@@ -128,11 +134,14 @@ Verified locally against base `77d2c6f4e2ebcb374ddbbd43e5b807d1e2e61f5b`:
 Simulation schema SHA-256:
 `6b9bad8d085a93b439fd6d6d89be63f913004932908aaad8700a70a942fe1072`.
 Scenario content SHA-256:
-`ca1eb8867dc65853f03178b420ac9bc2b7b93a034db2f00771ef84103cb19662`.
+`0d1dc6f1772b785b718cd7a1ba1c3960976d02d3e701953aafa83513685c1523`.
 Comparison contract SHA-256:
-`352982b78454110b204b15065179d38c66185ff8de1dd818e519b1eba5732384`.
-The report also includes exact referenced capability/control identities. No
-canonical conformance vectors or schemas were altered.
+`d1b9dfa4f5d5aea3cc6ae73c975d19b6a506386f0ae9fcb6507a24c6e3946cf8`.
+The report also includes exact referenced capability/control identities. Existing
+codec-v1 expected values and schema were preserved; its E9135 provenance metadata
+was corrected following direct ESR11 review. The separate controls-v1 canonical
+corpus was extended with explicit resistance-format cases. See the
+[specification audit](specification-audit.md) for the source conflict and identities.
 
 Optional future extensions: seeded fault exploration with shrinkable replay
 traces; stateful command ownership/queue policies; an Open Trainer adapter; virtual
