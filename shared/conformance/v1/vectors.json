@@ -35,8 +35,8 @@
     },
     {
       "id": "E9135",
-      "description": "Apply corrected Cross Trainer field definitions, including stride count resolution 0.1 stride.",
-      "source": ["esr11", "gss-r3"]
+      "description": "ESR11 Part II section 3.1 corrects Fitness Machine Profile 1.0 section 4.4.14.2.5 resistance command operand from UINT8 to SINT16. Cross Trainer stride resolution comes from gss-r3, not E9135.",
+      "source": ["esr11"]
     },
     {
       "id": "EC23224",

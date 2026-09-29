@@ -5,10 +5,15 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## 0.3.0
 
-Unreleased release candidate. Publication is a separate maintainer action after
-review and successful release checks.
+Release prepared for publication through the verified tag workflow.
 
 ### Added
+
+- Explicit resistance-command formats in raw and normalized APIs: the default
+  remains signed16 tenths, with opt-in UINT8 tenths; status encoding is unchanged.
+- Caller-owned C.7 bonding/lifetime-mutability evidence in capability snapshots,
+  with shared true/false/unknown fixtures and conditional Feature Indicate checks.
+- Deterministic shared equipment simulation and page-by-page specification audit.
 
 - Bidirectional raw codecs for Features, all five Supported Ranges, all 21
   Control Point requests and responses, all six measurement families, Training
@@ -24,6 +29,10 @@ review and successful release checks.
   independent installed-package integration examples.
 
 ### Changed
+
+- Capability snapshots without C.7 evidence now report insufficient evidence;
+  applicable operation prerequisites can be incomplete rather than satisfied.
+  This never grants permission to execute controls.
 
 - Moved TypeScript implementation and tooling into `packages/typescript` within
   the multi-language repository. Preserved package name, public module/export

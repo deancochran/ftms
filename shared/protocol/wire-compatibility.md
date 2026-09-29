@@ -11,6 +11,15 @@ length, or another selection. No empirical selection is the default.
 | Bike, cross-trainer, rower resistance measurement | unsigned 8-bit whole | signed 16-bit tenths | integer as selected on wire |
 | Treadmill instantaneous/average pace | unsigned 16-bit | unsigned 8-bit legacy | integer as selected on wire |
 | Supported Resistance Range | three unsigned bytes, divisor 1 | six bytes: signed16 minimum/maximum and unsigned16 increment, divisor 10 | integer numerators |
+| Control Point resistance request | signed 16-bit tenths (ESR11 E8991 and existing API default) | unsigned 8-bit tenths (literal FTMS 1.0.1 Table 4.15, conflicting with E8991) | integer tenths |
+
+The command selection is independent of all other selections. Status opcode
+`0x07` remains signed16 tenths per Table 4.26, even with UINT8 commands. See the
+[normative audit](../../docs/specification-audit.md) for source identities and
+the unresolved resistance scale annotations in the current GSS. The historical
+command default has direct ESR11 E8991 support. The retrieved 1.0.1 PDF and HTML
+Table 4.15 still print UINT8; that conflict does not establish that the erratum
+was revoked. The explicit UINT8 selection is not a universal correction.
 
 The reported Star Trac observation motivates the measurement resistance option;
 it is not a complete packet capture. The reported 32-byte treadmill packet

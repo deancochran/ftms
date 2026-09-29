@@ -6,8 +6,11 @@
 int main(void) {
   uint8_t bytes[8] = {0}; size_t written = 0U;
   ftms_control_request request = {FTMS_CONTROL_REQUEST_CONTROL, {0}};
+  const ftms_control_format_options command_format = {FTMS_CONTROL_RESISTANCE_UINT8_TENTHS};
+  const uint8_t resistance_request[] = {0x04U, 0x7bU};
   ftms_features features = {0U, 0U};
   ftms_cap_snapshot snapshot = {FTMS_CAP_DISCOVERY_COMPLETE, FTMS_CAP_SERVICE_PRESENT, 7U, NULL, 0U};
+  const ftms_cap_c7_evidence c7 = {FTMS_CAP_TRUTH_FALSE, FTMS_CAP_TRUTH_FALSE};
   ftms_cap_requirements requirements;
   ftms_cap_diagnostic diagnostics[1];
   ftms_cap_output out = {0};
@@ -21,6 +24,13 @@ int main(void) {
   const uint8_t partial[] = {0x61U, 0x00U, 0x78U, 0x00U, 0x2cU, 0x01U};
   const uint8_t final[] = {0x00U, 0x00U, 0x01U, 0x00U};
   out.diagnostics = diagnostics; out.diagnostic_capacity = 1;
+  if (ftms_decode_control_request_with_format(resistance_request, sizeof resistance_request,
+                                             &command_format, &request) != FTMS_OK ||
+      request.value.resistance_tenth_level != 123 ||
+      ftms_encode_control_request_with_format(&request, &command_format, bytes, sizeof bytes,
+                                             &written) != FTMS_OK ||
+      written != 2U || bytes[0] != 0x04U || bytes[1] != 0x7bU) return 1;
+  request.opcode = FTMS_CONTROL_REQUEST_CONTROL;
   if (ftms_record_init_with_format(&record, FTMS_MEASUREMENT_INDOOR_BIKE,
                                    &signed_resistance, 1U, 5U) != FTMS_RECORD_PENDING ||
       ftms_record_feed_with_format(&record, partial, sizeof partial, 1U, 1U,
@@ -33,8 +43,8 @@ int main(void) {
   if (ftms_encode_features(&features, bytes, sizeof bytes, &written) != FTMS_OK || written != 8U ||
       ftms_decode_features(bytes, sizeof bytes, &features) != FTMS_OK ||
        ftms_encode_control_request(&request, bytes, sizeof bytes, &written) != FTMS_OK || written != 1U ||
-       ftms_capability_requirements(&snapshot, &requirements) != FTMS_OK ||
-        ftms_evaluate_capabilities(&snapshot, &out) != FTMS_OK ||
+       ftms_capability_requirements_with_c7(&snapshot, NULL, &c7, &requirements) != FTMS_OK ||
+         ftms_evaluate_capabilities_with_c7(&snapshot, NULL, &c7, &out) != FTMS_OK ||
         ftms_decode_measurement(FTMS_MEASUREMENT_INDOOR_BIKE, more_data,
                                 sizeof more_data, &measurement) != FTMS_OK ||
         ftms_encode_training_status(&training, NULL, 0U, bytes, sizeof bytes, &written) != FTMS_OK || written != 2U) return 1;

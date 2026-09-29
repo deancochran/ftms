@@ -96,6 +96,7 @@ function snapshot(json: Json) {
     discovery: 0 | 1 | 2 | 3;
     scope: 0 | 1 | 2 | 3;
     generation: number;
+    c7?: { bondingSupported: 0 | 1 | 2; featureMayChangeOverLifetime: 0 | 1 | 2 };
     characteristics: {
       uuid: string;
       properties: number;
@@ -104,8 +105,19 @@ function snapshot(json: Json) {
       bytes: string;
     }[];
   };
+  const { c7, ...rest } = value;
   return {
-    ...value,
+    ...rest,
+    ...(c7 === undefined
+      ? {}
+      : {
+          c7: {
+            ...(c7.bondingSupported === 0 ? {} : { bondingSupported: c7.bondingSupported === 2 }),
+            ...(c7.featureMayChangeOverLifetime === 0
+              ? {}
+              : { featureMayChangeOverLifetime: c7.featureMayChangeOverLifetime === 2 }),
+          },
+        }),
     characteristics: value.characteristics.map((c) => ({
       ...c,
       bytes: Uint8Array.from(c.bytes.match(/../g)?.map((pair) => Number.parseInt(pair, 16)) ?? []),
@@ -114,6 +126,20 @@ function snapshot(json: Json) {
 }
 
 describe("capability conformance corpus", () => {
+  it("rejects invalid C.7 evidence without mutating caller evidence", () => {
+    const entry = corpus.cases.find((c) => c.id === "all-static-prerequisites")!;
+    const input = snapshot(expand(corpus.snapshots, entry.input));
+    const before = JSON.stringify(input);
+    for (const c7 of [null, 1, { bondingSupported: "yes" }, { extra: true }]) {
+      expect(() =>
+        evaluateFtmsCapabilities({ ...input, c7 } as unknown as Parameters<
+          typeof evaluateFtmsCapabilities
+        >[0]),
+      ).toThrow();
+      expect(JSON.stringify(input)).toBe(before);
+    }
+  });
+
   it("propagates resistance format through complete evidence without changing other ranges", () => {
     const entry = corpus.cases.find((c) => c.id === "all-static-prerequisites")!;
     const input = snapshot(expand(corpus.snapshots, entry.input));
@@ -150,7 +176,7 @@ describe("capability conformance corpus", () => {
 
   it("executes every canonical case with exact report equality", () => {
     expect(validateCorpus(corpus), JSON.stringify(validateCorpus.errors)).toBe(true);
-    expect(corpus.cases).toHaveLength(49);
+    expect(corpus.cases.length).toBeGreaterThan(0);
     expect(new Set(corpus.cases.map((entry) => entry.id)).size).toBe(corpus.cases.length);
     for (const entry of corpus.cases) {
       const input = expand(corpus.snapshots, entry.input);

@@ -47,20 +47,29 @@ static size_t operand_count(int64_t opcode) {
     default: return opcode >= 2 && opcode <= 20 ? 1U : 0U;
   }
 }
-static int request_in(int argc, char **argv, ftms_control_request *r) {
+static int format_in(const char *value, ftms_control_format_options *options) {
+  if (!strcmp(value, "uint8Tenths")) options->resistance_format = FTMS_CONTROL_RESISTANCE_UINT8_TENTHS;
+  else if (!strcmp(value, "signed16Tenths")) options->resistance_format = FTMS_CONTROL_RESISTANCE_SINT16_TENTHS;
+  else return 0;
+  return 1;
+}
+static int request_in(int argc, char **argv, ftms_control_request *r, int offset,
+                      const ftms_control_format_options *options) {
   int64_t opcode, values[5] = {0};
   size_t i, count;
-  if (!number(argv[2], -1, 65535, &opcode)) return 0;
+  if (argc <= offset || !number(argv[offset], -1, 65535, &opcode)) return 0;
   count = operand_count(opcode);
-  if ((size_t)argc != count + 3U) return 0;
+  if ((size_t)argc != count + (size_t)offset + 1U) return 0;
   for (i = 0; i < count; ++i) {
     int64_t low = 0, high = UINT16_MAX;
-    if (opcode == 3 || opcode == 4 || opcode == 5 || (opcode == 17 && i < 2U)) {
+    if (opcode == 4 && options && options->resistance_format == FTMS_CONTROL_RESISTANCE_UINT8_TENTHS) {
+      high = UINT8_MAX;
+    } else if (opcode == 3 || opcode == 4 || opcode == 5 || (opcode == 17 && i < 2U)) {
       low = INT16_MIN; high = INT16_MAX;
     } else if (opcode == 6 || (opcode == 17 && i >= 2U)) high = UINT8_MAX;
     else if (opcode == 12) high = UINT32_MAX;
     else if (opcode == 8 || opcode == 19) { low = -1; high = 65535; }
-    if (!number(argv[i + 3U], low, high, &values[i])) return 0;
+    if (!number(argv[i + (size_t)offset + 1U], low, high, &values[i])) return 0;
   }
   r->opcode = (ftms_control_opcode)opcode;
   switch (opcode) {
@@ -136,21 +145,30 @@ int main(int argc, char **argv) {
   size_t size, written;
   ftms_result result;
   if (argc < 3) return 64;
-  if (!strcmp(argv[1], "decode-request") || !strcmp(argv[1], "decode-response")) {
-    if (argc != 3 || !bytes_in(argv[2], bytes, &size)) { puts("{\"bridgeError\":true}"); return 0; }
-    if (!strcmp(argv[1], "decode-request")) {
+  if (!strcmp(argv[1], "decode-request") || !strcmp(argv[1], "decode-request-format") || !strcmp(argv[1], "decode-response")) {
+    ftms_control_format_options format;
+    const ftms_control_format_options *options = NULL;
+    int formatted = !strcmp(argv[1], "decode-request-format");
+    if (argc != (formatted ? 4 : 3) || (formatted && !format_in(argv[2], &format)) ||
+        !bytes_in(argv[formatted ? 3 : 2], bytes, &size)) { puts("{\"bridgeError\":true}"); return 0; }
+    if (formatted) options = &format;
+    if (!strcmp(argv[1], "decode-request") || formatted) {
       ftms_control_request request;
-      result = ftms_decode_control_request(bytes, size, &request);
+      result = ftms_decode_control_request_with_format(bytes, size, options, &request);
       if (result == FTMS_OK) request_out(&request);
     } else {
       ftms_control_response response;
       result = ftms_decode_control_response(bytes, size, &response);
       if (result == FTMS_OK) response_out(&response);
     }
-  } else if (!strcmp(argv[1], "encode-request")) {
+  } else if (!strcmp(argv[1], "encode-request") || !strcmp(argv[1], "encode-request-format")) {
     ftms_control_request request = {0};
-    if (!request_in(argc, argv, &request)) { puts("{\"bridgeError\":true}"); return 0; }
-    result = ftms_encode_control_request(&request, bytes, sizeof bytes, &written);
+    ftms_control_format_options format;
+    const ftms_control_format_options *options = NULL;
+    int formatted = !strcmp(argv[1], "encode-request-format");
+    if ((formatted && !format_in(argv[2], &format)) || !request_in(argc, argv, &request, formatted ? 3 : 2, formatted ? &format : NULL)) { puts("{\"bridgeError\":true}"); return 0; }
+    if (formatted) options = &format;
+    result = ftms_encode_control_request_with_format(&request, options, bytes, sizeof bytes, &written);
     if (result == FTMS_OK) emit_bytes(bytes, written);
   } else if (!strcmp(argv[1], "encode-response")) {
     ftms_control_response response = {0};

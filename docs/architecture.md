@@ -22,7 +22,7 @@ identity and public export paths remain stable. Published TypeScript is
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
 | `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by C and TypeScript |
-| `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 49 shared cases |
+| `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented protocol surface, unreleased |
 | `packages/swift/` | Native Apple package | Reserved |

@@ -10,13 +10,24 @@ Bluetooth qualification.
 ## Representation and comparison
 
 Each request has its wire opcode and ordered raw-integer `operands`, plus literal
-wire `bytes`. Opcodes 0, 1, 7 have no operands. Other operands are:
+wire `bytes`. An optional request-case `format` explicitly selects
+`signed16Tenths` (the omitted/default profile) or `uint8Tenths`; it applies only
+to opcode 04 resistance and is not a decoded field or a response property. ESR11
+Part II p.184 E8991 corrects the default command field from UINT8 to SINT16 while
+retaining tenths. `uint8Tenths` is therefore an explicit alternative profile for
+the literal 1.0 table, not an inferred or universally normative default.
+Valid formatted request fixtures must have decoded opcode 04. Invalid request
+fixtures may retain an explicit format while testing malformed bytes (including
+missing or invalid opcode bytes); response fixtures never accept a request format.
+The production APIs deliberately accept valid options for unrelated opcodes
+without changing them, but these are not format-specific valid corpus cases.
+Opcodes 0, 1, 7 have no operands. Other operands are:
 
 | Opcode (hex) | Raw operands in wire order |
 | --- | --- |
 | 02 | speed, 0.01 km/h (u16) |
 | 03 | inclination, 0.1 percent (s16) |
-| 04 | resistance, 0.1 level (s16) |
+| 04 | resistance, 0.1 level (s16 default; explicit `uint8Tenths` profile is u8) |
 | 05 | power, watts (s16) |
 | 06 | heart rate, bpm (u8) |
 | 08 | stop=1 / pause=2 |
@@ -24,7 +35,7 @@ wire `bytes`. Opcodes 0, 1, 7 have no operands. Other operands are:
 | 0c | distance, metres (u24) |
 | 0d | training seconds (u16) |
 | 0e, 0f, 10 | 2, 3, 5 zone durations in seconds respectively (u16 each) |
-| 11 | wind speed 0.001 m/s (s16), grade 0.01 percent (s16), rolling resistance 0.0001 (u8), wind resistance 0.01 kg/m (u8) |
+| 11 | wind speed 0.001 m/s (s16), grade 0.01 percent (s16), rolling resistance 0.0001 (u8), wind resistance coefficient 0.01 (u8; unitless in FTMS 1.0.1 E10187, kg/m wording in 1.0) |
 | 12 | wheel circumference, 0.1 mm (u16) |
 | 13 | spin-down start=1 / ignore=2 |
 | 14 | cadence, 0.5 rpm (u16) |
@@ -54,7 +65,7 @@ use `kind`, `length`, or `range` native errors (C values 3, 2, 4 respectively).
 
 ## Accounting and identity
 
-There are 35 fixtures (23 requests, 6 responses, 6 invalid decodes) and 62
+There are 41 fixtures (27 requests, 6 responses, 8 invalid decodes) and 72
 directional assertions. Every valid request is independently encoded and decoded.
 Two response fixtures explicitly specify `encode: false`: unknown result and
 unexpected trailing parameters are decode-only evidence, not canonical encoder

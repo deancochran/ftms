@@ -127,8 +127,13 @@ pending fragments rather than attempting to guess a format boundary.
 1. Build an `ftms_cap_snapshot` for **one** FTMS service instance/generation.
    UUIDs are full canonical display/network-order bytes; values are wire bytes.
    The caller owns raw data and decides discovery completeness and freshness.
-2. Call `ftms_capability_requirements` (or `_with_format`) for exact observation/diagnostic counts, using the same explicit range profile for both passes.
-3. Supply caller-owned buffers and call `ftms_evaluate_capabilities` (or `_with_format`). Buffer
+2. For C.7-aware Feature property evaluation, call `_with_c7` with explicit
+   `ftms_cap_c7_evidence` (and the same range profile for both passes). Legacy
+   APIs pass NULL C.7 evidence: it is unknown, not false, so a present Feature
+   adds an insufficient-evidence diagnostic and applicable operations are
+   incomplete; size diagnostic buffers from that call rather than reusing old
+   capacities.
+3. Supply caller-owned buffers and call the matching evaluation API. Buffer
    capacities are element counts. A caller may use fixed arrays and reject a
    snapshot that exceeds them; the library imposes no arbitrary device limit.
 4. Read `out.report`; `operations[opcode]` separately reports declaration,
@@ -160,6 +165,30 @@ Encode capacity is checked before any write and `written` is changed only on
 success. The codecs do not decide whether a connection is permitted to control a
 machine.
 
+For an explicit resistance-command layout, use
+`ftms_encode_control_request_with_format(request, options, out, capacity, written)`
+and `ftms_decode_control_request_with_format(data, size, options, out)` with
+`ftms_control_format_options`. Set `resistance_format` to
+`FTMS_CONTROL_RESISTANCE_UINT8_TENTHS` for the two-byte request `04 7b` with
+`resistance_tenth_level = 123`. This profile accepts integer numerators 0–255
+(0–25.5 levels); negative/out-of-range numerators fail without modifying output.
+The legacy functions, NULL options, or
+`FTMS_CONTROL_RESISTANCE_SINT16_TENTHS` retain the ESR11 E8991 signed16-tenths
+default (`04 7b 00` for that same numerator). No struct layout was changed.
+
+Only opcode `0x04` is affected. Do not infer this choice from packet length,
+measurement/range formats, feature bits or device identity. Status opcode `0x07`
+remains signed16 tenths. The literal 1.0.1 request table conflicts with E8991;
+the UINT8 option is an explicit alternative, not a replacement normative default.
+The source-checkout-only `docs/specification-audit.md` records the reconciliation;
+it is not included in installed C package artifacts. Selection does not authorize
+a Control Point operation.
+
+For simulation opcode `0x11`, `cw_hundredth_kg_per_m` retains its legacy public
+name. E10187 / FTMS 1.0.1 Table 4.20 defines Cw as **unitless**, with unchanged
+UINT8 / 0.01 wire resolution. No physical-unit conversion or struct rename is
+introduced; current units must not be inferred from that legacy field name.
+
 ## Verification
 
 ```sh
@@ -174,9 +203,9 @@ native package publication is added or claimed.
 The tests read canonical corpora directly:
 
 - codec v1: **97 passed, zero failed/unsupported/skipped**;
-- additional bidirectional corpora: controls 35 cases / 62 assertions, values
+- additional bidirectional corpora: controls 41 cases / 72 assertions, values
   8 / 16, measurements 26 / 47, statuses 38 / 63;
-- capability v1: **49 complete-report cases**, with schema/template/comparator
+- capability v1: **63 complete-report cases**, with schema/template/comparator
   regression tests; native tests additionally isolate all 17 target bits and
   verify invalid-argument/buffer guarantees;
 - strict C99 and ASan+UBSan tests, 10,000 codec/capability/control fuzz iterations

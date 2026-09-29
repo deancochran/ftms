@@ -360,6 +360,66 @@
           -32768
         ]
       }
+    },
+    {
+      "id": "request-resistance-u8-zero",
+      "operation": "request",
+      "format": "uint8Tenths",
+      "bytes": [
+        4,
+        0
+      ],
+      "decoded": {
+        "opcode": 4,
+        "operands": [
+          0
+        ]
+      }
+    },
+    {
+      "id": "request-resistance-u8-123",
+      "operation": "request",
+      "format": "uint8Tenths",
+      "bytes": [
+        4,
+        123
+      ],
+      "decoded": {
+        "opcode": 4,
+        "operands": [
+          123
+        ]
+      }
+    },
+    {
+      "id": "request-resistance-u8-255",
+      "operation": "request",
+      "format": "uint8Tenths",
+      "bytes": [
+        4,
+        255
+      ],
+      "decoded": {
+        "opcode": 4,
+        "operands": [
+          255
+        ]
+      }
+    },
+    {
+      "id": "request-resistance-default-123",
+      "operation": "request",
+      "bytes": [
+        4,
+        123,
+        0
+      ],
+      "decoded": {
+        "opcode": 4,
+        "operands": [
+          123
+        ]
+      }
     }
   ],
   "responses": [
@@ -536,6 +596,26 @@
         19,
         1,
         1
+      ],
+      "error": "length"
+    },
+    {
+      "id": "invalid-request-resistance-u8-short",
+      "operation": "request",
+      "format": "uint8Tenths",
+      "bytes": [
+        4
+      ],
+      "error": "length"
+    },
+    {
+      "id": "invalid-request-resistance-u8-long",
+      "operation": "request",
+      "format": "uint8Tenths",
+      "bytes": [
+        4,
+        0,
+        0
       ],
       "error": "length"
     }

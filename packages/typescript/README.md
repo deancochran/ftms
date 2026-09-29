@@ -102,6 +102,34 @@ if (!response.ok || !response.value.success) {
 `encodeFtmsControlRequest` is the throwing convenience variant.
 `tryEncodeFtmsControlRequest` is recommended at untrusted boundaries.
 
+Both normalized encoders accept an optional second `FtmsControlFormatOptions`
+argument, as do `encodeFtmsControlRequestRaw` and `decodeFtmsControlRequestRaw`:
+
+```ts
+const resistance = tryEncodeFtmsControlRequest(
+  { op: "setTargetResistance", resistanceLevel: 12.3 },
+  { resistanceFormat: "uint8Tenths" },
+); // successful value is Uint8Array.of(0x04, 0x7b)
+```
+
+Omitted/empty options preserve the ESR11 E8991 signed16-tenths default
+(`04 7b 00` for 12.3). The explicit `uint8Tenths` alternative permits 0–25.5
+normalized levels, or integer 0–255 raw tenths. Normalized rounding policy is
+unchanged; raw codecs reject fractional operands. Invalid options, including
+null, are rejected (a result error from `tryEncode`, otherwise a thrown error).
+Only resistance opcode `0x04` changes; other requests are unaffected. Selection
+is never inferred from packet length, measurements, ranges, status or device
+identity. Status resistance remains signed16 tenths. The literal 1.0.1 table
+conflicts with E8991; this alternative is not a claim that the signed correction
+was revoked. The source-checkout-only `docs/specification-audit.md` records the
+reconciliation; it is not part of the installed npm package.
+
+For simulation opcode `0x11`, the legacy `cwKgPerM` property keeps its public
+name, but E10187 / FTMS 1.0.1 Table 4.20 defines Cw as **unitless**. The wire
+representation remains UINT8 with resolution 0.01; no new physical-unit
+conversion is performed. Do not infer current normative units from that legacy
+property name.
+
 ### Control safety and ownership
 
 This package only encodes and decodes protocol values. Callers must:
@@ -222,6 +250,18 @@ Capability evaluation takes a pure protocol snapshot: uint32 generation, numeric
 discovery/scope/read states, canonical 32-lowercase-hex UUIDs, uint16 properties,
 and byte read evidence. Its report follows the shared capability contract,
 including all 21 operations, duplicates, missing/failed reads and contradictions.
+Optional caller-owned C.7 evidence distinguishes false from unknown:
+
+```ts
+evaluateFtmsCapabilities({
+  ...snapshot,
+  c7: { bondingSupported: true, featureMayChangeOverLifetime: true },
+}); // Feature must have Read | Indicate
+```
+
+Omit either C.7 fact when it is unknown; the evaluator does not invent false.
+That leaves applicable prerequisites incomplete with an insufficient-evidence
+diagnostic, while non-Indicate extra Feature properties remain contradictory.
 It does not perform discovery or return execution authorization. Full state-code
 definitions and examples are in `shared/conformance/capabilities/v1/schema.json`
 and `shared/protocol/capability-discovery.md` in the repository.

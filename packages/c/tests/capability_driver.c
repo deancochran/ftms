@@ -83,14 +83,15 @@ int main(void) {
   ftms_cap_characteristic chars[MAX_CHARS];
   uint8_t bytes[MAX_CHARS][MAX_BYTES];
   char uuid[33], payload[MAX_BYTES * 2U + 1U], trailing;
-  unsigned discovery, scope, count, i, properties, state, reason;
+  unsigned discovery, scope, count, i, properties, state, reason, bonding, mutable;
   uint32_t generation;
   size_t size;
   ftms_cap_snapshot snapshot;
+  ftms_cap_c7_evidence c7;
   ftms_cap_requirements requirements;
   ftms_cap_output out;
-  if (scanf("%u %u %" SCNu32 " %u", &discovery, &scope, &generation, &count) != 4 ||
-      discovery > 3U || scope > 3U || count > MAX_CHARS) return 64;
+  if (scanf("%u %u %" SCNu32 " %u %u %u", &discovery, &scope, &generation, &count, &bonding, &mutable) != 6 ||
+       discovery > 3U || scope > 3U || count > MAX_CHARS || bonding > 2U || mutable > 2U) return 64;
   memset(chars, 0, sizeof chars);
   for (i = 0; i < count; ++i) {
     if (scanf("%32s %u %u %u %2048s", uuid, &properties, &state, &reason, payload) != 5 ||
@@ -111,7 +112,9 @@ int main(void) {
   snapshot.generation = generation;
   snapshot.characteristics = chars;
   snapshot.characteristic_count = count;
-  if (ftms_capability_requirements(&snapshot, &requirements) != FTMS_OK) return 65;
+  c7.bonding_supported = (ftms_cap_truth)bonding;
+  c7.feature_may_change_over_lifetime = (ftms_cap_truth)mutable;
+  if (ftms_capability_requirements_with_c7(&snapshot, NULL, &c7, &requirements) != FTMS_OK) return 65;
   memset(&out, 0, sizeof out);
   out.observation_capacity = requirements.observation_count;
   out.diagnostic_capacity = requirements.diagnostic_count;
@@ -120,7 +123,7 @@ int main(void) {
   if ((requirements.observation_count && !out.observations) || (requirements.diagnostic_count && !out.diagnostics)) {
     free(out.observations); free(out.diagnostics); return 66;
   }
-  if (ftms_evaluate_capabilities(&snapshot, &out) != FTMS_OK) {
+  if (ftms_evaluate_capabilities_with_c7(&snapshot, NULL, &c7, &out) != FTMS_OK) {
     free(out.observations); free(out.diagnostics); return 67;
   }
   report_json(&out);

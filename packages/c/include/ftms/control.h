@@ -47,6 +47,16 @@ typedef enum ftms_control_result_code {
   FTMS_CONTROL_NOT_PERMITTED = 5
 } ftms_control_result_code;
 
+/* NULL selects the historical signed 16-bit tenths layout. This is an explicit
+ * caller-owned compatibility selection, not device-format inference. */
+typedef enum ftms_control_resistance_format {
+  FTMS_CONTROL_RESISTANCE_SINT16_TENTHS = 0,
+  FTMS_CONTROL_RESISTANCE_UINT8_TENTHS = 1
+} ftms_control_resistance_format;
+typedef struct ftms_control_format_options {
+  ftms_control_resistance_format resistance_format;
+} ftms_control_format_options;
+
 typedef struct ftms_control_request {
   ftms_control_opcode opcode;
   union {
@@ -93,6 +103,14 @@ typedef struct ftms_control_response {
  * FTMS_ERROR_RANGE means a field or response structure is invalid. */
 ftms_result ftms_encode_control_request(const ftms_control_request *request, uint8_t *out, size_t capacity, size_t *written);
 ftms_result ftms_decode_control_request(const uint8_t *data, size_t size, ftms_control_request *out);
+/* `_with_format` preserves raw tenths in resistance_tenth_level. Legacy
+ * wrappers are exactly equivalent to NULL options. */
+ftms_result ftms_encode_control_request_with_format(const ftms_control_request *request,
+                                                     const ftms_control_format_options *options,
+                                                     uint8_t *out, size_t capacity, size_t *written);
+ftms_result ftms_decode_control_request_with_format(const uint8_t *data, size_t size,
+                                                     const ftms_control_format_options *options,
+                                                     ftms_control_request *out);
 ftms_result ftms_encode_control_response(const ftms_control_response *response, uint8_t *out, size_t capacity, size_t *written);
 ftms_result ftms_decode_control_response(const uint8_t *data, size_t size, ftms_control_response *out);
 

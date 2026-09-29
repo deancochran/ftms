@@ -51,8 +51,11 @@ corpus. Swift and Kotlin remain scaffolds, not validated implementations.
   copy one explicit profile at initialization and reinitialization discards
   pending fragments before changing it.
 - Resistance **commands** remain separate from measurement and range layouts.
-  Legacy command widths, rounding and scale require independently justified
-  contracts and tests; no command format was changed by this work.
+  Commands now have an independent explicit UINT8-tenths option matching the
+  literal FTMS 1.0.1 Table 4.15. ESR11 E8991 directly supports the preserved
+  signed16-tenths default; the source conflict remains unresolved. See the
+  [audit and usage](specification-audit.md). Neither range nor measurement
+  selection changes the command format.
 - An Open Trainer adapter still needs DataView conversion at the application
   boundary, app-facing optional fields/timestamps, rounding/default/error policy,
   and upstream parser, command, trainer and simulator tests. The pure package
@@ -60,9 +63,15 @@ corpus. Swift and Kotlin remain scaffolds, not validated implementations.
 - Open Trainer transport observations do not supply all aggregate capability
   evidence. Do not fabricate complete properties/read/discovery evidence.
 - [FTMS 1.0.1](https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0-1/)
-  is adopted (2024-10-01). A section-by-section normative delta audit against
-  the pinned 1.0 text and mandatory Errata 23224 remains necessary; existence
-  of 1.0.1 alone is not grounds to silently change the published defaults.
+  is adopted (2024-10-01). The [focused normative audit](specification-audit.md)
+  checks all service sections against the pinned 1.0 text, resistance by
+  direction, pace, unavailable values, ESR11 E8991/E9135 and Errata 23224.
+  It adds explicit UINT8-tenths commands while preserving the erratum-backed
+  default. The recovered official annotated comparison now attributes all nine
+  errata listed in 1.0.1's history, including cadence-flag and Cw-unit corrections
+   missed by the first text-only pass. Source conflicts and Cw API limitations
+   remain explicit in the audit; C.7 static compatibility is implemented, while
+   bonded-reconnection indication and CCCD behavior remain transport limitations.
 - A verified device corpus still needs model/firmware, properties, original
   bytes and independently observed displayed units. Nine compatibility cases
   are mostly synthetic; the CORE range is the only captured characteristic in

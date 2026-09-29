@@ -294,9 +294,7 @@
           "type": "feed",
           "generation": 7,
           "bytes": [3, 0, 46, 22],
-          "expected": {
-            "status": "pending"
-          }
+          "expected": { "status": "pending" }
         },
         {
           "at": 2,
@@ -335,9 +333,7 @@
           "type": "feed",
           "generation": 7,
           "bytes": [3, 0, 46, 22],
-          "expected": {
-            "status": "pending"
-          }
+          "expected": { "status": "pending" }
         },
         {
           "at": 0,
@@ -376,9 +372,7 @@
           "type": "feed",
           "generation": 7,
           "bytes": [3, 0, 46, 22],
-          "expected": {
-            "status": "pending"
-          }
+          "expected": { "status": "pending" }
         },
         {
           "at": 5,
@@ -401,9 +395,7 @@
           "type": "feed",
           "generation": 7,
           "bytes": [3, 0, 46, 22],
-          "expected": {
-            "status": "pending"
-          }
+          "expected": { "status": "pending" }
         },
         {
           "at": 4,
@@ -620,14 +612,18 @@
           "type": "feed",
           "generation": 7,
           "bytes": [97, 0, 120, 0, 44, 1],
-          "expected": { "status": "pending" }
+          "expected": {
+            "status": "pending"
+          }
         },
         {
           "at": 1,
           "type": "feed",
           "generation": 7,
           "bytes": [1, 8, 133, 3],
-          "expected": { "status": "pending" }
+          "expected": {
+            "status": "pending"
+          }
         },
         {
           "at": 2,
@@ -666,14 +662,18 @@
           "type": "feed",
           "generation": 7,
           "bytes": [97, 0, 42, 43],
-          "expected": { "status": "pending" }
+          "expected": {
+            "status": "pending"
+          }
         },
         {
           "at": 1,
           "type": "feed",
           "generation": 7,
           "bytes": [1, 4, 133, 3],
-          "expected": { "status": "pending" }
+          "expected": {
+            "status": "pending"
+          }
         },
         {
           "at": 2,
@@ -1334,6 +1334,17 @@
         { "at": 2, "type": "response", "caseId": "response-success" },
         { "at": 3, "type": "response", "caseId": "response-not-supported" },
         { "at": 4, "type": "response", "caseId": "response-unknown-result" }
+      ]
+    },
+    {
+      "id": "scripted-u8-tenths-control-response",
+      "profile": "bike",
+      "generation": 1,
+      "steps": [
+        { "at": 1, "type": "control", "caseId": "request-resistance-u8-zero" },
+        { "at": 2, "type": "control", "caseId": "request-resistance-u8-123" },
+        { "at": 3, "type": "control", "caseId": "request-resistance-u8-255" },
+        { "at": 4, "type": "response", "caseId": "response-success" }
       ]
     }
   ]

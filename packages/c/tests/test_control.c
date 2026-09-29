@@ -83,6 +83,46 @@ static int boundary_contract(void) {
   }
   return 0;
 }
+static int resistance_format_contract(void) {
+  ftms_control_request request, decoded, saved;
+  ftms_control_format_options u8 = {FTMS_CONTROL_RESISTANCE_UINT8_TENTHS};
+  ftms_control_format_options invalid = {(ftms_control_resistance_format)2};
+  uint8_t bytes[4], before[4]; size_t written = 77U;
+  memset(&request, 0, sizeof request);
+  request.opcode = FTMS_CONTROL_SET_TARGET_RESISTANCE;
+  request.value.resistance_tenth_level = 0;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, sizeof bytes, &written) == FTMS_OK);
+  CHECK(written == 2U && memcmp(bytes, "\004\000", 2) == 0);
+  request.value.resistance_tenth_level = 123;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, sizeof bytes, &written) == FTMS_OK);
+  CHECK(written == 2U && memcmp(bytes, "\004{", 2) == 0);
+  request.value.resistance_tenth_level = 255;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, sizeof bytes, &written) == FTMS_OK);
+  CHECK(written == 2U && memcmp(bytes, "\004\377", 2) == 0);
+  CHECK(ftms_decode_control_request_with_format((const uint8_t *)"\004{", 2U, &u8, &decoded) == FTMS_OK);
+  CHECK(decoded.opcode == FTMS_CONTROL_SET_TARGET_RESISTANCE && decoded.value.resistance_tenth_level == 123);
+  memset(bytes, 0xa5, sizeof bytes); memcpy(before, bytes, sizeof bytes);
+  request.value.resistance_tenth_level = -1; written = 77U;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, sizeof bytes, &written) == FTMS_ERROR_RANGE);
+  CHECK(written == 77U && memcmp(bytes, before, sizeof bytes) == 0);
+  request.value.resistance_tenth_level = 256;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, sizeof bytes, &written) == FTMS_ERROR_RANGE);
+  CHECK(written == 77U && memcmp(bytes, before, sizeof bytes) == 0);
+  request.value.resistance_tenth_level = 123;
+  CHECK(ftms_encode_control_request_with_format(&request, &u8, bytes, 1U, &written) == FTMS_ERROR_LENGTH);
+  CHECK(written == 77U && memcmp(bytes, before, sizeof bytes) == 0);
+  memset(&saved, 0xa5, sizeof saved); decoded = saved;
+  CHECK(ftms_decode_control_request_with_format((const uint8_t *)"\004{\000", 3U, &u8, &decoded) == FTMS_ERROR_LENGTH);
+  CHECK(memcmp(&decoded, &saved, sizeof saved) == 0);
+  memset(bytes, 0xa5, sizeof bytes); memcpy(before, bytes, sizeof bytes); written = 77U;
+  CHECK(ftms_encode_control_request_with_format(&request, &invalid, bytes, sizeof bytes, &written) == FTMS_ERROR_KIND);
+  CHECK(written == 77U && memcmp(bytes, before, sizeof bytes) == 0);
+  CHECK(ftms_decode_control_request_with_format((const uint8_t *)"\004{", 2U, &invalid, &decoded) == FTMS_ERROR_KIND);
+  CHECK(memcmp(&decoded, &saved, sizeof saved) == 0);
+  CHECK(ftms_encode_control_request_with_format(&request, NULL, bytes, sizeof bytes, &written) == FTMS_OK);
+  CHECK(written == 3U && memcmp(bytes, "\004{\000", 3) == 0);
+  return 0;
+}
 int test_control(void) {
   ftms_control_request r; uint8_t b[12], saved[12]; size_t w=77U;
   static const uint8_t expected[][11] = {{0},{1},{2,210,4},{3,244,255},{4,244,255},{5,156,255},{6,150},{7},{8,2},{9,244,1},{10,88,2},{11,188,2},{12,3,2,1},{13,16,14},{14,10,0,20,0},{15,10,0,20,0,30,0},{16,10,0,20,0,30,0,40,0,50,0},{17,232,3,250,0,10,20},{18,8,82},{19,1},{20,180,0}};
@@ -111,5 +151,6 @@ int test_control(void) {
     b[0]=0;b[1]=2;b[2]=0xd2;b[3]=4;CHECK(ftms_decode_control_request(b+1U,3U,&r)==FTMS_OK&&r.value.speed_centikph==1234U);
   }
   CHECK(boundary_contract() == 0);
+  CHECK(resistance_format_contract() == 0);
   return 0;
 }

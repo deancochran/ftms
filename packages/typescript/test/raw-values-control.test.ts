@@ -31,6 +31,11 @@ function expectRawError(code: RawCodecError["code"], action: () => unknown): voi
   }
   throw new Error(`Expected RawCodecError(${code})`);
 }
+function controlOptions(format: unknown) {
+  return format === "signed16Tenths" || format === "uint8Tenths"
+    ? ({ resistanceFormat: format } as const)
+    : undefined;
+}
 
 describe("raw feature and supported-range conformance", () => {
   it("validates the canonical values corpus schema", () => {
@@ -140,6 +145,50 @@ describe("raw feature and supported-range conformance", () => {
 });
 
 describe("raw Control Point conformance", () => {
+  it("uses caller-selected UINT8 tenths resistance bytes without inference", () => {
+    const options = { resistanceFormat: "uint8Tenths" } as const;
+    expect(Array.from(encodeFtmsControlRequestRaw({ opcode: 4, operands: [0] }, options))).toEqual([
+      0x04, 0x00,
+    ]);
+    expect(
+      Array.from(encodeFtmsControlRequestRaw({ opcode: 4, operands: [123] }, options)),
+    ).toEqual([0x04, 0x7b]);
+    expect(
+      Array.from(encodeFtmsControlRequestRaw({ opcode: 4, operands: [255] }, options)),
+    ).toEqual([0x04, 0xff]);
+    expect(decodeFtmsControlRequestRaw(new Uint8Array([0x04, 0x7b]), options)).toEqual({
+      opcode: 4,
+      operands: [123],
+    });
+    expectRawError("range", () =>
+      encodeFtmsControlRequestRaw({ opcode: 4, operands: [-1] }, options),
+    );
+    expectRawError("range", () =>
+      encodeFtmsControlRequestRaw({ opcode: 4, operands: [256] }, options),
+    );
+    expectRawError("range", () =>
+      encodeFtmsControlRequestRaw({ opcode: 4, operands: [12.3] }, options),
+    );
+    expectRawError("length", () =>
+      decodeFtmsControlRequestRaw(new Uint8Array([0x04, 0, 0]), options),
+    );
+  });
+
+  it("strictly validates control format options and leaves other opcodes unchanged", () => {
+    for (const options of [null, { resistanceFormat: "whole" }, { extra: true }]) {
+      expectRawError("kind", () =>
+        encodeFtmsControlRequestRaw({ opcode: 2, operands: [1234] }, options as never),
+      );
+      expectRawError("kind", () =>
+        decodeFtmsControlRequestRaw(new Uint8Array([2, 0xd2, 4]), options as never),
+      );
+    }
+    const options = { resistanceFormat: "uint8Tenths" } as const;
+    expect(
+      Array.from(encodeFtmsControlRequestRaw({ opcode: 2, operands: [1234] }, options)),
+    ).toEqual([0x02, 0xd2, 0x04]);
+  });
+
   it("validates the canonical controls corpus schema and unique IDs", () => {
     const validate = new Ajv2020({ allErrors: true, strict: true }).compile(controlsSchema);
     expect(validate(controls), JSON.stringify(validate.errors)).toBe(true);
@@ -147,11 +196,42 @@ describe("raw Control Point conformance", () => {
     expect(new Set(cases.map((vector) => vector.id)).size).toBe(cases.length);
   });
 
+  it("rejects invalid request formats and formats on response cases", () => {
+    const validate = new Ajv2020({ allErrors: true, strict: true }).compile(controlsSchema);
+    const invalidFormat = structuredClone(controls);
+    invalidFormat.requests[0] = { ...invalidFormat.requests[0], format: "uint8Whole" } as never;
+    expect(validate(invalidFormat)).toBe(false);
+    for (const index of [0, 2]) {
+      const unrelatedFormat = structuredClone(controls);
+      unrelatedFormat.requests[index] = {
+        ...unrelatedFormat.requests[index],
+        format: "uint8Tenths",
+      } as never;
+      expect(validate(unrelatedFormat)).toBe(false);
+    }
+    const responseFormat = structuredClone(controls);
+    responseFormat.responses[0] = {
+      ...responseFormat.responses[0],
+      format: "uint8Tenths",
+    } as never;
+    expect(validate(responseFormat)).toBe(false);
+    const invalidResponseFormat = structuredClone(controls);
+    invalidResponseFormat.invalid[4] = {
+      ...invalidResponseFormat.invalid[4],
+      format: "uint8Tenths",
+    } as never;
+    expect(validate(invalidResponseFormat)).toBe(false);
+  });
+
   for (const vector of controls.requests) {
     it(`${vector.id} encodes its literal bytes`, () =>
-      expect(Array.from(encodeFtmsControlRequestRaw(vector.decoded))).toEqual(vector.bytes));
+      expect(
+        Array.from(encodeFtmsControlRequestRaw(vector.decoded, controlOptions(vector.format))),
+      ).toEqual(vector.bytes));
     it(`${vector.id} decodes its literal bytes`, () =>
-      expect(decodeFtmsControlRequestRaw(new Uint8Array(vector.bytes))).toEqual(vector.decoded));
+      expect(
+        decodeFtmsControlRequestRaw(new Uint8Array(vector.bytes), controlOptions(vector.format)),
+      ).toEqual(vector.decoded));
   }
   for (const vector of controls.responses) {
     it(`${vector.id} decodes its literal bytes`, () =>
@@ -164,7 +244,7 @@ describe("raw Control Point conformance", () => {
     it(`${vector.id} rejects with its canonical error`, () =>
       expectRawError(vector.error as RawCodecError["code"], () =>
         vector.operation === "request"
-          ? decodeFtmsControlRequestRaw(new Uint8Array(vector.bytes))
+          ? decodeFtmsControlRequestRaw(new Uint8Array(vector.bytes), controlOptions(vector.format))
           : decodeFtmsControlResponseRaw(new Uint8Array(vector.bytes)),
       ));
   }

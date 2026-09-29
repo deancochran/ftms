@@ -26,8 +26,8 @@ ranges are Speed, Inclination, Resistance Level, Heart Rate, and Power. The v1
 corpus also has 10 diagnostic vectors, which exercise malformed/truncated parsing
 behavior rather than a seventh protocol family. Its category total is 97 vectors;
 it must not be confused with the overall TypeScript test count or used to infer
-that all test cases are shared vectors. The current full TypeScript run has 350
-tests, including package-specific tests and the v1 comparator boundary tests.
+that all test cases are shared vectors. The 350-test TypeScript run was historical
+evidence from the earlier codec audit; current verification is recorded below.
 
 The published TypeScript release is client-oriented. Unreleased source additions
 now cover both directions through separate raw APIs without replacing existing
@@ -50,9 +50,9 @@ ambiguity and property contradictions. It does not infer a machine type, acquire
 permission, or authorize controls. See
 [capability discovery](../shared/protocol/capability-discovery.md).
 
-The separate capability runner executes 49 shared cases with complete exact
+The separate capability runner executes 63 shared cases with complete exact
 reports: discovery 12, duplicates 3, features 5, forward-compatibility 2,
-measurements 7, operations 4, properties 8, ranges 8. All cases pass in the current
+measurements 7, operations 4, properties 22, ranges 8. All cases pass in the current
 host run, with zero unsupported/skipped cases **in that corpus only**. Fourteen
 adapter/schema/template tests check wrong outputs, malformed fixtures and failure
 accounting. Native tests separately isolate all 17 target bits, every range
@@ -60,6 +60,41 @@ relationship, base procedures, all read reasons and argument/capacity atomicity.
 Those test-suite counts are not additional shared vectors or device evidence.
 
 ## Evidence and future gates
+
+### Authoritative current local evidence
+
+This section is the sole current-run record for this dirty branch. It is updated
+only after the listed commands complete; it does not hash this document or its
+own narrative.
+
+- Base: `2b5ff79b81639e8beeea8bc9b219cbf78c2c7194`; branch
+  `audit/ftms-1-0-1`; dirty local checkout (no commit, package publication, or
+  remote CI claim).
+- `env -u TMPDIR pnpm verify`: passed lint, typecheck, build and packed-consumer
+  checks; **552 tests in 13 files** passed. Codec v1 was **97/97 complete**;
+  TypeScript simulation was **38/38 scenarios, 79/79 steps**.
+- `make BUILD=build/commit-polish test` in `packages/c`: passed strict GCC/Clang
+  C99 units, ASan+UBSan units, both 10,000-input fuzz suites, codec v1 **97/97**,
+  controls **41 cases / 72 assertions**, capability v1 **63 complete reports**,
+  simulation **38/38 scenarios, 79/79 steps**, and the real source-artifact plus
+  installed C/C++ consumer checks. The capability unit suite includes one
+  four-diagnostic Feature observation, oversized pre-walk rejection, and output/
+  buffer atomicity checks.
+
+| Current input | SHA-256 |
+| --- | --- |
+| Capability schema | `1a23dd523896d41b6aa115eea906e6f899a9cfcc8008a87d133ba8c51409ef26` |
+| Capability vectors | `90a9b85e735455515c36fc089fa786bd928e217e81cf95f5ccef67c0d479d3dd` |
+| Capability corpus contract | `e844292d9a916aa63db9d1f6d22de5525c1923e3584afbcc5013d93d374e6a6a` |
+| Capability protocol contract | `9eab3cd08d1fdb83d26c48c62d57fe1c58a163166f414f20c697a933f8abd41e` |
+| Controls schema | `3cf0e2e807293d1f5eb4460f1b122e49f689d7301e05cbc3f33268d2d423f73f` |
+| Controls vectors | `766ef03b2aa0aabcef96b228bf83f9a8c8bf5bc2e3f61bd3e3779e72e8508531` |
+| Simulation scenarios | `bf0e45ffd5fda95adef18b3a46a03aea87d7203d6ce15de2edea33c5b79a98f5` |
+
+These identities cover canonical input assets, not generated logs or this
+evidence document. The nine incorporated 1.0.1 errata are the nine entries in
+the audit reconciliation; ESR11 and EC23224 are additional governing sources,
+not additional entries in that nine-errata count.
 
 Current evidence includes TypeScript host unit tests, schema validation, canonical
 shared vectors, and the package's linked-consumer/packed-artifact checks. The

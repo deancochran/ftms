@@ -35,10 +35,10 @@ Both ports now exercise the same canonical fixtures:
 | --- | ---: | ---: |
 | Original codec-v1 | 97 | 97 |
 | Raw values | 8 | 16 |
-| Raw controls | 35 | 62 |
+| Raw controls | 41 | 72 |
 | Raw measurements | 26 | 47 |
 | Raw statuses | 38 | 63 |
-| Capabilities | 49 | 49 complete reports |
+| Capabilities | 63 | 63 complete reports |
 
 All listed cases and declared directions passed in both ports. Invalid/decode-only
 fixtures are scoped explicitly; they are not claims of successful encoding.
@@ -48,6 +48,10 @@ reports compare exactly. Raw codec tests compare all normalized fields, not only
 opcode or selected metrics. Tests run in existing TypeScript and native CI jobs,
 so continued parity is checked against the same contracts rather than fixture
 copies maintained separately in each package.
+
+The controls count includes the later explicit resistance-command profile
+extension; see [the specification audit](specification-audit.md) for that
+follow-up's verification and the ESR11 versus literal 1.0.1 table conflict.
 
 ## Deliberate differences
 
@@ -87,12 +91,13 @@ passed all corpora, strict/sanitized units, 20,000 bounded fuzz iterations and s
 real installed C/C++ consumer combinations. Logs are ignored local files under
 `packages/c/build/parity-typescript.log` and `parity-native.log`.
 
-The shared capability contract wording now acknowledges both implementations.
-Its new SHA-256 is
-`035867b2c8590aeb753ba71d24904c09efa41c20855a68fa5e897009ac95f6a3`.
-Capability schema/vectors/comparison README are unchanged. Original codec-v1
-schema/vector/contract identities remain unchanged; additive corpus identities
-are those recorded in `packages/c/docs/verification-bidirectional.md`.
+The following paragraph is historical parity evidence. A later C.7 follow-up
+changed the capability corpus behavior and identities. Current command results
+and corpus hashes are recorded only in the authoritative current-evidence section
+of [coverage](coverage.md), not in an untracked release report or this historical
+parity record. Original codec-v1 schema/vector/contract identities remain
+unchanged; the capability corpus is separately versioned and does not alter
+codec-v1 or npm export semantics.
 Previous source-byte-unchanged statements predate this explicitly authorized
 TypeScript extension and are historical, not statements about current source.
 

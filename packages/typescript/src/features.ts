@@ -446,6 +446,20 @@ function validateSnapshot(snapshot: FtmsCapabilitySnapshot): void {
     !Array.isArray(snapshot.characteristics)
   )
     throw new RawCodecError("kind", "Invalid capability snapshot");
+  if (
+    snapshot.c7 !== undefined &&
+    (snapshot.c7 === null ||
+      typeof snapshot.c7 !== "object" ||
+      Array.isArray(snapshot.c7) ||
+      Object.keys(snapshot.c7).some(
+        (key) => key !== "bondingSupported" && key !== "featureMayChangeOverLifetime",
+      ) ||
+      (snapshot.c7.bondingSupported !== undefined &&
+        typeof snapshot.c7.bondingSupported !== "boolean") ||
+      (snapshot.c7.featureMayChangeOverLifetime !== undefined &&
+        typeof snapshot.c7.featureMayChangeOverLifetime !== "boolean"))
+  )
+    throw new RawCodecError("kind", "Invalid C.7 capability evidence");
   for (const c of snapshot.characteristics) {
     if (
       !c ||
@@ -461,6 +475,13 @@ function validateSnapshot(snapshot: FtmsCapabilitySnapshot): void {
     )
       throw new RawCodecError("kind", "Invalid capability characteristic");
   }
+}
+function c7EvidenceUnknown(snapshot: FtmsCapabilitySnapshot): boolean {
+  return !(
+    snapshot.c7?.bondingSupported === false ||
+    snapshot.c7?.featureMayChangeOverLifetime === false ||
+    (snapshot.c7?.bondingSupported === true && snapshot.c7?.featureMayChangeOverLifetime === true)
+  );
 }
 
 /** Evaluate static FTMS declarations and protocol prerequisites. This does not
@@ -501,8 +522,16 @@ export function evaluateFtmsCapabilities(
     const c = characteristics[i]!;
     if (!kind || !scopeOk) continue;
     const required = REQUIRED_PROPERTIES[kind]!;
-    if ((c.properties & required) !== required) diagnostics.push([5, kind, i]);
-    if ((c.properties & ~required) !== 0) diagnostics.push([6, kind, i]);
+    const c7RequiresIndicate =
+      kind === 1 &&
+      snapshot.c7?.bondingSupported === true &&
+      snapshot.c7?.featureMayChangeOverLifetime === true;
+    const c7Unknown = kind === 1 && c7EvidenceUnknown(snapshot);
+    const expected = c7RequiresIndicate ? required | 32 : required;
+    if ((c.properties & expected) !== expected) diagnostics.push([5, kind, i]);
+    if ((c.properties & ~(kind === 1 && c7Unknown ? expected | 32 : expected)) !== 0)
+      diagnostics.push([6, kind, i]);
+    if (c7Unknown) diagnostics.push([12, kind, i]);
     if (c.readState === 2) diagnostics.push([c.reason === 2 ? 8 : 7, kind, i]);
   }
   let machine = 0;
@@ -581,13 +610,23 @@ export function evaluateFtmsCapabilities(
       }
     }
   }
-  const characteristicReasons = (kind: number, unavailable: number, invalid: number) =>
-    presence[kind] === 0
-      ? unavailable
-      : presence[kind] !== 2 ||
-          characteristics[first[kind]!]!.properties !== REQUIRED_PROPERTIES[kind]!
-        ? invalid
-        : 0;
+  const characteristicReasons = (kind: number, unavailable: number, invalid: number) => {
+    if (presence[kind] === 0) return unavailable;
+    if (presence[kind] !== 2) return invalid;
+    const properties = characteristics[first[kind]!]!.properties;
+    if (kind === 1 && c7EvidenceUnknown(snapshot)) {
+      let reasons = 1024;
+      if ((properties & 2) === 0 || (properties & ~(2 | 32)) !== 0) reasons |= invalid;
+      return reasons;
+    }
+    const expected =
+      kind === 1 &&
+      snapshot.c7?.bondingSupported === true &&
+      snapshot.c7?.featureMayChangeOverLifetime === true
+        ? REQUIRED_PROPERTIES[kind]! | 32
+        : REQUIRED_PROPERTIES[kind]!;
+    return properties === expected ? 0 : invalid;
+  };
   const operations = TARGET_FOR_OPCODE.map((bit, opcode) => {
     let declaration: 0 | 1 | 2 = 0;
     let prerequisite: 0 | 1 | 2 | 3 = 2;

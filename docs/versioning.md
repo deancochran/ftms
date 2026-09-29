@@ -6,7 +6,7 @@ have independent version histories. Do not synchronize them by implication.
 | Boundary | Meaning | Current evidence |
 | --- | --- | --- |
 | Package semantic version | A package's public API and distribution compatibility | TypeScript has published `@deancochran/ftms` `0.2.0` and an unreleased `0.3.0` source candidate; C has an unreleased source-only `0.1.0` candidate in `packages/c/VERSION`; other native packages do not exist. |
-| FTMS specification and errata | Bluetooth SIG service semantics and corrections used to review behavior | FTMS 1.0 plus recorded ESR11 and EC23224 provenance. |
+| FTMS specification and errata | Bluetooth SIG service semantics and corrections used to review behavior | FTMS 1.0 plus ESR11 and EC23224 provenance; [1.0.1 annotated-redline reconciliation](specification-audit.md), with all nine incorporated errata attributed and remaining source conflicts explicitly recorded. |
 | Corpus schema format | Shape and comparison rules for fixtures | `schemaVersion: 1`, under `shared/conformance/v1/`. |
 | Corpus content revision | The exact schema/vector/contract bytes and checkout consumed by a runner | Pin immutable source commit, dirty indicator, and SHA-256 of both JSON assets plus `shared/conformance/README.md`. |
 | Capability corpus format/content | Separate static-evidence schema and fixtures under `shared/conformance/capabilities/v1` | Report HEAD/dirty state and SHA-256 of schema, vectors, capability corpus README, and `shared/protocol/capability-discovery.md`; does not alter codec v1 identity or npm exports. |
@@ -30,6 +30,34 @@ When a package's API or behavior changes, its maintainer applies that package's 
 semantic-version policy and release evidence. A corpus-only correction does not
 automatically require a synchronized package release, though an affected package
 may need one. Conversely, a package release need not alter the corpus.
+
+For the unreleased controls-v1 and capabilities-v1 corpora, this milestone
+explicitly extends the schema in place; it is an exception to the no-shape-change
+rule above, not a forward-compatibility guarantee for earlier v1 runners. These
+contracts must be consumed by exact schema/vector/contract hashes, not by
+`schemaVersion` alone. Older strict schemas reject the new properties, and older
+interpreters do not implement the C.7 comparison semantics. Consumers must upgrade
+the schema and runner together. Once these corpus contracts are released as
+stable, incompatible shape or interpretation changes require a new version and
+location. This exception does not change the original published codec-v1 contract.
+
+The controls-v1 command-profile extension is an optional case property that is
+backward-compatible only in the direction of new runners reading old fixtures:
+all prior fixtures retain their shape and omitted-format behavior,
+and recursive exact comparison is unchanged. Its new schema/vector/contract
+hashes identify this content revision. Consumers must validate the pinned schema
+and execute the selected format; they must not ignore an unfamiliar property or
+report unsupported selected cases as passing. The original codec-v1 E9135 edit
+is a separately documented provenance correction, not changed expected values.
+
+The capability corpus's C.7 change is observable behavior, not a provenance-only
+or behavior-neutral revision. Legacy/default capability APIs supply unknown C.7
+bonding/lifetime evidence; a present Feature then adds an insufficient-evidence
+diagnostic, makes applicable operation prerequisites incomplete, and can require
+larger diagnostic buffers. Consumers migrating to C.7-aware behavior must query
+requirements using the same C.7 evidence and capacity assumptions as evaluation.
+Explicit false/true C.7 evidence has the corresponding conditional Feature
+property behavior; it does not grant connection or control permission.
 
 The C candidate's `VERSION` file is its single package-version authority. CMake
 reads it for the project, package config, and
