@@ -169,9 +169,17 @@ typedef struct ftms_cap_output {
  * protocol consistency, GATT completeness, or permission to issue commands.
  * A range value/raw Feature words are meaningful only when decode == VALID. */
 ftms_result ftms_capability_requirements(const ftms_cap_snapshot *snapshot,
-                                       ftms_cap_requirements *out);
+                                        ftms_cap_requirements *out);
 ftms_result ftms_evaluate_capabilities(const ftms_cap_snapshot *snapshot,
-                                     ftms_cap_output *out);
+                                      ftms_cap_output *out);
+/* Explicit range layout is caller-owned evidence, never device inference. NULL
+ * preserves historical layouts. Invalid options fail before any output mutation. */
+ftms_result ftms_capability_requirements_with_format(const ftms_cap_snapshot *snapshot,
+                                        const ftms_range_format_options *options,
+                                        ftms_cap_requirements *out);
+ftms_result ftms_evaluate_capabilities_with_format(const ftms_cap_snapshot *snapshot,
+                                      const ftms_range_format_options *options,
+                                      ftms_cap_output *out);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -4,6 +4,7 @@ import { runInNewContext } from "node:vm";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 import { evaluateFtmsCapabilities } from "../src/features.js";
+import type { FtmsRangeFormatOptions } from "../src/types.js";
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 const corpus = JSON.parse(
@@ -113,6 +114,40 @@ function snapshot(json: Json) {
 }
 
 describe("capability conformance corpus", () => {
+  it("propagates resistance format through complete evidence without changing other ranges", () => {
+    const entry = corpus.cases.find((c) => c.id === "all-static-prerequisites")!;
+    const input = snapshot(expand(corpus.snapshots, entry.input));
+    const characteristic = input.characteristics.find(
+      (c) => c.uuid === "00002ad600001000800000805f9b34fb",
+    )!;
+    characteristic.bytes = Uint8Array.of(0, 0, 100, 0, 1, 0);
+    const expected = expand(corpus.reports, entry.expected) as Record<string, Json>;
+    const ranges = expected.ranges as Json[][];
+    ranges[2]![3] = [2, 0, 100, 1, 10, 2];
+    const observations = expected.observations as Json[][];
+    observations.find((row) => row[1] === characteristic.uuid)![6] = 6;
+    expect(evaluateFtmsCapabilities(input, { resistanceFormat: "signed16Tenths" })).toStrictEqual(
+      expected,
+    );
+    const historical = evaluateFtmsCapabilities(input);
+    expect(historical.ranges[2]?.[1]).toBe(2);
+    expect(evaluateFtmsCapabilities(input, { resistanceFormat: "uint8Whole" })).toStrictEqual(
+      historical,
+    );
+    for (const value of [-1, 256, "guess"]) {
+      expect(() =>
+        evaluateFtmsCapabilities(input, {
+          resistanceFormat: value,
+        } as unknown as FtmsRangeFormatOptions),
+      ).toThrow();
+    }
+    for (const options of [null, 1, "signed16Tenths", [], { typo: "signed16Tenths" }]) {
+      expect(() =>
+        evaluateFtmsCapabilities(input, options as unknown as FtmsRangeFormatOptions),
+      ).toThrow();
+    }
+  });
+
   it("executes every canonical case with exact report equality", () => {
     expect(validateCorpus(corpus), JSON.stringify(validateCorpus.errors)).toBe(true);
     expect(corpus.cases).toHaveLength(49);

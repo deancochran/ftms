@@ -116,7 +116,14 @@ ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurem
 ftms_result ftms_measurement_plan(const ftms_measurement *snapshot,
                                    size_t value_budget,
                                    ftms_measurement_packet *packets,
-                                   size_t packet_capacity, size_t *count);
+                                    size_t packet_capacity, size_t *count);
+/* Uses the same explicit profile for validation, group budgeting, and every
+ * emitted packet. NULL is exactly ftms_measurement_plan's historical layout. */
+ftms_result ftms_measurement_plan_with_format(const ftms_measurement *snapshot,
+                                    const ftms_measurement_format_options *options,
+                                    size_t value_budget,
+                                    ftms_measurement_packet *packets,
+                                    size_t packet_capacity, size_t *count);
 
 /* Bounded receive-side reassembly for one equipment connection/generation.
  * The caller owns one context per connection, initializes it for that
@@ -133,6 +140,16 @@ typedef struct ftms_record_context {
   uint8_t active;
   ftms_measurement merged;
 } ftms_record_context;
+
+/* An alternate-layout receive context.  The selected profile is copied by
+ * value at initialization and remains fixed until the next
+ * ftms_record_init_with_format call; it is never inferred from a fragment.
+ * This is a separate public type so ftms_record_context keeps its established
+ * ABI layout.  Treat its contents as API-owned after initialization. */
+typedef struct ftms_record_format_context {
+  ftms_record_context record;
+  ftms_measurement_format_options options;
+} ftms_record_format_context;
 
 /* Initialize a caller-owned context. Invalid kind, null context, zero age, or
  * an age >= 2^31 returns INVALID and leaves the context unchanged. Reset
@@ -166,9 +183,24 @@ ftms_record_status ftms_record_init(ftms_record_context *context,
                                     uint32_t generation, uint32_t max_age);
 void ftms_record_reset(ftms_record_context *context);
 ftms_record_status ftms_record_feed(ftms_record_context *context,
-                                    const uint8_t *data, size_t size,
-                                    uint32_t generation, uint32_t now,
-                                    ftms_measurement *out);
+                                     const uint8_t *data, size_t size,
+                                     uint32_t generation, uint32_t now,
+                                     ftms_measurement *out);
+/* Format-aware assembly uses the same profile for strict fragment decode and
+ * canonical re-encode. NULL options selects the historical default. Options
+ * are copied before context storage is written, so an options pointer may name
+ * context->options. Invalid options, kind, age, or a null context return
+ * INVALID without changing any context bytes. Reset preserves the chosen
+ * profile; reinitialization deliberately discards any pending record. */
+ftms_record_status ftms_record_init_with_format(ftms_record_format_context *context,
+                                                ftms_measurement_kind kind,
+                                                const ftms_measurement_format_options *options,
+                                                uint32_t generation, uint32_t max_age);
+void ftms_record_reset_with_format(ftms_record_format_context *context);
+ftms_record_status ftms_record_feed_with_format(ftms_record_format_context *context,
+                                                const uint8_t *data, size_t size,
+                                                uint32_t generation, uint32_t now,
+                                                ftms_measurement *out);
 #ifdef __cplusplus
 }
 #endif
