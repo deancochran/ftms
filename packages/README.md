@@ -1,6 +1,6 @@
 # FTMS packages
 
-Current source versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
+Published versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
 codecs, static capability interpretation and additive range inspection. Swift
 and Kotlin remain README-only scaffolds. See [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.

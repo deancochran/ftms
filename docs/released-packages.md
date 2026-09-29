@@ -3,24 +3,40 @@
 Last checked read-only against npm and GitHub: **2026-09-29**.
 This is a point-in-time record, not a promise that branch source is published.
 
-## Release preparation: TypeScript 0.4.0 / C 0.2.0
+## Published: TypeScript 0.4.0 / C 0.2.0
 
-The maintainer authorized committing, merging and publishing these source versions.
+PR [#5](https://github.com/deancochran/ftms/pull/5) merged at
+`a32de9c0b108bc55c9dc11752d928e959efd73ac`; both version tags identify that commit.
 Local verification passed 588 TypeScript tests, the full native suite, package
-consumers and Cortex-M0 compilation. PR #5 and the tag workflows must complete
-before the new versions are described here as verified public releases. The
-table below is the **historical published baseline**, not the candidate versions.
+consumers and Cortex-M0 compilation. CI, Native C, Publish and Release C all
+completed successfully for the release commit. The public artifacts were then
+downloaded and independently verified, not merely inferred from workflow status.
+
+- npm **0.4.0** is the `latest` version; registry `gitHead` matches the release
+  commit. SHA-512 integrity passed, its 42-file layout is preserved, and all seven
+  published source files match. An isolated consumer of the downloaded artifact
+  exercised range inspection and strict normalized numeric bounds successfully.
+- C **0.2.0** archive SHA-256:
+  `3aa60d809f3dcd02634417018d39f325c46a552734f0fe311ba748261914e61f`.
+  The downloaded archive passed source-manifest verification and installed,
+  vendored and FetchContent C/C++ consumers plus both repository examples.
+- Remote release consumers passed on Linux, macOS and Windows; Conan/vcpkg
+  recipes passed against the artifact. This is not public registry submission.
+- PR CI initially exposed a hard-coded 0.1 CMake consumer request. The verifier
+  now reads `VERSION`; the final PR/main/release runs passed. No failed gate was
+  bypassed. GitHub emitted non-fatal Node-action deprecation warnings; migrating
+  the pinned artifact actions is separate maintenance.
 
 Repository examples are not included in the C source archive. Artifact tests
 copy the repository examples into isolated consumer directories and link them
 against the extracted/installed archive; they do not claim the archive ships them.
 
-## Historical public baseline
+## Current public packages
 
 | Port | Public release verified | Runnable example | What is not released |
 | --- | --- | --- | --- |
-| TypeScript | npm `@deancochran/ftms@0.3.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline | 0.4.0 inspection and boundary hardening are absent from this historical artifact |
-| C / C++ | GitHub `c-v0.1.0` source archive | [Installed C client](../examples/c-client/README.md) exercises installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
+| TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native Swift/Kotlin implementations |
+| C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
 | Swift | None | None | Implementation and SwiftPM release |
 | Kotlin | None | None | Implementation and Maven Central release |
 
@@ -43,14 +59,14 @@ communicates with equipment.
 The C example uses `find_package(ftms CONFIG REQUIRED)` against an installed
 artifact, not private source paths. The source-package verifier builds/installs
 the archive, moves its prefix and runs the example from an isolated copy.
-The public archive is at <https://github.com/deancochran/ftms/releases/tag/c-v0.1.0>.
+The public archive is at <https://github.com/deancochran/ftms/releases/tag/c-v0.2.0>.
 Source availability does not establish package-manager registry publication.
 
 ## Historical baseline identity and next actions
 
-- Both releases identify `74f1552959d96755f38eac42f6999a5b04088b2f`.
+- Previous npm 0.3.0 and C 0.1.0 releases identify `74f1552959d96755f38eac42f6999a5b04088b2f`.
 - npm 0.3.0 integrity and all seven included source files matched that checkout.
-- C archive SHA-256 is
+- Previous C 0.1.0 archive SHA-256 is
   `3dc61329a2883f88a7828cff77b282961c9e91680ecae0ca5100622e9d8e6924`;
   its checksum asset and ten source/header files matched the reviewed checkout.
 - CI, Native C, Publish and Release C runs for that commit succeeded. This does
@@ -61,7 +77,8 @@ Source availability does not establish package-manager registry publication.
   immutable artifact exists. Local recipe tests are not registry publication.
 
 See [C release runbook](releasing-c.md) and [real-equipment test procedure](equipment-testing.md).
-Local work now includes a [limited passive KICKR CORE pilot](equipment-results/2026-09-29-kickr-core-linux.md).
-It is not evidence bundled into the already-published releases.
+The repository includes a [limited passive KICKR CORE pilot](equipment-results/2026-09-29-kickr-core-linux.md).
+It used the earlier local 0.1.0-based C installation, not the newly published
+0.2.0 artifact. Publication and host replay do not expand that device evidence.
 Do not advertise compatibility with specific equipment until reviewed evidence
 names the actual model, firmware, platform and installed package version.
