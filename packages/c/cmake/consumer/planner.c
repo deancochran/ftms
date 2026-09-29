@@ -21,7 +21,7 @@ int main(void) {
   snapshot.value[FTMS_M_RESISTANCE] = 120;
   snapshot.value[FTMS_M_POWER] = 300;
   snapshot.value[FTMS_M_ELAPSED_TIME] = 901;
-  if (ftms_measurement_plan(&snapshot, 4U, NULL, 0U, &count) != FTMS_OK || count != 3U) return 1;
+  if (ftms_measurement_plan(&snapshot, 4U, NULL, 0U, &count) != FTMS_OK || count != 4U) return 1;
   if (ftms_measurement_plan_with_format(&snapshot, &measurement_options, 6U, NULL, 0U, &count) != FTMS_OK || count != 3U) return 2;
   if (ftms_record_init_with_format(&records, FTMS_MEASUREMENT_INDOOR_BIKE,
                                    &measurement_options, 4U, 10U) != FTMS_RECORD_PENDING) return 3;
