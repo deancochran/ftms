@@ -1,5 +1,10 @@
 # Compatibility diagnostics and structural coverage — 2026-09-29
 
+**Historical pre-release verification record.** The later release preparation
+sets TypeScript 0.4.0 and C 0.2.0. Statements below about dirty work and unchanged
+versions describe the original implementation run, not current release state.
+See [released packages](released-packages.md) for publication evidence.
+
 Local, uncommitted work on `fix/protocol-boundary-hardening`, based on
 `74f1552959d96755f38eac42f6999a5b04088b2f`. This follows the hardening and passive
 pilot recorded separately. Nothing in this milestone was published or tested

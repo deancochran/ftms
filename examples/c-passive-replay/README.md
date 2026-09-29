@@ -17,7 +17,9 @@ not captured from a KICKR. Zwift-specific shifting is outside this FTMS pilot.
 
 ## Build against an installed C artifact
 
-Install the reviewed C 0.1.0 source artifact using `packages/c/INSTALL.md`, then:
+This example and capture script are **repository-only**, not included in the C
+source archive. Obtain this directory from the matching repository release tag.
+Install C **0.2.0** using `packages/c/INSTALL.md`, then build the repository example:
 
 ```sh
 cmake -S examples/c-passive-replay -B build/passive-replay \
@@ -32,6 +34,9 @@ and power 250 W. Output is complete raw JSON, not rounded display values. `value
 is indexed by `FTMS_M_*` in `measurement.h`; interpret `present` and `unavailable`
 before using a value. More Data packets are not individually complete records;
 this small replay tool does **not** assemble them or make compatibility decisions.
+
+The earlier real-device pilot used a locally installed 0.1.0-based library;
+that historical evidence is distinct from the 0.2.0 release-consumer checks.
 
 Exit 0 means the decoder returned without truncation/RFU/trailing diagnostics,
 not that the trainer or its readings are certified. Exit 2 means a native decode

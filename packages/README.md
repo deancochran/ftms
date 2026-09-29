@@ -1,9 +1,9 @@
 # FTMS packages
 
-TypeScript 0.3.0 and C 0.1.0 are released with bidirectional codecs and static
-capability interpretation. Swift and Kotlin remain README-only scaffolds.
-See [release identities](../docs/released-packages.md). Unreleased hardening
-changes are not automatically available in those artifacts.
+Current source versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
+codecs, static capability interpretation and additive range inspection. Swift
+and Kotlin remain README-only scaffolds. See [release identities](../docs/released-packages.md)
+for verified publication status; source metadata alone is not publication evidence.
 
 | Port | Initial consumers | Planned distribution |
 | --- | --- | --- |

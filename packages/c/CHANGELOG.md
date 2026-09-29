@@ -10,7 +10,8 @@
   layout cases, 46 sentinel positions, 47 reserved bits and 650 planner budgets.
   Native matrix runs normally and under ASan/UBSan; installed consumers exercise
   the new inspection symbols.
-- Add a host-only passive telemetry capture/replay example and document limited
+- Add a repository-only host passive telemetry capture/replay example (not
+  included in the C source archive) and document limited
   KICKR CORE evidence. No universal interoperability, safe-control, MCU runtime or
   Bluetooth qualification claim is made. Registry submissions remain separate.
 

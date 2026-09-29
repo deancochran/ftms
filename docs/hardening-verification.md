@@ -1,5 +1,9 @@
 # Boundary hardening — 2026-09-29
 
+**Historical pre-release record.** Dirty/uncommitted and unchanged-version
+statements below describe that run. Later release preparation sets TypeScript
+0.4.0 and C 0.2.0; see [released packages](released-packages.md) for publication.
+
 Local work in `fix/protocol-boundary-hardening`, based on clean published-source
 commit `74f1552959d96755f38eac42f6999a5b04088b2f`. This report describes dirty,
 uncommitted changes, not a new release. No version, tag or registry was changed.
