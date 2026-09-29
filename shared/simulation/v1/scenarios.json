@@ -1,0 +1,1340 @@
+{
+  "schemaVersion": 1,
+  "baseTick": 4294967294,
+  "profiles": [
+    {
+      "id": "treadmill",
+      "kind": 0,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "cross",
+      "kind": 1,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "step",
+      "kind": 2,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "stair",
+      "kind": 3,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "rower",
+      "kind": 4,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "bike",
+      "kind": 5,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": {
+        "resistance": 0,
+        "pace": 0
+      }
+    },
+    {
+      "id": "bike-signed",
+      "kind": 5,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": { "resistance": 1, "pace": 0 }
+    },
+    {
+      "id": "cross-signed",
+      "kind": 1,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": { "resistance": 1, "pace": 0 }
+    },
+    {
+      "id": "rower-signed",
+      "kind": 4,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": { "resistance": 1, "pace": 0 }
+    },
+    {
+      "id": "tread-legacy",
+      "kind": 0,
+      "origin": "synthetic-contract-ref",
+      "maxAge": 5,
+      "format": { "resistance": 0, "pace": 1 }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "minimal-treadmill",
+      "profile": "treadmill",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 0,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "minimal-cross",
+      "profile": "cross",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 1,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "minimal-step",
+      "profile": "step",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 12, 0, 34, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 2,
+              "flags": 0,
+              "present": 25165824,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 34, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 6
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "minimal-stair",
+      "profile": "stair",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 12, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 3,
+              "flags": 0,
+              "present": 8388608,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0,
+                0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "minimal-rower",
+      "profile": "rower",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 48, 200, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 4,
+              "flags": 0,
+              "present": 100663296,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 200,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "minimal-bike",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "bike-split",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2,
+              "present": 3,
+              "unavailable": 0,
+              "values": [
+                1235, 5678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "same-tick-order",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2,
+              "present": 3,
+              "unavailable": 0,
+              "values": [
+                1235, 5678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "expiry-boundary",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 5,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "expired"
+          }
+        }
+      ]
+    },
+    {
+      "id": "expiry-within",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 4,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2,
+              "present": 3,
+              "unavailable": 0,
+              "values": [
+                1235, 5678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrap-expiry",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 5,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "expired"
+          }
+        }
+      ]
+    },
+    {
+      "id": "generation-stale",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 8,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "generation"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bike-signed-complete",
+      "profile": "bike-signed",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [96, 8, 1, 0, 120, 0, 44, 1, 133, 3],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2144,
+              "present": 2244609,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 901, 0, 0, 300, 0, 0, 0, 120, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 10
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "cross-signed-complete",
+      "profile": "cross-signed",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [128, 0, 0, 1, 0, 244, 255],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 1,
+              "flags": 128,
+              "present": 2097153,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 7
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "rower-signed-complete",
+      "profile": "rower-signed",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [128, 0, 2, 3, 0, 244, 255],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 4,
+              "flags": 128,
+              "present": 102760448,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 2, 3,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 7
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tread-legacy-complete",
+      "profile": "tread-legacy",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [96, 4, 232, 3, 42, 43, 133, 3],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 0,
+              "flags": 1120,
+              "present": 16769,
+              "unavailable": 0,
+              "values": [
+                1000, 0, 0, 0, 0, 0, 0, 42, 43, 0, 0, 0, 0, 0, 901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 8
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "bike-signed-split",
+      "profile": "bike-signed",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [97, 0, 120, 0, 44, 1],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 8, 133, 3],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2144,
+              "present": 2244609,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 901, 0, 0, 300, 0, 0, 0, 120, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tread-legacy-split",
+      "profile": "tread-legacy",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [97, 0, 42, 43],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 4, 133, 3],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 232, 3],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 0,
+              "flags": 1120,
+              "present": 16769,
+              "unavailable": 0,
+              "values": [
+                1000, 0, 0, 0, 0, 0, 0, 42, 43, 0, 0, 0, 0, 0, 901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "duplicate-clears",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 47, 22],
+          "expected": {
+            "status": "invalid"
+          }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "dropped-final",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "drop",
+          "bytes": [],
+          "expected": {
+            "status": "dropped"
+          }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 211, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 2,
+              "present": 3,
+              "unavailable": 0,
+              "values": [
+                1235, 5678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "disconnected-feed",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "disconnect",
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "disconnected"
+          }
+        }
+      ]
+    },
+    {
+      "id": "reconnect-clears",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "reconnect",
+          "generation": 8,
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 8,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "malformed-empty",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [],
+          "expected": {
+            "status": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "malformed-truncated",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0],
+          "expected": {
+            "status": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "malformed-rfu",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 32, 210, 4],
+          "expected": {
+            "status": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "malformed-trailing",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4, 9],
+          "expected": {
+            "status": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cross-direction-change",
+      "profile": "cross",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 128, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 0, 211, 4],
+          "expected": {
+            "status": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "reset-clears",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 1,
+          "type": "reset",
+          "expected": {
+            "status": "pending"
+          }
+        },
+        {
+          "at": 2,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-before-pending",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 210, 4],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [3, 0, 46, 22],
+          "expected": {
+            "status": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bike-default-hr-split",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "indoor-bike-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 2, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 512,
+              "present": 4097,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "treadmill-default-hr-split",
+      "profile": "treadmill",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "treadmill-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 1, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 0,
+              "flags": 256,
+              "present": 4097,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "cross-default-hr-split",
+      "profile": "cross",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "cross-trainer-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 8, 0, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 1,
+              "flags": 2048,
+              "present": 4097,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "rower-default-hr-split",
+      "profile": "rower",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "rower-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [1, 2, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 2, 3, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 4,
+              "flags": 512,
+              "present": 100667392,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "step-default-hr-split",
+      "profile": "step",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "step-climber-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [33, 0, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0, 2, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 2,
+              "flags": 32,
+              "present": 25169920,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "stair-default-hr-split",
+      "profile": "stair",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "stair-climber-data" },
+        {
+          "at": 0,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [65, 0, 120],
+          "expected": { "status": "pending" }
+        },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 3,
+              "flags": 64,
+              "present": 8392704,
+              "unavailable": 0,
+              "values": [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+                0, 0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "capability-discovery-to-telemetry",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "partial-with-all-observed-prerequisites" },
+        {
+          "at": 1,
+          "type": "feed",
+          "generation": 7,
+          "bytes": [0, 0, 1, 0],
+          "expected": {
+            "status": "complete",
+            "raw": {
+              "kind": 5,
+              "flags": 0,
+              "present": 1,
+              "unavailable": 0,
+              "values": [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0
+              ],
+              "moreData": 0,
+              "backward": 0,
+              "truncated": 0,
+              "trailingBytes": 0,
+              "reservedFlags": 0,
+              "bytesRead": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "scripted-control-response",
+      "profile": "bike",
+      "generation": 7,
+      "steps": [
+        { "at": 0, "type": "capabilities", "caseId": "all-static-prerequisites" },
+        { "at": 1, "type": "control", "caseId": "request-opcode-00" },
+        { "at": 2, "type": "response", "caseId": "response-success" },
+        { "at": 3, "type": "response", "caseId": "response-not-supported" },
+        { "at": 4, "type": "response", "caseId": "response-unknown-result" }
+      ]
+    }
+  ]
+}
