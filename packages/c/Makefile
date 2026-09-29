@@ -52,6 +52,11 @@ test: $(BUILD)/libftms.a
 	$(BUILD)/test-codec
 	$(CC) $(CFLAGS) src/ftms.c src/capabilities.c tests/capability_driver.c -o $(BUILD)/capability-driver
 	python3 tests/capability_adapter.py $(BUILD)/capability-driver
+	$(CC) $(CFLAGS) src/ftms.c src/measurement.c tests/simulation_driver.c -o $(BUILD)/simulation-driver
+	FTMS_SIMULATION_DRIVER=$(abspath $(BUILD)/simulation-driver) python3 -m unittest tests/test_simulation_adapter.py
+	python3 tests/simulation_adapter.py $(BUILD)/simulation-driver
+	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/measurement.c tests/simulation_driver.c -o $(BUILD)/simulation-driver-sanitized
+	python3 tests/simulation_adapter.py $(BUILD)/simulation-driver-sanitized
 	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/control.c src/capabilities.c tests/test_codec.c tests/test_control.c tests/test_capabilities.c -o $(BUILD)/test-codec-sanitized
 	$(BUILD)/test-codec-sanitized
 	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/control.c src/capabilities.c tests/fuzz.c -o $(BUILD)/fuzz

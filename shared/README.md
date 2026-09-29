@@ -17,6 +17,8 @@ package, a native toolchain, BLE, or an OS lifecycle API.
   for ports consuming these fixtures.
 - [conformance/capabilities/v1](conformance/capabilities/v1/) is a separate,
   versioned static-capability corpus; it does not extend codec conformance v1.
+- [simulation/](simulation/README.md) is a separate deterministic, synthetic
+  equipment-trace contract used only by host test harnesses.
 
 The v1 corpus bytes and historical schema identity are preserved during this
 relocation, including `/v0.2.0/conformance/v1/schema.json`. A new filesystem

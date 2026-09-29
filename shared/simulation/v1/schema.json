@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profiles", "scenarios"],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "baseTick": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "origin", "maxAge", "format"],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "kind": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "origin": {
+            "const": "synthetic-contract-ref"
+          },
+          "maxAge": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "format": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["resistance", "pace"],
+            "properties": {
+              "resistance": {
+                "enum": [0, 1]
+              },
+              "pace": {
+                "enum": [0, 1]
+              }
+            }
+          }
+        }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "profile", "generation", "steps"],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "profile": {
+            "$ref": "#/$defs/id"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 512,
+            "items": { "$ref": "#/$defs/step" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
+    "at": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "generation": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "bytes": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "type": "integer", "minimum": 0, "maximum": 255 }
+    },
+    "raw": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "flags",
+        "present",
+        "unavailable",
+        "values",
+        "moreData",
+        "backward",
+        "truncated",
+        "trailingBytes",
+        "reservedFlags",
+        "bytesRead"
+      ],
+      "properties": {
+        "kind": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "flags": { "type": "integer", "minimum": 0, "maximum": 16777215 },
+        "present": { "type": "integer", "minimum": 0, "maximum": 1073741823 },
+        "unavailable": { "type": "integer", "minimum": 0, "maximum": 1073741823 },
+        "values": {
+          "type": "array",
+          "minItems": 30,
+          "maxItems": 30,
+          "items": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 }
+        },
+        "moreData": { "enum": [0, 1] },
+        "backward": { "enum": [0, 1] },
+        "truncated": { "enum": [0, 1] },
+        "trailingBytes": { "enum": [0, 1] },
+        "reservedFlags": { "enum": [0, 1] },
+        "bytesRead": { "type": "integer", "minimum": 0, "maximum": 64 }
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "raw"],
+          "properties": { "status": { "const": "complete" }, "raw": { "$ref": "#/$defs/raw" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": {
+              "enum": ["pending", "invalid", "expired", "generation", "dropped", "disconnected"]
+            }
+          }
+        }
+      ]
+    },
+    "feed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "type", "generation", "bytes", "expected"],
+      "properties": {
+        "at": { "$ref": "#/$defs/at" },
+        "type": { "const": "feed" },
+        "generation": { "$ref": "#/$defs/generation" },
+        "bytes": { "$ref": "#/$defs/bytes" },
+        "expected": { "$ref": "#/$defs/result" }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "type", "expected"],
+      "properties": {
+        "at": { "$ref": "#/$defs/at" },
+        "type": { "enum": ["reset", "disconnect"] },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": { "status": { "const": "pending" } }
+        }
+      }
+    },
+    "connect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "type", "generation", "expected"],
+      "properties": {
+        "at": { "$ref": "#/$defs/at" },
+        "type": { "enum": ["connect", "reconnect"] },
+        "generation": { "$ref": "#/$defs/generation" },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": { "status": { "const": "pending" } }
+        }
+      }
+    },
+    "drop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "type", "bytes", "expected"],
+      "properties": {
+        "at": { "$ref": "#/$defs/at" },
+        "type": { "const": "drop" },
+        "bytes": { "$ref": "#/$defs/bytes" },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": { "status": { "const": "dropped" } }
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "type", "caseId"],
+      "properties": {
+        "at": { "$ref": "#/$defs/at" },
+        "type": { "enum": ["capabilities", "control", "response"] },
+        "caseId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "step": {
+      "oneOf": [
+        { "$ref": "#/$defs/feed" },
+        { "$ref": "#/$defs/lifecycle" },
+        { "$ref": "#/$defs/connect" },
+        { "$ref": "#/$defs/drop" },
+        { "$ref": "#/$defs/reference" }
+      ]
+    }
+  }
+}

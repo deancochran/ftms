@@ -55,6 +55,8 @@ See the [architecture](docs/architecture.md) and
 [capability contract](shared/protocol/capability-discovery.md) for boundaries.
 The [conformance runner contract](shared/conformance/README.md) records the
 language-neutral v1 comparison and reporting rules.
+The [deterministic simulation contract](docs/simulation.md) is separate,
+host-only protocol/session evidence and is not Bluetooth qualification.
 
 ## Repository commands
 
