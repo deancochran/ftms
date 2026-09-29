@@ -3,6 +3,26 @@
 All notable changes to `@deancochran/ftms` are documented here. The package
 follows [Semantic Versioning](https://semver.org/).
 
+## 0.4.0
+
+### Added
+
+- Add `inspectFtmsRangeRaw`, a caller-profile-preserving range diagnostic with
+  bounded structural candidates. It does not infer a format, physical unit, or
+  control permission from a candidate's success.
+- Add shared exact range-inspection fixtures and a structural measurement matrix:
+  181,760 layout combinations, sentinel and reserved-bit cases across all six
+  equipment families. Existing defaults and capability report shapes are unchanged.
+
+### Fixed
+
+- Reject inherited/accessor wire-format selections and C.7 evidence. Own data
+  properties remain supported across realms and on null-prototype records.
+- Check original normalized control bounds before grid alignment; use a
+  documented binary64-relative tolerance instead of an absolute `1e-9` allowance.
+  Raw integer codecs and default formats are unchanged. Out-of-bound inputs now
+  report `out_of_range` before resolution validation.
+
 ## 0.3.0
 
 Release prepared for publication through the verified tag workflow.

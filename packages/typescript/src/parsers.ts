@@ -1,4 +1,4 @@
-import { isByteSource, toBytes, toDataView } from "./binary.js";
+import { isByteSource, toBytes, toDataView, validateOwnSettings } from "./binary.js";
 import { FTMS_CHARACTERISTICS, FTMS_MACHINE_STATUS_OPCODES } from "./constants.js";
 import type {
   FtmsControlRequestRaw,
@@ -1372,6 +1372,7 @@ const rawDefs: readonly {
   },
 ];
 function formattedRawDef(kind: number, options?: FtmsMeasurementFormatOptions) {
+  validateOwnSettings(options, ["resistanceFormat", "treadmillPaceFormat"]);
   if (
     options !== undefined &&
     (options === null ||

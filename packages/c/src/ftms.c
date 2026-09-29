@@ -218,6 +218,71 @@ ftms_result ftms_decode_range_with_format(ftms_range_kind kind, const uint8_t *d
   *out = local; return FTMS_OK;
 }
 
+static ftms_range_profile range_profile(ftms_range_kind kind,
+                                        ftms_resistance_range_format format) {
+  switch (kind) {
+    case FTMS_RANGE_SPEED: return FTMS_RANGE_PROFILE_UINT16_HUNDREDTHS;
+    case FTMS_RANGE_INCLINATION: return FTMS_RANGE_PROFILE_SINT16_TENTHS;
+    case FTMS_RANGE_RESISTANCE_LEVEL:
+      return format == FTMS_RESISTANCE_RANGE_SINT16_TENTHS
+                 ? FTMS_RANGE_PROFILE_SINT16_TENTHS : FTMS_RANGE_PROFILE_UINT8_WHOLE;
+    case FTMS_RANGE_HEART_RATE: return FTMS_RANGE_PROFILE_UINT8_BPM;
+    case FTMS_RANGE_POWER: return FTMS_RANGE_PROFILE_SINT16_WATTS;
+    default: return FTMS_RANGE_PROFILE_UINT8_WHOLE;
+  }
+}
+
+static ftms_range_inspection_status inspection_status(ftms_result result) {
+  return result == FTMS_ERROR_RANGE ? FTMS_RANGE_INSPECTION_RANGE :
+         result == FTMS_OK ? FTMS_RANGE_INSPECTION_VALID : FTMS_RANGE_INSPECTION_LENGTH;
+}
+
+ftms_result ftms_inspect_range_with_format(ftms_range_kind kind, const uint8_t *data,
+                                           size_t size,
+                                           const ftms_range_format_options *options,
+                                           ftms_range_inspection *out) {
+  ftms_range_inspection local = {0};
+  ftms_range_format_options formats[2] = {
+    {FTMS_RESISTANCE_RANGE_UINT8_WHOLE}, {FTMS_RESISTANCE_RANGE_SINT16_TENTHS}};
+  ftms_resistance_range_format selected = FTMS_RESISTANCE_RANGE_UINT8_WHOLE;
+  size_t count;
+  size_t i;
+  if (out == NULL || data == NULL) return FTMS_ERROR_NULL;
+  if (kind < FTMS_RANGE_SPEED || kind > FTMS_RANGE_POWER) return FTMS_ERROR_KIND;
+  if (options != NULL) selected = options->resistance_format;
+  if (selected != FTMS_RESISTANCE_RANGE_UINT8_WHOLE &&
+      selected != FTMS_RESISTANCE_RANGE_SINT16_TENTHS) return FTMS_ERROR_KIND;
+  if (selected == FTMS_RESISTANCE_RANGE_SINT16_TENTHS && kind != FTMS_RANGE_RESISTANCE_LEVEL)
+    return FTMS_ERROR_KIND;
+  count = kind == FTMS_RANGE_RESISTANCE_LEVEL ? 2U : 1U;
+  local.observed_size = size;
+  local.candidate_count = count;
+  local.selected_profile = range_profile(kind, selected);
+  for (i = 0U; i < count; ++i) {
+    ftms_result result;
+    ftms_range_inspection_candidate *candidate = &local.candidates[i];
+    candidate->profile = range_profile(kind, formats[i].resistance_format);
+    candidate->expected_size = candidate->profile == FTMS_RANGE_PROFILE_UINT8_WHOLE ||
+                               candidate->profile == FTMS_RANGE_PROFILE_UINT8_BPM ? 3U : 6U;
+    result = ftms_decode_range_with_format(kind, data, size,
+                                            kind == FTMS_RANGE_RESISTANCE_LEVEL ? &formats[i] : NULL,
+                                            &candidate->value);
+    candidate->status = inspection_status(result);
+    if (candidate->profile == local.selected_profile) {
+      local.expected_size = candidate->expected_size;
+      local.status = candidate->status;
+      local.value = candidate->value;
+    }
+  }
+  *out = local;
+  return FTMS_OK;
+}
+
+ftms_result ftms_inspect_range(ftms_range_kind kind, const uint8_t *data,
+                               size_t size, ftms_range_inspection *out) {
+  return ftms_inspect_range_with_format(kind, data, size, NULL, out);
+}
+
 ftms_result ftms_encode_range_with_format(const ftms_range *range,
                                           const ftms_range_format_options *options,
                                           uint8_t *out, size_t capacity,

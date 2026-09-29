@@ -1,13 +1,14 @@
 # FTMS packages
 
-TypeScript is implemented. C is an unreleased, partial C99 source-library slice
-for Feature/range decoding and static capability evidence; Swift and Kotlin remain README-only
-scaffolds. No native port is published.
+TypeScript 0.3.0 and C 0.1.0 are released with bidirectional codecs and static
+capability interpretation. Swift and Kotlin remain README-only scaffolds.
+See [release identities](../docs/released-packages.md). Unreleased hardening
+changes are not automatically available in those artifacts.
 
 | Port | Initial consumers | Planned distribution |
 | --- | --- | --- |
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
-| [C](c/README.md) | Embedded firmware and C++ applications | Unreleased portable C99 source slice (no CMake integration claimed) |
+| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive; Make and CMake integration |
 | [Swift](swift/README.md) | iOS and other supported Apple applications | Swift Package Manager |
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven artifact |
 

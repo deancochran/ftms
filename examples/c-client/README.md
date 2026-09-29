@@ -8,14 +8,14 @@ field's scale and unavailable sentinel.
 
 ## Build from the local source candidate
 
-The C `0.1.0` candidate is not published. First obtain an archive supplied by
+For local candidate verification, first obtain an archive supplied by
 your maintainer (or build the local candidate), verify its SHA-256 sidecar, then
 install it to an isolated prefix:
 
 ```sh
 python3 packages/c/scripts/source-bundle.py
-tar -xzf packages/c/build/source-candidate/ftms-c-0.1.0.tar.gz
-cmake -S ftms-c-0.1.0 -B ftms-build -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
+tar -xzf packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz
+cmake -S ftms-c-0.2.0 -B ftms-build -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
 cmake --build ftms-build
 cmake --install ftms-build
 cmake -S examples/c-client -B example-build -DCMAKE_PREFIX_PATH="$PWD/ftms-prefix"

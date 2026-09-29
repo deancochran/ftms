@@ -1,3 +1,27 @@
+import { RawCodecError } from "./types.js";
+
+/** Explicit configuration cannot come from inherited fields or getters.
+ * Accepts foreign-realm/null-prototype objects; not a sandbox for hostile Proxies. */
+export function validateOwnSettings(
+  value: unknown,
+  fields: readonly string[],
+  allowOtherFields = false,
+): void {
+  if (value === undefined) return;
+  if (value === null || typeof value !== "object" || Array.isArray(value))
+    throw new RawCodecError("kind", "Settings must be an options object");
+  if (
+    !allowOtherFields &&
+    Reflect.ownKeys(value).some((key) => typeof key !== "string" || !fields.includes(key))
+  )
+    throw new RawCodecError("kind", "Unknown settings field");
+  for (const field of fields) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, field);
+    if (descriptor ? !("value" in descriptor) : field in value)
+      throw new RawCodecError("kind", `${field} must be an own data property`);
+  }
+}
+
 /** Realm-safe check for the only byte containers accepted by the public API. */
 export function isByteSource(data: unknown): data is ArrayBuffer | Uint8Array {
   if (ArrayBuffer.isView(data)) {

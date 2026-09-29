@@ -47,6 +47,30 @@ export interface FtmsMeasurementFormatOptions {
 export interface FtmsRangeFormatOptions {
   readonly resistanceFormat?: "uint8Whole" | "signed16Tenths";
 }
+/** A selected range layout and the structurally possible alternatives.
+ * A valid alternative is byte-layout evidence only: it neither proves a physical
+ * unit nor selects a profile or authorizes a control. */
+export type FtmsRangeProfile =
+  | "uint16Hundredths"
+  | "signed16Tenths"
+  | "uint8Whole"
+  | "uint8Bpm"
+  | "signed16Watts";
+export type FtmsRangeInspectionStatus = "valid" | "length" | "range";
+export interface FtmsRangeInspectionCandidate {
+  readonly profile: FtmsRangeProfile;
+  readonly expectedLength: number;
+  readonly status: FtmsRangeInspectionStatus;
+  readonly value: FtmsRangeRaw | null;
+}
+export interface FtmsRangeInspection {
+  readonly selectedProfile: FtmsRangeProfile;
+  readonly actualLength: number;
+  readonly expectedLength: number;
+  readonly status: FtmsRangeInspectionStatus;
+  readonly value: FtmsRangeRaw | null;
+  readonly candidates: readonly FtmsRangeInspectionCandidate[];
+}
 /** Caller-owned C.7 facts. Undefined means unknown; false is distinct from unknown. */
 export interface FtmsCapabilityC7Evidence {
   readonly bondingSupported?: boolean;

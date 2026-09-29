@@ -65,8 +65,8 @@ def consume(directory, prelude, cmake, ctest, *options):
     run(ctest, "--test-dir", build, "--build-config", "Release", "--output-on-failure", "--no-tests=error")
 
 
-def consume_example(directory, prefix, cmake, ctest):
-    shutil.copytree(ROOT / "examples" / "c-client", directory)
+def consume_example(directory, prefix, cmake, ctest, name="c-client"):
+    shutil.copytree(ROOT / "examples" / name, directory)
     build = directory / "build"
     run(cmake, "-S", directory, "-B", build, "-DCMAKE_BUILD_TYPE=Release",
         f"-DCMAKE_PREFIX_PATH={prefix}")
@@ -114,6 +114,7 @@ def main():
         consume(temp / "installed consumer", f"find_package(ftms {version} EXACT CONFIG REQUIRED)",
                 cmake, ctest, f"-DCMAKE_PREFIX_PATH={relocated}")
         consume_example(temp / "installed example", relocated, cmake, ctest)
+        consume_example(temp / "passive replay example", relocated, cmake, ctest, "c-passive-replay")
         consume(temp / "vendored consumer", f'add_subdirectory("{source.as_posix()}" ftms-build)', cmake, ctest)
         consume(temp / "fetched consumer",
                 'include(FetchContent)\nFetchContent_Declare(ftms\n'
@@ -124,7 +125,7 @@ def main():
                 'FetchContent_MakeAvailable(ftms)', cmake, ctest)
     if hashlib.sha256(archive.read_bytes()).hexdigest() != before:
         raise RuntimeError("verification changed the release artifact")
-    print("Exact source artifact: 6 C/C++ consumers plus the installed C example passed across install, vendoring and FetchContent")
+    print("Exact source artifact: 6 C/C++ consumers plus installed client and passive replay examples passed across install, vendoring and FetchContent")
 
 
 if __name__ == "__main__":

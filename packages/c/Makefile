@@ -26,6 +26,12 @@ install: $(BUILD)/libftms.a
 	install -m 644 include/ftms/*.h "$(DESTDIR)$(PREFIX)/include/ftms/"
 	install -m 644 $(BUILD)/libftms.a "$(DESTDIR)$(PREFIX)/lib/libftms.a"
 test: $(BUILD)/libftms.a
+	$(CC) $(CFLAGS) src/ftms.c tests/inspection_driver.c -o $(BUILD)/inspection-driver
+	FTMS_INSPECTION_DRIVER=$(abspath $(BUILD)/inspection-driver) python3 -m unittest tests/test_inspection_corpus.py
+	$(CC) $(CFLAGS) src/ftms.c src/measurement.c tests/measurement_matrix_driver.c -o $(BUILD)/measurement-matrix
+	python3 tests/test_measurement_matrix.py $(BUILD)/measurement-matrix
+	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/measurement.c tests/measurement_matrix_driver.c -o $(BUILD)/measurement-matrix-sanitized
+	python3 tests/test_measurement_matrix.py $(BUILD)/measurement-matrix-sanitized
 	$(CC) $(CFLAGS) src/ftms.c src/status.c tests/status_driver.c -o $(BUILD)/status-driver
 	python3 -m unittest tests/test_status_adapter.py
 	python3 tests/status_adapter.py $(BUILD)/status-driver

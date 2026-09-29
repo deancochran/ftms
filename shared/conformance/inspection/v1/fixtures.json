@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "label": "synthetic",
+  "cases": [
+    {"id":"speed-valid","kind":"speed","bytes":[244,1,184,11,50,0],"expected":{
+      "selectedProfile":"uint16Hundredths","actualLength":6,"expectedLength":6,"status":"valid",
+      "value":{"kind":"speed","minimum":500,"maximum":3000,"increment":50,"scaleDivisor":100,"unit":0},
+      "candidates":[{"profile":"uint16Hundredths","expectedLength":6,"status":"valid","value":{"kind":"speed","minimum":500,"maximum":3000,"increment":50,"scaleDivisor":100,"unit":0}}]}},
+    {"id":"inclination-range","kind":"inclination","bytes":[10,0,9,0,1,0],"expected":{
+      "selectedProfile":"signed16Tenths","actualLength":6,"expectedLength":6,"status":"range","value":null,
+      "candidates":[{"profile":"signed16Tenths","expectedLength":6,"status":"range","value":null}]}},
+    {"id":"heart-short","kind":"heartRate","bytes":[60,200],"expected":{
+      "selectedProfile":"uint8Bpm","actualLength":2,"expectedLength":3,"status":"length","value":null,
+      "candidates":[{"profile":"uint8Bpm","expectedLength":3,"status":"length","value":null}]}},
+    {"id":"power-oversized","kind":"power","bytes":[0,0,1,0,1,0,7,7,7,7,7,7,7,7],"expected":{
+      "selectedProfile":"signed16Watts","actualLength":14,"expectedLength":6,"status":"length","value":null,
+      "candidates":[{"profile":"signed16Watts","expectedLength":6,"status":"length","value":null}]}},
+    {"id":"resistance-default","kind":"resistance","bytes":[1,100,1],"expected":{
+      "selectedProfile":"uint8Whole","actualLength":3,"expectedLength":3,"status":"valid",
+      "value":{"kind":"resistance","minimum":1,"maximum":100,"increment":1,"scaleDivisor":1,"unit":2},
+      "candidates":[{"profile":"uint8Whole","expectedLength":3,"status":"valid","value":{"kind":"resistance","minimum":1,"maximum":100,"increment":1,"scaleDivisor":1,"unit":2}},{"profile":"signed16Tenths","expectedLength":6,"status":"length","value":null}]}},
+    {"id":"resistance-selected-miss","kind":"resistance","bytes":[1,100,1],"options":{"resistanceFormat":"signed16Tenths"},"expected":{
+      "selectedProfile":"signed16Tenths","actualLength":3,"expectedLength":6,"status":"length","value":null,
+      "candidates":[{"profile":"uint8Whole","expectedLength":3,"status":"valid","value":{"kind":"resistance","minimum":1,"maximum":100,"increment":1,"scaleDivisor":1,"unit":2}},{"profile":"signed16Tenths","expectedLength":6,"status":"length","value":null}]}},
+    {"id":"resistance-alternate","kind":"resistance","bytes":[0,0,100,0,1,0],"expected":{
+      "selectedProfile":"uint8Whole","actualLength":6,"expectedLength":3,"status":"length","value":null,
+      "candidates":[{"profile":"uint8Whole","expectedLength":3,"status":"length","value":null},{"profile":"signed16Tenths","expectedLength":6,"status":"valid","value":{"kind":"resistance","minimum":0,"maximum":100,"increment":1,"scaleDivisor":10,"unit":2}}]}},
+    {"id":"resistance-alt-selected","kind":"resistance","bytes":[0,0,100,0,1,0],"options":{"resistanceFormat":"signed16Tenths"},"expected":{
+      "selectedProfile":"signed16Tenths","actualLength":6,"expectedLength":6,"status":"valid",
+      "value":{"kind":"resistance","minimum":0,"maximum":100,"increment":1,"scaleDivisor":10,"unit":2},
+      "candidates":[{"profile":"uint8Whole","expectedLength":3,"status":"length","value":null},{"profile":"signed16Tenths","expectedLength":6,"status":"valid","value":{"kind":"resistance","minimum":0,"maximum":100,"increment":1,"scaleDivisor":10,"unit":2}}]}},
+    {"id":"resistance-zero-increment","kind":"resistance","bytes":[0,0,100,0,0,0],"options":{"resistanceFormat":"signed16Tenths"},"expected":{
+      "selectedProfile":"signed16Tenths","actualLength":6,"expectedLength":6,"status":"range","value":null,
+      "candidates":[{"profile":"uint8Whole","expectedLength":3,"status":"length","value":null},{"profile":"signed16Tenths","expectedLength":6,"status":"range","value":null}]}}
+  ]
+}
