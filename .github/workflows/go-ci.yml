@@ -1,0 +1,37 @@
+name: Go CI
+on:
+  push:
+    paths: ["packages/go/**", ".github/workflows/go-ci.yml", "shared/conformance/**", "shared/protocol/**", "LICENSE"]
+  pull_request:
+    paths: ["packages/go/**", ".github/workflows/go-ci.yml", "shared/conformance/**", "shared/protocol/**", "LICENSE"]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: ["1.24.x", "1.27.x"]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m pip install -r scripts/requirements.txt
+      - run: bash scripts/verify.sh
+        env:
+          FTMS_GO_REPORT_DIR: ${{ runner.temp }}/ftms-go-reports
+      - run: go test -run='^$' -fuzz=FuzzDecodeWire -fuzztime=10s -parallel=2
+      - run: go test -run='^$' -fuzz=FuzzInterpretCapabilities -fuzztime=10s -parallel=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: go-verification-${{ matrix.go-version }}
+          path: ${{ runner.temp }}/ftms-go-reports

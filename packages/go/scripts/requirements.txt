@@ -1,0 +1,2 @@
+# Contributor-only schema validation; not a Go runtime dependency.
+jsonschema==4.26.0
