@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: csharp-verify-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+  group: csharp-verify-${{ github.workflow }}-${{ inputs.source-ref || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' && inputs.source-ref == '' }}
 
 jobs:
   verify:
