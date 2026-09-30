@@ -1,6 +1,6 @@
 # Released packages and executable examples
 
-Last checked against npm, GitHub, Maven Central, PyPI, crates.io and the Go module proxy:
+Last checked against npm, GitHub, Maven Central, PyPI, crates.io, NuGet and the Go module proxy:
 **2026-09-30 UTC**.
 This is a point-in-time record, not a promise that branch source is published.
 
@@ -16,6 +16,51 @@ unreleased branch source must not be represented as part of that artifact.
 The [Dart package](../packages/dart/README.md) is published on pub.dev as
 `deancochran_ftms` **0.1.0**; see its release evidence below.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
+## Published prerelease: C# 0.1.0-alpha.1
+
+NuGet serves **`DeanCochran.Ftms` 0.1.0-alpha.1**, owned by `deancochran`:
+<https://www.nuget.org/packages/DeanCochran.Ftms/0.1.0-alpha.1>.
+
+```sh
+dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1
+```
+
+- Immutable SSH-signed tag `csharp-v0.1.0-alpha.1` identifies source commit
+  `db1f24a37363c329caf3dce4dcbcf813c6b01a69`, integrated by [PR #31](https://github.com/deancochran/ftms/pull/31).
+- [Release run 36787466238](https://github.com/deancochran/ftms/actions/runs/36787466238)
+  passed all gates and published through NuGet Trusted Publishing. Recovery tooling
+  at `99cc6ce5758bc3af6e1863f82769b3627bc524aa` (PR #32) corrected a tag-event
+  identity check without changing the tag, source or package version.
+  The earlier attempt stopped before uploading anything.
+- Clean-source Linux/macOS/Windows gates passed; both packed target assemblies
+  (`netstandard2.1`, `net10.0`) executed in isolated consumers. Linux x64 NativeAOT
+  passed with the library rooted for complete analysis.
+- Evidence covers 228 codec/raw/inspection cases with 330 comparisons, 63 exact
+  capability cases, and 181,760 measurement layouts in both directions plus 46
+  sentinel, 47 RFU and 315 prefix cases. No failed/unsupported/skipped cases.
+- Fresh **public NuGet** consumers compiled and executed both target assemblies;
+  the installed Standard assembly repeated codec, capability and matrix runners.
+- The downloaded package's NuGet repository signature and `deancochran` owner
+  were verified using the official client and pinned certificate
+  `1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D`.
+  Every archive entry other than NuGet's added `.signature.p7s` matched the tested upload.
+- [GitHub release assets](https://github.com/deancochran/ftms/releases/tag/csharp-v0.1.0-alpha.1)
+  retain the upload, signed public download, symbols package, identity manifest,
+  public-consumer report, corpus evidence and `SHA256SUMS`.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Tested unsigned `.nupkg` upload | `a22352966722e5176f727313b118aaaa8f429e4d551e6286ca316085e591d54d` |
+| NuGet repository-signed `.nupkg` download | `436358d13db7c32557b89f587d619fafd7ef3d79d24edb34aa500732aff1e08d` |
+| Submitted `.snupkg` | `31b62075f5763cd842cdea0d65a1c61c1be7e9c623831bc32413ce3c701dd869` |
+
+The interface remains prerelease. Scope is `FullWire`, `RangeInspection`,
+`CapabilityEvidence` and `NormalizedViews`; no fragment planning/assembly, BLE,
+equipment-control authorization or Bluetooth qualification is claimed. Symbol
+upload succeeded; asynchronous symbol-server indexing is not separately proven.
+See the [C# guide](../packages/csharp/README.md) and
+[release runbook](../packages/csharp/docs/releasing.md).
 
 ## Published: Go v0.1.0
 
@@ -309,6 +354,7 @@ corpus, Cortex-M0 compile-only and packed-consumer evidence.
 | Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 | Python | PyPI `deancochran-ftms==0.1.0a2` | Verified public wheel/sdist consumers including capability evaluation; no repository BLE example | Stable interface and live-device evidence |
 | Rust | crates.io `ftms==0.1.0` | Released package and docs.rs | Later range/control/status projections, expanded runner evidence, and BLE/device evidence |
+| C# | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1 | Both public target assemblies executed in isolated consumers | Stable API, Unity/MAUI/device runtime and BLE/qualification evidence |
 
 ## Start with the released TypeScript package
 

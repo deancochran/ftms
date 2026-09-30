@@ -1,5 +1,17 @@
 # C# verification evidence
 
+## Published alpha.1
+
+NuGet **`DeanCochran.Ftms` 0.1.0-alpha.1** is now published and verified. The
+[canonical release record](../../../docs/released-packages.md#published-prerelease-c-010-alpha1)
+contains the exact clean source, corrected recovery-tooling identity, public hashes
+and successful Linux/macOS/Windows release run. Public consumers executed both
+target assemblies, and the NuGet repository signature/payload comparison passed.
+This supersedes the initial local-only publication and CI limits below, not their
+remaining Unity/MAUI/real-device/qualification exclusions.
+
+## Initial local development evidence
+
 Verified locally on Linux x64 with .NET SDK **10.0.100** and .NET runtime **10.0.0**.
 Source base: `accc347f12d1244b24f2e8a422627cca0dad2763` plus the uncommitted C# work;
 generated reports explicitly record `dirty: true`. This is not clean-release evidence.

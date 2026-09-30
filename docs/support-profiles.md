@@ -100,11 +100,11 @@ artifact identities and publication boundaries are in
 | Rust `ftms` 0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.0 / `rust-v0.1.0` released; newer range/control/status projections and 97-case evidence are unreleased |
 | Dart `deancochran_ftms` 0.1.0 source candidate | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Implemented in source; not tagged or published on pub.dev; see [Dart evidence](../packages/dart/doc/verification.md) |
 
-C# development now has an explicitly approved `FullWire` parity objective with
-`CapabilityEvidence`, `RangeInspection` and normalized views. This supersedes the
-earlier client-first recommendation for this port, not the requirement for
-complete directional evidence. Its package-owned coverage record distinguishes
-that objective from verified behavior; there is no NuGet publication claim.
+C# `DeanCochran.Ftms` **0.1.0-alpha.1** is published on NuGet with `FullWire`,
+`CapabilityEvidence`, `RangeInspection` and `NormalizedViews`. Its
+[release evidence](released-packages.md#published-prerelease-c-010-alpha1)
+records canonical case accounting, both public target-assembly consumers and
+host-specific limits. This supersedes the earlier client-first recommendation.
 `RecordPlanning` and `RecordAssembly` remain outside its initial scope.
 
 Other future ports should select the smallest profile justified by a consumer;
