@@ -4,7 +4,8 @@ Status: TypeScript and C have published bidirectional codecs, static capability
 interpretation and range inspection. Swift 0.1.0 implements these surfaces natively,
 with separate Linux/macOS, Git-consumer and Apple SDK release gates. See the
 [release record](released-packages.md) for actual publication identities; source
-metadata is not publication evidence. Kotlin remains a scaffold in this checkout.
+metadata is not publication evidence. Kotlin/JVM 0.1.0 is independently implemented
+and published on Maven Central with Java/Kotlin execution and Android APK checks.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
@@ -22,12 +23,12 @@ identity and public export paths remain stable. Published TypeScript is
 | `packages/typescript/` | TypeScript README, changelog, manifest, sources, tests, scripts, and compiler configs | Implemented |
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C and Swift |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift and Kotlin |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented; C 0.2.0 released |
 | `packages/swift/` | Native SwiftPM protocol package | Implemented; version 0.1.0 with independent release gates |
-| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Reserved |
+| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Implemented; 0.1.0 published on Maven Central |
 | `examples/` | Future integration examples outside the core packages | Reserved |
 
 Rust and other language ports are deferred. The existing TypeScript package
