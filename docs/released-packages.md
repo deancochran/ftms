@@ -13,11 +13,36 @@ The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
 with an evolving API and no capability APIs; consult its separate release evidence.
 The [Rust crate](../packages/rust/README.md) is an implemented 0.1.0 source
 candidate, but no `rust-v0.1.0` tag or crates.io package exists as of this check.
-The [Dart package](../packages/dart/README.md) is a new 0.1.0 source candidate,
-not a pub.dev release. Its local verification and future publication gates are
-recorded [separately](../packages/dart/doc/verification.md); no public Dart
-installation is claimed by this release matrix.
+The [Dart package](../packages/dart/README.md) is published on pub.dev as
+`deancochran_ftms` **0.1.0**; see its release evidence below.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
+## Published: Dart 0.1.0
+
+- Registry: <https://pub.dev/packages/deancochran_ftms/versions/0.1.0>.
+- Source/tag: `dart-v0.1.0` identifies
+  `3ca87a685942f942ef1f8c7af5681cf88371bc9b` (PR #23).
+- Public archive SHA-256:
+  `c3adbd9af2f67a274607b09a6cac997eea4bdac32dbdb7b7cef82e92fc0d50ed`.
+- First publication used the authenticated maintainer CLI, as required for
+  pub.dev bootstrap. The downloaded registry archive matched the verified file
+  manifest; a fresh exact-version hosted consumer passed analysis, both public
+  examples, and native compilation/execution.
+- [Merged-source CI](https://github.com/deancochran/ftms/actions/runs/36760823865)
+  passed the Linux/macOS/Windows minimum/current SDK matrix, JavaScript/Wasm
+  browser tests and Flutter Android/iOS consumer builds. Local conformance covered
+  all nine corpora, including 181,760 measurement layouts in both directions.
+- GitHub environment `pub-dev` requires maintainer approval and allows only tags
+  matching `dart-v*`. The maintainer confirmed pub.dev GitHub automation is set to
+  repository `deancochran/ftms`, pattern `dart-v{{version}}`, required environment
+  `pub-dev`, push events enabled and workflow-dispatch disabled. A future version
+  will provide the first end-to-end OIDC publication evidence.
+- The bootstrap tag's automatic release run is intentionally cancelled rather
+  than uploading the already-published version again. Do not rerun that upload.
+  Archived 0.1.0 documentation describes its pre-publication candidate state;
+  this release matrix supersedes those historical status statements.
+- Host and consumer checks do not establish real-device BLE interoperability or
+  Bluetooth qualification.
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
 
