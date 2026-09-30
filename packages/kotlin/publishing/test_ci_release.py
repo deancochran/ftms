@@ -55,7 +55,7 @@ class CIReleaseTest(unittest.TestCase):
         with self.assertRaises(release.ReleaseError):
             ci.version()
 
-    def test_secretful_jobs_require_main_or_matching_tag(self):
+    def test_verification_requires_main_or_matching_tag(self):
         with patch.object(release, "clean_commit", return_value="commit"), patch.object(release, "run") as run:
             self.assertEqual(("commit", "0.2.0"), ci.source_identity())
             run.assert_called_with(["git", "merge-base", "--is-ancestor", "commit", "origin/main"])
@@ -65,6 +65,15 @@ class CIReleaseTest(unittest.TestCase):
                     ci.source_identity()
             with patch.dict(os.environ, {"GITHUB_REPOSITORY": "someone/fork"}), self.assertRaises(release.ReleaseError):
                 ci.source_identity()
+
+    def test_publication_requires_matching_tag_not_main_or_pr(self):
+        with patch.object(release, "clean_commit", return_value="commit"), patch.object(release, "run"):
+            with self.assertRaises(release.ReleaseError):
+                ci.source_identity(require_release_tag=True)
+            with patch.dict(os.environ, {"GITHUB_REF_TYPE": "tag", "GITHUB_REF_NAME": "kotlin-v0.2.0"}):
+                self.assertEqual(("commit", "0.2.0"), ci.source_identity(require_release_tag=True))
+                with patch.dict(os.environ, {"GITHUB_EVENT_NAME": "pull_request"}), self.assertRaises(release.ReleaseError):
+                    ci.source_identity(require_release_tag=True)
 
     def test_pr_gate_is_non_secretful(self):
         with patch.dict(os.environ, {"GITHUB_EVENT_NAME": "pull_request", "GITHUB_REF_NAME": "9/merge"}), \

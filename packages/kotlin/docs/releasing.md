@@ -51,16 +51,14 @@ For each new release:
    to `packages/kotlin/CHANGELOG.md`. Gradle reads VERSION directly; do not maintain
    a second version literal in `build.gradle.kts`. Review intentional API changes.
 2. Merge the reviewed version update into **`main`** through the normal PR process.
-3. GitHub Actions automatically verifies, creates the signed `kotlin-vVERSION`
-   tag, publishes to Central, verifies public artifacts/consumers, and completes
-   the GitHub release. **No local GPG setup, token entry or manual tag signing is
-   needed for each release.**
+3. Create and push the reviewed matching, signed annotated `kotlin-vVERSION` tag
+   using the configured signing identity. The tag workflow
+   verifies, then publishes to Central and verifies public artifacts/consumers.
+   Main pushes are verification-only; they never create tags or publish.
 
 A push of an already-signed, matching `kotlin-v*` tag also triggers the workflow,
 as with the other ports. Tagged commits must be on `main`, the tag/version and
 changelog must match, and the signing identity must match the configured key.
-An Actions-created tag uses `GITHUB_TOKEN`; GitHub does not start another workflow
-for that push, so the same running workflow continues the publication itself.
 
 The workflow has two separate jobs:
 
@@ -72,7 +70,7 @@ The workflow has two separate jobs:
 - **Publish (restricted environment):** import the persisted key into an
   owner-only directory under `RUNNER_TEMP`, verify actual signing-key possession
   and Central namespace authority, sign the already-tested bytes without a
-  rebuild, create/verify the signed tag, validate/publish the exact bundle, then
+  rebuild, verify the existing signed tag, validate/publish the exact bundle, then
   download/hash/signature-check public files and rerun public consumers. The
   credential directory and GPG agent are cleaned in an `always()` step.
 
@@ -85,14 +83,11 @@ failed or ambiguous duplicate deployment stops rather than silently choosing one
 Only after public checks pass is the draft made public. Actions additionally
 retains public evidence for 90 days; completed GitHub release assets are durable.
 
-Use **Actions → Release Kotlin → Run workflow** on `main` for recovery or checks:
-
-- `mode=verify` (default): full gate, stored credentials/key validation, and—if
-  already released—public artifact and consumer verification. No tag, Central
-  upload, publish request or GitHub release mutation is performed.
-- `mode=publish`: resume the current version's draft/deployment or publish a new
-  verified version. Existing public versions remain verify-only. Do not increment
-  a version merely to test publishing credentials.
+Use **Actions → Release Kotlin → Run workflow** on main or a matching release tag
+for the credential-free artifact gate only. Manual dispatch does not import keys,
+validate account credentials, contact Central, create tags or publish releases.
+Publication requires pushing the exact signed tag; an authorized retry can rerun
+its failed jobs. Do not increment a version merely to test publishing credentials.
 
 Publication is serialized per version with cancellation disabled; different
 version bumps use independent groups so a newer version cannot discard an older

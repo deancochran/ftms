@@ -1,21 +1,8 @@
 name: Native Rust
 
 on:
-  pull_request:
-    paths:
-      - 'packages/rust/**'
-      - 'shared/**'
-      - '.github/workflows/native-rust.yml'
-      - '.github/workflows/release-rust.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'packages/rust/**'
-      - 'shared/**'
-      - '.github/workflows/native-rust.yml'
-      - '.github/workflows/release-rust.yml'
-  workflow_dispatch:
   workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read

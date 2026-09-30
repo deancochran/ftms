@@ -82,10 +82,11 @@ version, FTMS protocol revision and corpus identity remain independent. This is
 host/artifact and Android-build evidence, not a live Kotlin BLE or Android-runtime
 test, physical accuracy result, or Bluetooth qualification.
 
-Future Kotlin releases are automated by **Release Kotlin**: a reviewed
-`packages/kotlin/VERSION`/changelog update merged to `main` runs the full gate,
-creates the signed language-specific tag, publishes to Central and verifies public
-consumers before completing its GitHub release. The persistent `maven-central`
+Future Kotlin releases are automated by **Release Kotlin** after a maintainer
+pushes the matching signed annotated `kotlin-vVERSION` tag on a reviewed `main`
+commit. Merging a version/changelog update does not publish. The tag workflow runs
+the full gate, publishes to Central and verifies public consumers before completing
+its GitHub release. The persistent `maven-central`
 environment holds the existing credentials/signing material; it does not require
 repeating local integration setup for each version. Existing published versions
 are verified without another upload. See the runbook for recovery and rotation.

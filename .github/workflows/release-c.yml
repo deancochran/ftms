@@ -53,9 +53,11 @@ jobs:
           python3 packages/c/scripts/source-bundle.py --release
           archive="packages/c/build/source-candidate/ftms-c-$(cat packages/c/VERSION).tar.gz"
           python3 packages/c/scripts/verify-source-bundle.py --archive "$archive"
-          echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
-          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(sha256sum "$archive" | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+          {
+            echo "tag=$GITHUB_REF_NAME"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "sha256=$(sha256sum "$archive" | cut -d ' ' -f1)"
+          } >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: c-source-release
@@ -112,6 +114,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: c-source-release
@@ -127,8 +133,6 @@ jobs:
           set -euo pipefail
           python -c "import hashlib,os,pathlib; p=list(pathlib.Path('artifact').glob('*.tar.gz')); assert len(p)==1; assert hashlib.sha256(p[0].read_bytes()).hexdigest()==os.environ['EXPECTED_SHA256']"
           (cd artifact && sha256sum -c ./*.sha256)
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            echo "Refusing to modify an existing release"; exit 1
-          fi
-          gh release create "$RELEASE_TAG" artifact/* --verify-tag --title "FTMS C ${RELEASE_TAG#c-v}" \
-            --notes "Portable C99 source package. All codec and artifact checks passed. Registry submissions are separate. No board or Bluetooth qualification is implied."
+          printf '%s\n' 'Portable C99 source package. All codec and artifact checks passed. Registry submissions are separate. No board or Bluetooth qualification is implied.' > "$RUNNER_TEMP/c-release-notes.md"
+          python3 tools/github-release-assets.py --repo "$GH_REPO" --tag "$RELEASE_TAG" --commit '${{ needs.gate.outputs.commit }}' \
+            --title "FTMS C ${RELEASE_TAG#c-v}" --notes "$RUNNER_TEMP/c-release-notes.md" artifact/*

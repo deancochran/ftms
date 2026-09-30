@@ -22,3 +22,6 @@ coverage/
 /.build/
 /packages/swift/.build/
 /packages/swift/Verification/__pycache__/
+
+# Local release/CI helper test imports
+/tools/__pycache__/

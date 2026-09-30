@@ -31,16 +31,19 @@ def version():
     return value
 
 
-def source_identity():
+def source_identity(require_release_tag=False):
     commit = release.clean_commit()
     value = version()
     event = os.environ.get("GITHUB_EVENT_NAME")
+    if require_release_tag and event == "pull_request":
+        raise release.ReleaseError("Publication is not permitted from pull requests")
     if event != "pull_request":
         if os.environ.get("GITHUB_REPOSITORY") != REPOSITORY:
             raise release.ReleaseError("Publishing is restricted to the canonical repository")
         ref_type, ref_name = os.environ.get("GITHUB_REF_TYPE"), os.environ.get("GITHUB_REF_NAME")
-        if (ref_type, ref_name) not in (("branch", "main"), ("tag", "kotlin-v" + value)):
-            raise release.ReleaseError("Release requires main or a version-matched Kotlin tag")
+        allowed = (("tag", "kotlin-v" + value),) if require_release_tag else (("branch", "main"), ("tag", "kotlin-v" + value))
+        if (ref_type, ref_name) not in allowed:
+            raise release.ReleaseError("Publication requires a version-matched Kotlin tag" if require_release_tag else "Verification requires main or a version-matched Kotlin tag")
         release.run(["git", "merge-base", "--is-ancestor", commit, "origin/main"])
     return commit, value
 
@@ -85,7 +88,7 @@ def load_gate(expected_sha256):
     if release.sha256(data) != expected_sha256:
         raise release.ReleaseError("Downloaded gate metadata differs from the verification job output")
     metadata = json.loads(data)
-    commit, value = source_identity()
+    commit, value = source_identity(require_release_tag=True)
     if metadata["sourceCommit"] != commit or metadata["version"] != value:
         raise release.ReleaseError("Gate artifact identifies a different source/version")
     actual = {p.relative_to(VERIFIED).as_posix() for p in VERIFIED.rglob("*") if p.is_file()}

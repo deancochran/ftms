@@ -1,19 +1,7 @@
 name: Kotlin JVM
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'packages/kotlin/**'
-      - 'shared/**'
-      - '.github/workflows/native-kotlin.yml'
-      - '.github/workflows/release-kotlin.yml'
-  pull_request:
-    paths:
-      - 'packages/kotlin/**'
-      - 'shared/**'
-      - '.github/workflows/native-kotlin.yml'
-      - '.github/workflows/release-kotlin.yml'
+  workflow_call:
   workflow_dispatch:
 
 permissions:

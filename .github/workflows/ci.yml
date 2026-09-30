@@ -12,10 +12,41 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Select verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      typescript: ${{ steps.select.outputs.typescript }}
+      c: ${{ steps.select.outputs.c }}
+      kotlin: ${{ steps.select.outputs.kotlin }}
+      rust: ${{ steps.select.outputs.rust }}
+      swift: ${{ steps.select.outputs.swift }}
+      python: ${{ steps.select.outputs.python }}
+      docs: ${{ steps.select.outputs.docs }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select affected ports (unknown changes select all)
+        id: select
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then
+            python3 tools/ci-changes.py --all >> "$GITHUB_OUTPUT"
+          else
+            python3 tools/ci-changes.py --base "$BASE" >> "$GITHUB_OUTPUT"
+          fi
+
   verify:
+    needs: changes
+    if: needs.changes.outputs.typescript == 'true'
     name: Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -41,4 +72,70 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify source and packed artifact
-        run: pnpm verify
+        run: pnpm --filter @deancochran/ftms verify
+
+  workflow-lint:
+    name: Workflow syntax
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Install pinned actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+      - name: Lint workflows
+        run: '"$(go env GOPATH)/bin/actionlint" -color'
+      - name: Test release and CI helpers without credentials
+        run: |
+          python3 -m unittest discover -s tools -p 'test_*.py' -v
+          python3 -m unittest discover -s packages/python/tests -p test_release_retry.py -v
+          node --test tools/release-prepare.test.mjs packages/typescript/scripts/test-npm-release.mjs
+
+  c:
+    needs: changes
+    if: needs.changes.outputs.c == 'true'
+    uses: ./.github/workflows/native-c.yml
+
+  kotlin:
+    needs: changes
+    if: needs.changes.outputs.kotlin == 'true'
+    uses: ./.github/workflows/native-kotlin.yml
+
+  rust:
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
+    uses: ./.github/workflows/native-rust.yml
+
+  swift:
+    needs: changes
+    if: needs.changes.outputs.swift == 'true'
+    uses: ./.github/workflows/native-swift.yml
+
+  python:
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/release-python.yml
+
+  docs:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/docs.yml
+
+  summary:
+    name: CI summary
+    if: always()
+    needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, docs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all selected verification jobs
+        env:
+          RESULTS: ${{ toJson(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          case "$RESULTS" in *failure*|*cancelled*) exit 1;; esac

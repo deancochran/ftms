@@ -16,6 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const archiveOutput = process.env.FTMS_PACKAGE_ARCHIVE;
 const executable = (name) => (process.platform === "win32" ? `${name}.cmd` : name);
 const sourceManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
 const packagePathSegments = sourceManifest.name.split("/");
@@ -431,6 +432,14 @@ void parsed;
     ["exec", "tsc", "--project", path.join(consumerDirectory, "tsconfig.json")],
     packageRoot,
   );
+
+  // CI may publish only this tested byte stream. Copying is deliberately last:
+  // an archive is not released when any isolated-consumer check above fails.
+  if (archiveOutput) {
+    await mkdir(path.dirname(archiveOutput), { recursive: true });
+    await copyFile(tarball, archiveOutput);
+    console.log(`FTMS_PACKAGE_ARCHIVE=${archiveOutput}`);
+  }
 
   console.log(
     `Verified packed ${sourceManifest.name} allowlist, maps, runtime neutrality, exports, browser resolution, and declarations.`,

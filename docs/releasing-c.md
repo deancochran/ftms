@@ -92,9 +92,10 @@ rerun it before claiming the same platform evidence.
    Linux also tests Conan and vcpkg. Artifact SHA-256 travels between jobs and is
    checked again before release. Failed platform/package-manager jobs block release.
 6. After environment approval, the workflow creates a GitHub release for the
-   existing tag and uploads the tested archive/sidecar. It refuses to update an
-   existing release. Failed releases are investigated; published bytes/tags are
-   never silently rewritten. No npm or registry publication is performed.
+   existing tag and uploads the tested archive/sidecar. A retry retains matching
+   existing assets and may add missing verified assets. A tag-commit or digest
+   mismatch fails; existing assets are never overwritten. Failed releases are
+   investigated, not silently rewritten. No npm or registry publication is performed.
 
 ## Public registry submissions — separate delivery
 
