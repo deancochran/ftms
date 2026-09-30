@@ -10,7 +10,8 @@ readme = "README.md"
 keywords = ["bluetooth", "ftms", "fitness", "embedded", "no-std"]
 categories = ["embedded", "no-std", "encoding"]
 publish = ["crates-io"]
-exclude = [".toolchain", "target", "*.crate", "rust-toolchain.toml", "tests", "scripts"]
+# Cargo includes tracked dotfiles; repository-only metadata is not crate content.
+exclude = [".gitignore", ".toolchain", "target", "*.crate", "rust-toolchain.toml", "tests", "scripts"]
 
 [lib]
 path = "src/lib.rs"

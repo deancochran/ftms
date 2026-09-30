@@ -170,7 +170,7 @@ class ReleaseTests(unittest.TestCase):
     def test_archive_content_and_traversal_guards(self):
         self.assertEqual(release.inspect_archive(self.archive)["commit"], self.commit)
         for entry in ["/outside", "ftms-0.1.0/../outside", "other/src/lib.rs",
-                      "ftms-0.1.0/src/lib.rs", "ftms-0.1.0/scripts/release.py",
+                      "ftms-0.1.0/src/lib.rs", "ftms-0.1.0/scripts/release.py", "ftms-0.1.0/.gitignore",
                       "ftms-0.1.0/.toolchain/cargo/credentials.toml", "ftms-0.1.0/src\\escape"]:
             self.make_archive(extra=entry)
             with self.subTest(entry=entry), self.assertRaises(release.ReleaseError):
