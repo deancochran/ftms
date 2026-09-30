@@ -1,6 +1,7 @@
 # Released packages and executable examples
 
 Last checked read-only against npm and GitHub: **2026-09-29**.
+Kotlin Maven Central publication and public consumers verified: **2026-09-30**.
 This is a point-in-time record, not a promise that branch source is published.
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
@@ -31,14 +32,53 @@ Repository examples are not included in the C source archive. Artifact tests
 copy the repository examples into isolated consumer directories and link them
 against the extracted/installed archive; they do not claim the archive ships them.
 
+## Published: Kotlin/JVM 0.1.0
+
+Maven Central now serves **`io.github.deancochran:ftms:0.1.0`**:
+<https://repo.maven.apache.org/maven2/io/github/deancochran/ftms/0.1.0/>.
+The signed annotated tag `kotlin-v0.1.0` identifies clean source commit
+`1fdfefb62f5c1b6a6b3e757cf24deb9d5c09560a`, not the later PR merge commit.
+Central deployment `86dfed11-b0e1-4795-a233-60e12e6fc12a` reached `PUBLISHED`.
+The [GitHub release](https://github.com/deancochran/ftms/releases/tag/kotlin-v0.1.0)
+retains the exact Central bundle, signed manifest, public key, publication receipts
+and signed clean-source conformance reports.
+
+- Clean-source gates: 87 JUnit tests, all applicable canonical corpora and
+  181,760 measurement layouts encoded and decoded; all nine PR CI checks passed.
+- Binary, sources, Dokka documentation, POM and Gradle module metadata were signed
+  with OpenPGP fingerprint `A355E4B9EBD3FAEC850A84A6B7A6488FE4805547`. All ten staged
+  artifacts/signatures matched the prepared manifest before the publish request.
+- All **30 public files** (five artifacts, signatures and checksum sidecars) were
+  downloaded and matched the signed manifest. Signatures verified. Independent
+  Kotlin and Java consumers executed and the Android consumer built an APK with
+  FTMS resolution exclusive to the public Maven Central repository.
+- The Portal returned the exact Maven PURL at `VALIDATED` but empty PURL lists at
+  `PUBLISHING`/`PUBLISHED`. A follow-up client fix handles that observed behavior
+  without weakening the pre-publish coordinate/staged-byte checks. It has 18
+  passing offline publishing-safety tests. No artifact or tag was replaced.
+
+| Artifact | Verified SHA-256 |
+| --- | --- |
+| Binary JAR | `c32c3d4bf2533c0d5ff20cc30778973e0c1fd9568a7e75c505a6db0cbaf6a650` |
+| Sources JAR | `cbbc3b3363125c7501ff45eb0780f6bfe21747988ccd015452c7bf126afaa8b7` |
+| Documentation JAR | `b940124bbf6684b37b2333a8178ea4250a8c0243b1af688f8bae99a23ce4771a` |
+| Central upload bundle | `f56b8db378ab1efb7242126fbbed42fef7d1761c9a2316e735d8c2c3a126eb25` |
+
+The repeatable, explicit `prepare → upload → publish → verify` process and
+credential/key maintenance are documented in the
+[Kotlin release runbook](../packages/kotlin/docs/releasing.md). Kotlin package
+version, FTMS protocol revision and corpus identity remain independent. This is
+host/artifact and Android-build evidence, not a live Kotlin BLE or Android-runtime
+test, physical accuracy result, or Bluetooth qualification.
+
 ## Current public packages
 
 | Port | Public release verified | Runnable example | What is not released |
 | --- | --- | --- | --- |
-| TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native Swift/Kotlin implementations |
+| TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native implementations are separate packages, not npm exports |
 | C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
-| Swift | GitHub [`swift-v0.1.0`](https://github.com/deancochran/ftms/releases/tag/swift-v0.1.0), installed by SwiftPM revision/tag | Isolated public tag consumer runs on Linux/macOS and builds against five Apple SDK targets; [usage](../packages/swift/README.md) | SwiftPM semantic-version ranges in this mixed-tag repository; BLE/device/qualification evidence |
-| Kotlin | No verified public Maven Central release | Kotlin 0.1.0 local artifact: Kotlin/Java execution and Android APK build verified; [evidence](../packages/kotlin/docs/verification.md) | Central namespace/token/signing prerequisites and public artifact verification |
+| Swift | None | None | Implementation and SwiftPM release |
+| Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 
 ## Start with the released TypeScript package
 

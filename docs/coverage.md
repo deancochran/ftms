@@ -6,8 +6,8 @@ or Bluetooth qualification. C has unreleased bidirectional codecs and static
 capability interpretation. Swift now implements the corresponding native codec,
 range-inspection and capability surfaces; see [Swift verification](../packages/swift/README.md)
 for its host corpus/matrix checks and separate Apple/distribution gates. Kotlin
-remains scaffold-only in this checkout. The historical TypeScript/C tables below
-do not substitute for Swift-specific evidence.
+has separate [full raw conformance and public-artifact verification](../packages/kotlin/docs/verification.md).
+The historical TypeScript/C tables below do not substitute for language-specific evidence.
 
 ## Current codec surface
 

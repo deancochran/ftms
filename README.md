@@ -26,7 +26,9 @@ range-inspection diagnostics without changing existing defaults or automatically
 selecting device formats. [Swift](packages/swift/README.md) now has native codecs,
 range inspection and capabilities with independent SwiftPM version **0.1.0**;
 installation uses the Swift-specific tag or commit, not npm version ranges.
-Kotlin/Java remains scaffold-only in this checkout.
+[Kotlin/JVM and Java](packages/kotlin/README.md) are supported by the independent
+Maven Central package **`io.github.deancochran:ftms:0.1.0`**, including an Android
+artifact-consumer build check.
 See [verified releases](docs/released-packages.md) for actual publication status
 and [compatibility verification](docs/compatibility-verification.md) for scope and
 test accounting. Neither regression tests nor one trainer pilot establish
@@ -40,7 +42,7 @@ universal interoperability, PTS results or Bluetooth qualification.
 | [packages/typescript/](packages/typescript/README.md) | npm API docs, changelog, sources, tests, compiler configs, and npm-specific scripts |
 | [packages/c/](packages/c/README.md) | Portable bidirectional C99 codecs and static capability evidence, consumable from C++ |
 | [packages/swift/](packages/swift/README.md) | Native Swift 6 protocol package for SwiftPM, independent of other ports |
-| [packages/kotlin/](packages/kotlin/README.md) | Future independent Kotlin/JVM package, consumable from Java/Android |
+| [packages/kotlin/](packages/kotlin/README.md) | Independent Kotlin/JVM FTMS package on Maven Central, consumable from Java/Android |
 | [docs/](docs/architecture.md) | Repository-wide [architecture](docs/architecture.md), [coverage](docs/coverage.md), and [versioning](docs/versioning.md) guidance |
 | [examples/](examples/README.md) | Installed consumers and passive capture/replay examples outside protocol cores |
 | Root configs and workflows | Repository orchestration, formatting, hooks, and release gates |

@@ -2,8 +2,9 @@
 
 Published versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
 codecs, static capability interpretation and additive range inspection. Swift
-**0.1.0** is published with Linux/macOS and Apple SDK verification; Kotlin's
-state in this checkout remains a README-only scaffold. See the
+has an unreleased native implementation with Linux host verification; Kotlin/JVM
+**0.1.0** is published on Maven Central with public Java/Kotlin consumer execution
+and Android APK compilation evidence. See the
 [Swift package](swift/README.md) for exact limits and [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.
 
@@ -12,7 +13,7 @@ for verified publication status; source metadata alone is not publication eviden
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
 | [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive; Make and CMake integration |
 | [Swift](swift/README.md) | iOS and other supported Apple applications | Swift Package Manager |
-| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven artifact |
+| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central: `io.github.deancochran:ftms` |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must

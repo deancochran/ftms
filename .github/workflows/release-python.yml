@@ -1,0 +1,135 @@
+name: Python verification and release
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["python-v*"]
+    paths:
+      - "packages/python/**"
+      - "shared/conformance/**"
+      - "shared/protocol/**"
+      - ".github/workflows/release-python.yml"
+  pull_request:
+    paths:
+      - "packages/python/**"
+      - "shared/conformance/**"
+      - "shared/protocol/**"
+      - ".github/workflows/release-python.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: packages/python
+    outputs:
+      version: ${{ steps.identity.outputs.version }}
+      wheel-sha256: ${{ steps.digests.outputs.wheel }}
+      sdist-sha256: ${{ steps.digests.outputs.sdist }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.9.15"
+          working-directory: packages/python
+          enable-cache: false
+      - name: Install test interpreters
+        run: uv python install 3.11 3.14
+      - name: Validate package identity and release tag
+        id: identity
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version=$(uv run --python 3.11 --locked --group dev python -c 'import tomllib; p=tomllib.load(open("pyproject.toml", "rb"))["project"]; assert p["name"] == "deancochran-ftms"; print(p["version"])')
+          if [ "$REF_TYPE" = tag ]; then
+            test "$REF_NAME" = "python-v$version"
+          fi
+          grep -Fx "## $version" CHANGELOG.md
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Verify both Python versions, codecs, matrix and isolated artifacts
+        run: uv run --locked --group dev python scripts/verify.py
+      - name: Validate distribution metadata
+        run: uv tool run --from twine==7.0.0 twine check --strict build/isolated/*.whl build/isolated/*.tar.gz
+      - name: Require clean, complete evidence from this commit
+        run: |
+          test -z "$(git status --porcelain --untracked-files=all)"
+          uv run --locked --group dev python - <<'PY'
+          import json, os
+          from pathlib import Path
+          for name in ("verification-report.json", "measurement-status-verification-report.json", "measurement-matrix-verification-report.json"):
+              report = json.loads((Path("build") / name).read_text())
+              assert report["sourceCommit"] == os.environ["GITHUB_SHA"]
+              assert report["dirty"] is False
+              if name == "verification-report.json":
+                  assert report["runnerComplete"] and report["conformanceComplete"]
+              else:
+                  assert report["complete"]
+          package = json.loads(Path("build/package-verification-report.json").read_text())
+          assert package["complete"] and package["wheelReproducibleFromSdist"] and package["archiveManifestsVerified"]
+          PY
+      - name: Record distribution checksums
+        id: digests
+        env:
+          VERSION: ${{ steps.identity.outputs.version }}
+        run: |
+          set -euo pipefail
+          echo "wheel=$(sha256sum "build/isolated/deancochran_ftms-$VERSION-py3-none-any.whl" | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "sdist=$(sha256sum "build/isolated/deancochran_ftms-$VERSION.tar.gz" | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+      - name: Retain verified distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-dist-${{ github.sha }}
+          path: |
+            packages/python/build/isolated/*.whl
+            packages/python/build/isolated/*.tar.gz
+          if-no-files-found: error
+      - name: Retain exact conformance and installation evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-evidence-${{ github.sha }}
+          path: packages/python/build/*verification-report.json
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    if: github.repository == 'deancochran/ftms' && github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'python-v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/deancochran-ftms/
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: python-dist-${{ github.sha }}
+          path: dist
+      - name: Verify the build job's exact artifacts
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+          WHEEL_SHA256: ${{ needs.verify.outputs.wheel-sha256 }}
+          SDIST_SHA256: ${{ needs.verify.outputs.sdist-sha256 }}
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' "$WHEEL_SHA256" "dist/deancochran_ftms-$VERSION-py3-none-any.whl" "$SDIST_SHA256" "dist/deancochran_ftms-$VERSION.tar.gz" | sha256sum --check --strict
+          test "$(find dist -type f | wc -l)" -eq 2
+      - name: Publish to PyPI with Trusted Publishing and attestations
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
+          print-hash: true

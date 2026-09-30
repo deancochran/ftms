@@ -19,7 +19,8 @@ TypeScript wire codec. This release-packaging milestone records that difference
 rather than claiming renewed complete API parity or silently expanding protocol
 scope. Swift now has a separately released native 0.1.0 implementation; its evidence is
 documented in [the Swift package](../packages/swift/README.md), not inferred from
-this TypeScript/C audit. Kotlin remains scaffold-only in this checkout.
+this TypeScript/C audit. Kotlin's subsequent implementation and Maven Central
+release have the separately scoped evidence linked above.
 
 Explicit format propagation is intentionally asymmetric: TypeScript propagates
 caller-selected layouts through normalized measurement parsing, registry dispatch,
@@ -117,5 +118,6 @@ These are local source capabilities, not additions already available in publishe
 transport, permissions, connection/control ownership or actuator safety. Embedded
 runtime/board, real-device interoperability and Bluetooth qualification remain
 unverified; Swift's subsequent host implementation has separate evidence in its
-package README, while Kotlin remains a scaffold in this checkout. No assertion of universal FTMS or
+package README; Kotlin's separate implementation has its own verification report.
+No assertion of universal FTMS or
 physical-equipment compatibility follows from these finite regression corpora.
