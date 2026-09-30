@@ -1,4 +1,4 @@
-use ftms::{measurement::*, status::*, *};
+use ftms::{measurement::*, normalized::*, status::*, *};
 
 fn main() {
     let raw = RawFeatures {
@@ -6,6 +6,13 @@ fn main() {
         target: 0x4000_0000,
     };
     assert_eq!(decode_features(&encode_features(raw)), Ok(raw));
+    assert!(!normalize_features(raw).supports_erg());
+    assert_eq!(
+        normalize_control_request(NormalizedControlRequest::TargetSpeedKph(12.34))
+            .unwrap()
+            .opcode,
+        2
+    );
     let range = RawRange {
         kind: RangeKind::Power,
         minimum: -100,
@@ -24,6 +31,7 @@ fn main() {
         decode_range(RangeKind::Power, &range_bytes, RangeOptions::default()),
         Ok(range)
     );
+    assert_eq!(normalize_range(range).maximum, 4000.0);
     let request = ControlRequest {
         opcode: 4,
         operands: [-10, 0, 0, 0, 0],
@@ -100,6 +108,11 @@ fn main() {
     assert_eq!(encode_machine_status(&machine, &mut out), Ok(2));
     assert_eq!(out, [0x14, 4]);
     assert_eq!(decode_machine_status(&out), machine);
+    assert_eq!(
+        normalize_machine_status(machine).unwrap().label,
+        "spin_down_status"
+    );
+    assert_eq!(normalize_machine_status(machine).unwrap().action, Some(4));
     let training = RawTrainingStatus {
         flags: 3,
         code: 2,

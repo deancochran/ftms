@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Added public allocation-free normalized range, human-unit control-request,
+  control-response and Machine Status projections, retaining status actions.
+  The normalized codec-v1 adapter now validates and
+  accounts for all 97 canonical cases (zero unsupported/skipped); this is source
+  capability after 0.1.0, not a change to that released artifact.
+
 ## 0.1.0
 
 Initial Rust protocol-library release.

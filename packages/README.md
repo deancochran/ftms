@@ -16,7 +16,7 @@ publication evidence.
 | [Swift](swift/README.md) | iOS and other supported Apple applications | SwiftPM `swift-v0.1.0` |
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a1; evolving alpha |
-| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
+| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` 0.1.0; newer source capabilities unreleased |
 | [Dart](dart/README.md) | Flutter applications and standalone Dart tools | `deancochran_ftms` 0.1.0 source candidate; not published on pub.dev |
 
 Start from the [architecture](../docs/architecture.md) and the shared
@@ -33,9 +33,10 @@ it. Add build manifests and CI with real implementations, not empty packages.
 Do not infer future registry names, minimum platform versions or release dates
 from a directory or deferred-port mention.
 
-Rust now implements bidirectional raw codecs with independent `no_std` sources,
-conformance tests and gated publishing. It does not yet implement capability
-interpretation or fragment assembly; see its [coverage and evidence](rust/docs/verification.md).
+Rust 0.1.0 is released on crates.io with capability interpretation, record
+assembly and normalized Feature/measurement views. Its unreleased source adds
+range/control/status projections and 97-case evidence; see its
+[coverage and evidence](rust/docs/verification.md).
 C# is being implemented with an explicitly approved full-wire parity objective;
 see its package-owned coverage and verification evidence before relying on a
 particular module. Other future ports remain deferred until a consumer justifies

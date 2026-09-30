@@ -11,8 +11,8 @@ This is the **canonical current release matrix**. Begin with the
 [Kotlin guide](../packages/kotlin/README.md).
 The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
 with an evolving API and no capability APIs; consult its separate release evidence.
-The [Rust crate](../packages/rust/README.md) is an implemented 0.1.0 source
-candidate, but no `rust-v0.1.0` tag or crates.io package exists as of this check.
+The [Rust crate](../packages/rust/README.md) **0.1.0** is published on crates.io;
+unreleased branch source must not be represented as part of that artifact.
 The [Dart package](../packages/dart/README.md) is a new 0.1.0 source candidate,
 not a pub.dev release. Its local verification and future publication gates are
 recorded [separately](../packages/dart/doc/verification.md); no public Dart
@@ -166,21 +166,23 @@ consumer job for future Python tags. A read-only rerun downloaded both artifacts
 matched the hashes above and executed independent isolated wheel and sdist
 consumers on Python 3.11.15; both completed successfully.
 
-## Implemented source candidate: Rust 0.1.0 (not published)
+## Published: Rust 0.1.0
 
-PR [#14](https://github.com/deancochran/ftms/pull/14) merged the independent,
-allocation-free `no_std` Rust implementation at
-`384f7304b6e5add0cee495c983928cc65c17a31b`. Its `Cargo.toml` declares 0.1.0,
-but source metadata is not a release: there is no `rust-v0.1.0` tag, crates.io
-package or Rust GitHub release. The crates.io API returned not found during this
-read-only check.
+crates.io serves [`ftms` 0.1.0](https://crates.io/crates/ftms/0.1.0). The annotated
+tag `rust-v0.1.0` identifies `58b9add0addea516769c6f01d4b117a1b02110e1`; its
+release archive SHA-256 is
+`fbb9cf806ba89441ef44bab25b65c7caab405c83efe8ededcfd42cc04011f86f`.
+[Release Rust run 36763795982](https://github.com/deancochran/ftms/actions/runs/36763795982)
+succeeded, and docs.rs is live. This verifies the released artifact, not later
+unreleased range/control/status normalized projections and expanded coverage.
 
-The candidate implements `FullWire` raw codecs and `RangeInspection`; it does not
-implement capability interpretation, normalized views, fragment planning/assembly,
-BLE, device runtime or control authorization. See the package's
+The released artifact provides `FullWire` raw codecs, `RangeInspection`, capability
+interpretation, normalized Feature/measurement views and record planning/assembly.
+Only the newer range/control/status normalized projections and 97-case runner
+evidence are unreleased. BLE, device runtime and control authorization are not
+provided. See the package's
 [verification record](../packages/rust/docs/verification.md) for exact host,
-corpus, Cortex-M0 compile-only and packed-consumer evidence. Do not use a registry
-installation instruction until this matrix records a verified public artifact.
+corpus, Cortex-M0 compile-only and packed-consumer evidence.
 
 ## Current public packages
 
@@ -191,6 +193,7 @@ installation instruction until this matrix records a verified public artifact.
 | Swift | GitHub/SwiftPM `swift-v0.1.0` | Public tag-pinned Linux/macOS consumers and Apple SDK builds | BLE integration and Apple-device runtime evidence |
 | Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 | Python | PyPI `deancochran-ftms==0.1.0a1` | Isolated wheel/sdist package consumers; no repository BLE example | Capability evaluation, stable interface and live-device evidence |
+| Rust | crates.io `ftms==0.1.0` | Released package and docs.rs | Later range/control/status projections, expanded runner evidence, and BLE/device evidence |
 
 ## Start with the released TypeScript package
 

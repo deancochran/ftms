@@ -8,7 +8,8 @@ package, a native toolchain, BLE, or an OS lifecycle API.
 - [protocol/capability-discovery.md](protocol/capability-discovery.md) describes
   static protocol interpretation rules and acceptance scenarios. TypeScript, C,
   Swift and Kotlin implement them without BLE or control authorization; Python's
-  current alpha and the Rust source candidate do not.
+  current alpha does not. Rust 0.1.0 implements them; later range/control/status
+  projections and expanded normalized codec evidence are separately unreleased.
 - [conformance/v1/schema.json](conformance/v1/schema.json) and
   [conformance/v1/vectors.json](conformance/v1/vectors.json) are the canonical
   versioned codec regression corpus. Fixtures are executable expectations and
