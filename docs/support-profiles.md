@@ -78,9 +78,9 @@ Orthogonal modules need not be copied into every package. In particular, C's
 bounded planning and assembly interfaces are not missing wire directions in the
 other ports.
 
-Rust's released 0.1.0 crate is a `FullWire` artifact with capability evidence,
-normalized Feature/measurement views and records. Its later range/control/status
-projections and 97-case normalized codec-v1 coverage are unreleased source evidence.
+Rust's released 0.1.1 crate is a `FullWire` artifact with capability evidence,
+normalized Feature/measurement/range/control/status views and records. Its
+normalized codec-v1 runner accounts for all 97 cases.
 
 ## Current package claims
 
@@ -97,7 +97,7 @@ artifact identities and publication boundaries are in
 | Kotlin/JVM `io.github.deancochran:ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection` | Published on Maven Central |
 | Go `github.com/deancochran/ftms/packages/go` v0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, range-only normalized views | Published nested Go module; public consumers verified on Go 1.24.0 and 1.27.1, Linux/amd64 |
 | Python `deancochran-ftms` 0.1.0a2 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection` and selected `NormalizedViews` | Published PyPI alpha; public wheel/sdist consumers verified |
-| Rust `ftms` 0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.0 / `rust-v0.1.0` released; newer range/control/status projections and 97-case evidence are unreleased |
+| Rust `ftms` 0.1.1 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.1 / `rust-v0.1.1` released; public registry consumer verified |
 | Dart `deancochran_ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Published on pub.dev; see [release evidence](released-packages.md#published-dart-010) |
 
 C# `DeanCochran.Ftms` **0.1.0-alpha.1** is published on NuGet with `FullWire`,

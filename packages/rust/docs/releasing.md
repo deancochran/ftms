@@ -104,9 +104,11 @@ no extra manual reviewer gate: a valid tag push triggers the automated gates.
 
 ## Preparing a release
 
-The current source prepares **0.1.1** with additive normalized range/control/status
-views and all 97 codec-v1 cases accounted for. The public release remains 0.1.0
-until `rust-v0.1.1` is explicitly pushed and its publication checks succeed.
+Version **0.1.1** is published with additive normalized range/control/status
+views and all 97 codec-v1 cases accounted for. The immutable `rust-v0.1.1` tag
+and public archive/consumer evidence are recorded in the
+[release matrix](../../../docs/released-packages.md#published-rust-011).
+Use a new version for future changes; do not move this tag.
 
 1. Complete the intended scope; review public interfaces, crate name, version,
    changelog, docs and supported-toolchain claims. Publication is permanent.

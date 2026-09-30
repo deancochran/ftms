@@ -18,7 +18,7 @@ publication evidence.
 | [Go](go/README.md) | Go applications, gateways and protocol tools | Published Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
 | [C#](csharp/README.md) | .NET applications and protocol tools | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1; evolving prerelease |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a2; evolving alpha |
-| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` 0.1.0; newer source capabilities unreleased |
+| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` 0.1.1; normalized views and public consumer verified |
 | [Dart](dart/README.md) | Flutter applications and standalone Dart tools | pub.dev: `deancochran_ftms` 0.1.0 |
 
 Start from the [architecture](../docs/architecture.md) and the shared
@@ -35,8 +35,8 @@ it. Add build manifests and CI with real implementations, not empty packages.
 Do not infer future registry names, minimum platform versions or release dates
 from a directory or deferred-port mention.
 
-Rust 0.1.0 is released on crates.io with capability interpretation, record
-assembly and normalized Feature/measurement views. Its unreleased source adds
+Rust 0.1.1 is released on crates.io with capability interpretation, record
+assembly and normalized Feature/measurement views. Version 0.1.1 also includes
 range/control/status projections and 97-case evidence; see its
 [coverage and evidence](rust/docs/verification.md).
 C# is published as a full-wire prerelease with normalized views, range inspection
