@@ -2,8 +2,12 @@
 
 **Pure managed Bluetooth Fitness Machine Service protocol library for .NET.**
 
-`0.1.0-alpha.1` is an evolving prerelease. Check NuGet.org and the completed
-`csharp-v*` release workflow before treating any version as publicly available.
+**[0.1.0-alpha.1 is published on NuGet](https://www.nuget.org/packages/DeanCochran.Ftms/0.1.0-alpha.1).**
+The interface remains an evolving prerelease.
+
+```sh
+dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1
+```
 
 ## Scope
 

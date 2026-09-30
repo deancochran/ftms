@@ -44,10 +44,10 @@ establish publication; consult the release matrix above.
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-C# implementation is explicitly approved with a `FullWire` parity objective,
-range inspection, capability interpretation and normalized views. The package's
-own coverage and verification records distinguish implemented behavior from that
-objective; local package metadata is not a NuGet release. Other future ports
+C# `DeanCochran.Ftms` 0.1.0-alpha.1 is published on NuGet with `FullWire`, range
+inspection, capability interpretation and normalized views. Its
+[release evidence](released-packages.md#published-prerelease-c-010-alpha1) records
+actual public consumers; local metadata alone is not release evidence. Other future ports
 remain deferred until a consumer justifies a specific support profile. The
 existing TypeScript package continues to serve JavaScript and React Native consumers.
 

@@ -1,6 +1,7 @@
 # C# coverage
 
-Local `0.1.0-alpha.1` source candidate; **not published on NuGet**.
+Published NuGet prerelease **`DeanCochran.Ftms` 0.1.0-alpha.1**. See the
+[canonical release evidence](../../../docs/released-packages.md#published-prerelease-c-010-alpha1).
 
 | Area | Decode | Encode | Notes |
 | --- | --- | --- | --- |
@@ -13,7 +14,8 @@ Local `0.1.0-alpha.1` source candidate; **not published on NuGet**.
 | Machine Status | Yes | Yes | Known parameter mappings, unknown opcodes and partial evidence |
 
 Source profile: **`FullWire`**, plus `RangeInspection`, `CapabilityEvidence` and
-`NormalizedViews`. This is a source/host-test claim, not a released-package claim.
+`NormalizedViews`. The public package's signature, payload and installed consumers
+have been verified; this does not establish real-device compatibility.
 Interfaces are idiomatic C# and do not duplicate every other port's convenience API.
 
 Excluded: `RecordPlanning`, `RecordAssembly`, BLE transport, scheduling, ownership,
