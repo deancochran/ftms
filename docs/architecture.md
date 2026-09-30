@@ -1,9 +1,10 @@
 # Cross-language FTMS architecture
 
-Status: TypeScript has a published client release plus unreleased bidirectional
-raw codecs and static capability interpretation. C has unreleased Feature/range
-encoding/decoding, measurement/control/status codecs and static capability
-interpretation. Swift/Kotlin remain scaffolds.
+Status: TypeScript and C have published bidirectional codecs, static capability
+interpretation and range inspection. Swift 0.1.0 implements these surfaces natively,
+with separate Linux/macOS, Git-consumer and Apple SDK release gates. See the
+[release record](released-packages.md) for actual publication identities; source
+metadata is not publication evidence. Kotlin remains a scaffold in this checkout.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
@@ -14,37 +15,36 @@ TypeScript, C, Swift, and Kotlin occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
 `pnpm-workspace.yaml` includes only the implemented TypeScript package. Its npm
 identity and public export paths remain stable. Published TypeScript is
-`@deancochran/ftms@0.2.0`; the next source candidate is `0.3.0`.
+`@deancochran/ftms@0.4.0`.
 
 | Location | Responsibility | Current state |
 | --- | --- | --- |
 | `packages/typescript/` | TypeScript README, changelog, manifest, sources, tests, scripts, and compiler configs | Implemented |
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by C and TypeScript |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C and Swift |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
-| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented protocol surface, unreleased |
-| `packages/swift/` | Native Apple package | Reserved |
+| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented; C 0.2.0 released |
+| `packages/swift/` | Native SwiftPM protocol package | Implemented; version 0.1.0 with independent release gates |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Reserved |
 | `examples/` | Future integration examples outside the core packages | Reserved |
 
 Rust and other language ports are deferred. The existing TypeScript package
 continues to serve JavaScript and React Native consumers.
 
-The C port now has a narrow source implementation and port-local host tooling; it
-remains unreleased and does not add a native package manifest, toolchain download,
-or publishing job. Add each package's build and installation files
+The C port has native source, host tooling and independent release automation.
+Add each package's build and installation files
  with its first real implementation and tests. Directory names are not promises
  of registry names or published artifacts.
 
-Swift Package Manager is the planned ecosystem exception: a conventional Git URL
+Swift Package Manager is an ecosystem exception: a conventional Git URL
 dependency needs a repository-root `Package.swift`, even though Swift sources,
 tests, documentation, and package-owned tooling remain under `packages/swift/`.
-When Swift is implemented, prefer a thin root manifest that points into those
-directories, or deliberately use a distribution repository instead. Do not add an
-empty root manifest now. A future Swift release must test an isolated Git-URL
-dependency, not only a local-directory build.
+The implemented thin root manifest points into those directories. Swift stays
+in this repository using `swift-vVERSION` tags, installed via revision/tag pins
+rather than normal SwiftPM semantic-version requirements. Its release gate tests
+an isolated public Git/tag dependency, not only a local-directory build.
 
 ## Layers
 
