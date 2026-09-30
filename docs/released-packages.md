@@ -38,7 +38,7 @@ against the extracted/installed archive; they do not claim the archive ships the
 | TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native Swift/Kotlin implementations |
 | C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
 | Swift | None | None | Implementation and SwiftPM release |
-| Kotlin | None | None | Implementation and Maven Central release |
+| Kotlin | No verified public Maven Central release | Kotlin 0.1.0 local artifact: Kotlin/Java execution and Android APK build verified; [evidence](../packages/kotlin/docs/verification.md) | Central namespace/token/signing prerequisites and public artifact verification |
 
 ## Start with the released TypeScript package
 
