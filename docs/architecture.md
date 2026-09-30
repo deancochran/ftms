@@ -4,8 +4,9 @@ Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
 range inspection and static capability interpretation. Python 0.1.0a2 is a
 published alpha with bidirectional raw codecs, range inspection and static
 capability evaluation; its convenience API remains language-specific and evolving.
-Rust 0.1.0 is an implemented `no_std` source candidate with static capability
-interpretation and no registry publication.
+Rust 0.1.0 is a released `no_std` crate with static capability interpretation,
+normalized Feature/measurement views and record planning/assembly; only the newer
+range/control/status projections and 97-case runner evidence are unreleased.
 Dart is an implemented, unpublished full-wire source candidate with static
 capability evidence, range inspection and normalized measurement views.
 See the [canonical release matrix](released-packages.md) for versions and distribution
@@ -38,7 +39,7 @@ establish publication; consult the release matrix above.
 | `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Published alpha 0.1.0a2 with static capability evidence |
-| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
+| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.1.0 released with capabilities, normalized Feature/measurement views and records; newer range/control/status projections are unreleased |
 | `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Implemented 0.1.0 source candidate; not published on pub.dev |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |

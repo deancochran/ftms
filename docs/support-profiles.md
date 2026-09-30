@@ -78,6 +78,10 @@ Orthogonal modules need not be copied into every package. In particular, C's
 bounded planning and assembly interfaces are not missing wire directions in the
 other ports.
 
+Rust's released 0.1.0 crate is a `FullWire` artifact with capability evidence,
+normalized Feature/measurement views and records. Its later range/control/status
+projections and 97-case normalized codec-v1 coverage are unreleased source evidence.
+
 ## Current package claims
 
 Claims below identify current released package versions and implemented source
@@ -93,7 +97,7 @@ artifact identities and publication boundaries are in
 | Kotlin/JVM `io.github.deancochran:ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection` | Published on Maven Central |
 | Go `github.com/deancochran/ftms/packages/go` v0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, range-only normalized views | Published nested Go module; public consumers verified on Go 1.24.0 and 1.27.1, Linux/amd64 |
 | Python `deancochran-ftms` 0.1.0a2 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection` and selected `NormalizedViews` | Published PyPI alpha; public wheel/sdist consumers verified |
-| Rust `ftms` 0.1.0 source candidate | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | Implemented in source; not tagged or published on crates.io |
+| Rust `ftms` 0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.0 / `rust-v0.1.0` released; newer range/control/status projections and 97-case evidence are unreleased |
 | Dart `deancochran_ftms` 0.1.0 source candidate | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Implemented in source; not tagged or published on pub.dev; see [Dart evidence](../packages/dart/doc/verification.md) |
 
 C# development now has an explicitly approved `FullWire` parity objective with

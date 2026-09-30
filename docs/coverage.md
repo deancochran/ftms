@@ -9,11 +9,11 @@ package's verification record. Historical TypeScript/C tables below do not
 substitute for language-specific evidence.
 
 Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md).
-Its source candidate now has allocation-free static capability evidence, normalized
-measurement views, bounded More Data planning and caller-clocked assembly. Its
-capability-v1 runner passes 63/63 exact reports; its normalized codec-v1 runner
-passes 35 Feature cases and explicitly marks 62 other cases unsupported. Registry
-publication remains unclaimed.
+Its released 0.1.0 artifact has allocation-free static capability evidence,
+normalized Feature/measurement views, bounded More Data planning and caller-clocked
+assembly; capability-v1 passes 63/63 exact reports. Unreleased source adds range,
+control and status projections and normalized codec-v1 execution of all 97 cases
+with zero unsupported/skipped cases; that newer evidence is not a release claim.
 
 Dart has an unpublished [full-wire source candidate](../packages/dart/README.md)
 with static capability evidence, range inspection and normalized measurement
