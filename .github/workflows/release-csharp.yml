@@ -1,0 +1,175 @@
+name: Release C# NuGet
+
+on:
+  push:
+    tags: ['csharp-v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: csharp-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  native:
+    uses: ./.github/workflows/native-csharp.yml
+
+  gate:
+    name: Build and verify exact C# release artifacts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      commit: ${{ steps.identity.outputs.commit }}
+      version: ${{ steps.identity.outputs.version }}
+      manifest_sha256: ${{ steps.identity.outputs.manifest_sha256 }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+    defaults:
+      run:
+        working-directory: packages/csharp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: packages/csharp/global.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install test-only schema validator
+        run: python -m pip install -r verification/requirements.txt
+      - name: Validate signed tag, main ancestry, and build once with NativeAOT
+        id: identity
+        env:
+          CSHARP_RELEASE_SIGNER: ${{ vars.CSHARP_RELEASE_SIGNER }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          TAG_OBJECT: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+          python publishing/release.py gate --tag "$RELEASE_TAG" --tag-object "$TAG_OBJECT"
+          manifest=artifacts/release-manifest.json
+          echo "commit=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["sourceCommit"])')" >> "$GITHUB_OUTPUT"
+          echo "version=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["version"])')" >> "$GITHUB_OUTPUT"
+          echo "manifest_sha256=$(sha256sum "$manifest" | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=csharp-release-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+      - name: Upload only the exact tested packages and identity evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: csharp-release-${{ github.sha }}
+          path: |
+            packages/csharp/artifacts/packages/DeanCochran.Ftms.*.nupkg
+            packages/csharp/artifacts/packages/DeanCochran.Ftms.*.snupkg
+            packages/csharp/artifacts/release-manifest.json
+            packages/csharp/artifacts/package-verification.json
+            packages/csharp/artifacts/aot-verification.json
+            packages/csharp/artifacts/*conformance*.json
+            packages/csharp/artifacts/schema-validation.json
+          if-no-files-found: error
+          retention-days: 90
+
+  publish:
+    name: Publish exact verified NuGet artifacts
+    needs: [gate, native]
+    if: github.repository == 'deancochran/ftms' && github.ref_type == 'tag' && github.ref_name == format('csharp-v{0}', needs.gate.outputs.version)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: nuget
+      url: https://www.nuget.org/packages/DeanCochran.Ftms/${{ needs.gate.outputs.version }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: packages/csharp/global.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.gate.outputs.artifact_name }}
+          path: packages/csharp/artifacts
+      - name: Require the hash-bound, exact two-package artifact set
+        working-directory: packages/csharp
+        env:
+          EXPECTED_MANIFEST_SHA256: ${{ needs.gate.outputs.manifest_sha256 }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        run: |
+          set -euo pipefail
+          test "$(sha256sum artifacts/release-manifest.json | cut -d ' ' -f 1)" = "$EXPECTED_MANIFEST_SHA256"
+          test "$(find artifacts/packages -maxdepth 1 -type f | wc -l)" -eq 2
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          manifest = json.loads(Path('artifacts/release-manifest.json').read_text())
+          assert manifest['version'] == os.environ['VERSION'] and manifest['dirty'] is False
+          for name, entry in manifest['files'].items():
+              p = Path('artifacts/packages') / name
+              assert p.is_file() and p.stat().st_size == entry['size']
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == entry['sha256']
+          PY
+      - name: Obtain a short-lived NuGet OIDC credential
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish exactly the tested main and symbols packages
+        working-directory: packages/csharp
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        run: |
+          set -euo pipefail
+          push() { dotnet nuget push "$1" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --timeout 300 --no-symbols; }
+          # Do not use --skip-duplicate: an existing immutable version is a release failure.
+          if ! push "artifacts/packages/DeanCochran.Ftms.$VERSION.nupkg"; then
+            python publishing/release.py public-verify --existing --manifest artifacts/release-manifest.json || true
+            exit 1
+          fi
+          push "artifacts/packages/DeanCochran.Ftms.$VERSION.snupkg"
+
+  verify-public:
+    name: Verify public NuGet repository signature and consumers
+    needs: [gate, publish]
+    if: needs.publish.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: packages/csharp/global.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.gate.outputs.artifact_name }}
+          path: packages/csharp/artifacts
+      - name: Verify signed public payloads and fresh-cache consumers
+        working-directory: packages/csharp
+        env:
+          EXPECTED_MANIFEST_SHA256: ${{ needs.gate.outputs.manifest_sha256 }}
+        run: |
+          test "$(sha256sum artifacts/release-manifest.json | cut -d ' ' -f 1)" = "$EXPECTED_MANIFEST_SHA256"
+          python publishing/release.py public-verify --manifest artifacts/release-manifest.json
+      - name: Retain public evidence (symbols may index asynchronously)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: csharp-public-evidence-${{ github.sha }}
+          path: |
+            packages/csharp/artifacts/public-package-verification.json
+            packages/csharp/artifacts/public-*-conformance-netstandard.json
+          if-no-files-found: error
+          retention-days: 90

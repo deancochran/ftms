@@ -18,7 +18,7 @@ dotnet test tests/DeanCochran.Ftms.Tests -c Release --no-restore --logger 'trx;L
 dotnet run --project verification/CodecConformance -c Release --no-restore -- artifacts/codec-conformance.json
 dotnet run --project verification/CapabilityConformance -c Release --no-restore -- artifacts/capability-conformance.json
 dotnet run --project verification/MatrixConformance -c Release --no-restore -- artifacts/matrix-conformance.json
-dotnet pack src/DeanCochran.Ftms -c Release --no-build --no-restore -o artifacts/packages
+dotnet pack src/DeanCochran.Ftms -c Release --no-build --no-restore -p:RepositoryCommit="$(git rev-parse HEAD)" -o artifacts/packages
 "$python" verification/verify-package.py
 if [[ "${FTMS_VERIFY_AOT:-0}" == 1 ]]; then
   "$python" verification/verify-aot.py "${FTMS_AOT_RID:-linux-x64}"

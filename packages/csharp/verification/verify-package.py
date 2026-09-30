@@ -63,6 +63,9 @@ def audit_archive(path, version, symbols=False):
         repository = metadata_xml.find("{*}repository")
         if repository is None or repository.get("url") != "https://github.com/deancochran/ftms" or not repository.get("commit"):
             raise ValueError("Missing repository/source identity")
+        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=PACKAGE, text=True).strip()
+        if repository.get("commit") != commit:
+            raise ValueError("Nuspec repository commit does not match the checked-out source")
         if metadata_xml.findall(".//{*}dependency"):
             raise ValueError("Unexpected runtime dependency")
         if not symbols and archive.read("README.md") != (PACKAGE / "README.md").read_bytes():
@@ -81,11 +84,11 @@ def project(tfm, executable, body=""):
             '<TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>' + body + '</Project>')
 
 
-def consumers(feed, version, temporary):
+def consumers(feed, version, temporary, source_label="isolated local NuGet feed", report_prefix=""):
     results = []
     for tfm in TFMS:
         directory = temporary / tfm
-        directory.mkdir()
+        directory.mkdir(parents=True)
         cache = directory / "cache"
         env = dict(os.environ, NUGET_PACKAGES=str(cache), NUGET_HTTP_CACHE_PATH=str(directory / "http-cache"),
                    DOTNET_CLI_TELEMETRY_OPTOUT="1", DOTNET_NOLOGO="1")
@@ -129,9 +132,9 @@ def consumers(feed, version, temporary):
                         '<ItemGroup><Compile Include="' + escape(str(PACKAGE / "verification" / suite / "*.cs"), {'"': '&quot;'}) + '"/>'
                         '<Reference Include="DeanCochran.Ftms"><HintPath>' + escape(str(library)) + '</HintPath></Reference></ItemGroup>')
                 (runner / "Runner.csproj").write_text(project("net10.0", True, body))
-                report = PACKAGE / "artifacts" / f"{report_name}-conformance-netstandard.json"
+                report = PACKAGE / "artifacts" / f"{report_prefix}{report_name}-conformance-netstandard.json"
                 run("dotnet", "run", "--project", "Runner.csproj", "-c", "Release", "--", str(report), cwd=runner, env=env)
-        results.append({"target": tfm, "asset": expected_asset, "compiled": True, "executed": True, "source": "isolated local NuGet feed"})
+        results.append({"target": tfm, "asset": expected_asset, "compiled": True, "executed": True, "source": source_label})
     return results
 
 
