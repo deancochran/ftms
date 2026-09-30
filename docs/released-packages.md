@@ -1,6 +1,6 @@
 # Released packages and executable examples
 
-Last checked read-only against npm, GitHub, Maven Central, PyPI and crates.io:
+Last checked against npm, GitHub, Maven Central, PyPI, crates.io and the Go module proxy:
 **2026-09-30 UTC**.
 This is a point-in-time record, not a promise that branch source is published.
 
@@ -13,11 +13,84 @@ The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
 with an evolving API and no capability APIs; consult its separate release evidence.
 The [Rust crate](../packages/rust/README.md) **0.1.0** is published on crates.io;
 unreleased branch source must not be represented as part of that artifact.
-The [Dart package](../packages/dart/README.md) is a new 0.1.0 source candidate,
-not a pub.dev release. Its local verification and future publication gates are
-recorded [separately](../packages/dart/doc/verification.md); no public Dart
-installation is claimed by this release matrix.
+The [Dart package](../packages/dart/README.md) is published on pub.dev as
+`deancochran_ftms` **0.1.0**; see its release evidence below.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
+## Published: Go v0.1.0
+
+The public Go module proxy and checksum database serve
+**`github.com/deancochran/ftms/packages/go@v0.1.0`**. The annotated tag
+**`packages/go/v0.1.0`** identifies verified clean source
+**`bb470e951694bbcaa092fad9a03a3c1c9bb6a757`**, merged into `main` by
+[PR #26](https://github.com/deancochran/ftms/pull/26) at
+`45e77b89b54d903932ad9b3da3edf929f4ea6324`. The tag identifies the reviewed source
+commit, not the merge commit. No separate repository or root Go manifest is needed.
+
+```sh
+go get github.com/deancochran/ftms/packages/go@v0.1.0
+```
+
+- [Go CI](https://github.com/deancochran/ftms/actions/runs/36773096393) and
+  [project CI](https://github.com/deancochran/ftms/actions/runs/36773097111) passed
+  before merge. Local clean-source gates passed on Go **1.24.0** and **1.27.1**.
+- Fresh public consumers on both toolchains downloaded through
+  `proxy.golang.org` with `sum.golang.org` enabled, without `replace` or a workspace.
+  Telemetry, control and capability code ran; downloaded-module tests/build and
+  license verification passed independently of sibling shared fixtures.
+- Public download provenance reports the exact repository, `packages/go` subdir,
+  tag and source commit above. Module sum:
+  `h1:Hmy4+bHNO3r0Tzs0Vpm5E04aWPv9wfSnhywjyDfM7vw=`.
+  `go.mod` sum: `h1:ulbbeannQPoraddmBFBr7H6l2cxWlAINU8HEKtTDmoE=`.
+  Module zip SHA-256:
+  `907ee6e66d6b2eae75196831917a92735cc958a6eabea84ba20433743503fe9f`.
+- All **63 capability cases** passed exact whole-report comparison with zero
+  failed/unsupported/skipped cases. Additional gates passed 122 additive raw
+  cases / 216 directional assertions, 9 range-inspection reports, 181,760
+  structural layouts in both directions, 46 sentinel positions, 47 RFU cases,
+  and 315 incomplete prefixes. Both bounded fuzz targets passed.
+- The [GitHub release](https://github.com/deancochran/ftms/releases/tag/packages/go/v0.1.0)
+  retains clean-source corpus identities, all four capability-contract hashes,
+  public consumer evidence, matrix/inspection accounting, fuzz results and
+  `SHA256SUMS`.
+- [pkg.go.dev](https://pkg.go.dev/github.com/deancochran/ftms/packages/go@v0.1.0)
+  displays the exact v0.1.0 package documentation and executable examples.
+
+Scope is raw bidirectional codecs, range inspection, normalized ranges and static
+capability interpretation. Normalized measurement views, original normalized
+codec-v1 comparison, and record planning/assembly remain outside this release.
+Minimum Go is 1.24; current executed consumer evidence is Linux/amd64. This does
+not establish real-device interoperability, BLE lifecycle, physical-control
+permission, or Bluetooth qualification. See the [Go guide](../packages/go/README.md),
+[coverage](../packages/go/docs/coverage.md) and
+[repeatable verification](../packages/go/docs/verification.md).
+
+## Published: Dart 0.1.0
+
+- Registry: <https://pub.dev/packages/deancochran_ftms/versions/0.1.0>.
+- Source/tag: `dart-v0.1.0` identifies
+  `3ca87a685942f942ef1f8c7af5681cf88371bc9b` (PR #23).
+- Public archive SHA-256:
+  `c3adbd9af2f67a274607b09a6cac997eea4bdac32dbdb7b7cef82e92fc0d50ed`.
+- First publication used the authenticated maintainer CLI, as required for
+  pub.dev bootstrap. The downloaded registry archive matched the verified file
+  manifest; a fresh exact-version hosted consumer passed analysis, both public
+  examples, and native compilation/execution.
+- [Merged-source CI](https://github.com/deancochran/ftms/actions/runs/36760823865)
+  passed the Linux/macOS/Windows minimum/current SDK matrix, JavaScript/Wasm
+  browser tests and Flutter Android/iOS consumer builds. Local conformance covered
+  all nine corpora, including 181,760 measurement layouts in both directions.
+- GitHub environment `pub-dev` requires maintainer approval and allows only tags
+  matching `dart-v*`. The maintainer confirmed pub.dev GitHub automation is set to
+  repository `deancochran/ftms`, pattern `dart-v{{version}}`, required environment
+  `pub-dev`, push events enabled and workflow-dispatch disabled. A future version
+  will provide the first end-to-end OIDC publication evidence.
+- The bootstrap tag's automatic release run is intentionally cancelled rather
+  than uploading the already-published version again. Do not rerun that upload.
+  Archived 0.1.0 documentation describes its pre-publication candidate state;
+  this release matrix supersedes those historical status statements.
+- Host and consumer checks do not establish real-device BLE interoperability or
+  Bluetooth qualification.
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
 
