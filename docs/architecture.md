@@ -4,8 +4,8 @@ Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
 range inspection and static capability interpretation. Python 0.1.0a1 is a
 published partial alpha with bidirectional raw codecs and no capability evaluator;
 the Python source now additionally implements an unreleased static evaluator.
-Rust 0.1.0 is an implemented `no_std` raw-codec source candidate with no registry
-publication or capability evaluator.
+Rust 0.1.0 is an implemented `no_std` source candidate with static capability
+interpretation and no registry publication.
 Dart is an implemented, unpublished full-wire source candidate with static
 capability evidence, range inspection and normalized measurement views.
 See the [canonical release matrix](released-packages.md) for versions and distribution

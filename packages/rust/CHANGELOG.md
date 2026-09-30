@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-Initial Rust raw-codec release.
+Initial Rust protocol-library release.
 
 - Independent, allocation-free `no_std` implementation with no unsafe code or
   runtime dependencies; minimum supported Rust version 1.85.1.
@@ -14,6 +14,10 @@ Initial Rust raw-codec release.
   boundary checks, Cortex-M0 compilation and isolated packaged consumers.
 - Gated `rust-vVERSION` crates.io publishing and checksum-pinned GitHub release evidence.
 
-Feature/capability interpretation and fragment planning/reassembly are not yet
-implemented. These host/package checks are not MCU execution, Rust BLE/device
+- Static capability-evidence interpretation with 63 exact canonical reports,
+  typed Feature queries and normalized measurement projections, and bounded
+  More Data planning/assembly. Normalized codec-v1 evidence covers 35 Feature
+  cases; the remaining 62 cases are explicitly unsupported by that runner.
+
+These host/package checks are not MCU execution, Rust BLE/device
 interoperability, PTS or Bluetooth qualification evidence.

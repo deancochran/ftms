@@ -45,8 +45,11 @@ schema/vector/contract hashes and every case/direction outcome.
 | compatibility/v1 | 9 | 18 | Measurements 6; ranges 3 |
 
 All listed executions have **zero failures, unsupported cases, skips and runner
-errors**. The immutable normalized codec-v1 (97 cases) and capability-v1 corpora
-are **not claimed** by this raw-codec milestone. Schema format v1, FTMS
+errors**. Capability-v1 is separately executed as 63/63 exact reports with zero
+non-passes. The normalized codec-v1 runner executes all 35 Feature cases exactly
+and explicitly reports the remaining 62 cases unsupported; it does not claim a
+complete 97-case codec-v1 result.
+Schema format v1, FTMS
 specification revisions, package versions and these fixture content hashes are
 independent identities.
 
@@ -65,7 +68,8 @@ Per-family structural case counts are Treadmill 16,384; Cross Trainer 131,072;
 Step Climber 512; Stair Climber 1,024; Rower 16,384; Indoor Bike 16,384. More Data
 and Cross Trainer direction states are included. This is complete field-presence
 enumeration, not every numeric value or real-device behavior. The C-only planner
-budget contract is not claimed; Rust does not yet plan or assemble fragments.
+budget contract is not yet claimed as a canonical corpus result; Rust now has
+bounded planning and assembly unit coverage.
 
 Additional package tests check every measurement field's extrema and adjacent
 out-of-width values; sentinel eligibility; exact/short storage and no-write-on-
@@ -128,7 +132,9 @@ At this codec milestone only Rust 1.85.1 local host/package results and Cortex
 compilation had been verified. Additional pipeline work is recorded below;
 MCU linking/execution, Rust BLE/device testing, PTS and Bluetooth qualification
 remain unverified. No equipment commands were sent.
-Normalized feature/capability interpretation remains unimplemented. At this
+Normalized feature/capability interpretation is implemented in the source
+candidate, but the normalized codec-v1 and capability-v1 corpus results remain
+unclaimed until their full runners are recorded. At this
 milestone nothing had been committed, merged, pushed or published; the package
 name/version were candidate metadata, not evidence of registry availability or
 publication.
@@ -166,7 +172,8 @@ These candidates remain dirty and are deliberately ineligible for release.
 At pipeline setup, the `crates-io` GitHub environment was configured for `rust-v*`
 tags with the encrypted publishing secret, while workflow files were still
 local/uncommitted. No release tag or package was published during setup.
-Feature/capability interpretation remains out of scope.
+Feature/capability interpretation is source-implemented; registry publication
+and full corpus-runner evidence remain separate gates.
 
 ## Integration verification
 

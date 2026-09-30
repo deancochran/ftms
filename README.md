@@ -27,8 +27,9 @@ See [releasing](docs/releasing.md) for independent package tags and release step
 The role-based [support profiles](docs/support-profiles.md) distinguish client and
 equipment wire directions from optional package modules.
 
-Rust is an independent, allocation-free raw-codec implementation. It does not yet
-implement capability interpretation or fragment assembly; see its
+Rust is an independent, allocation-free `no_std` implementation with raw codecs,
+static capability evidence, normalized views, and bounded record planning/assembly;
+it does not own BLE, execution authority, or device lifecycle. See its
 [coverage and evidence](packages/rust/docs/verification.md).
 
 ## Decode your first measurement

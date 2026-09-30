@@ -14,7 +14,10 @@
 
 use core::fmt;
 
+pub mod capabilities;
 pub mod measurement;
+pub mod normalized;
+pub mod records;
 pub mod status;
 
 pub const FEATURE_BYTES: usize = 8;

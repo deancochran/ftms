@@ -8,13 +8,15 @@ For example, version `0.1.0` requires exactly `rust-v0.1.0`. SemVer prereleases
 are supported; build-metadata suffixes are deliberately not release identities.
 Every version needs an exact `## VERSION` heading in this package's changelog.
 
-The initial release scope is the raw codecs documented in the README, not
-capability interpretation, fragment assembly or device qualification.
+The initial release scope includes the raw codecs, static capability evidence,
+normalized views, and bounded record planning/assembly documented in the README.
+It does not include BLE lifecycle management or device qualification. See
+`verification.md` for corpus-specific coverage and unsupported cases.
 
 ## Pipeline
 
-`.github/workflows/native-rust.yml` runs on relevant pull requests/main pushes,
-manual verification dispatches and calls from the release workflow. It has no
+`.github/workflows/native-rust.yml` runs on manual verification dispatches and
+calls from the release workflow. It has no
 publishing credentials. Its jobs cover:
 
 - Linux on the pinned MSRV and current stable, plus macOS and Windows on stable;
