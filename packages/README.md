@@ -3,7 +3,8 @@
 TypeScript **0.4.0**, C **0.2.0**, Swift **0.1.0** and Kotlin/JVM **0.1.0** are
 published with bidirectional codecs, range inspection and static capability
 interpretation. Python **0.1.0a1** is a published partial alpha with bidirectional
-raw codecs and no capability evaluator. See the role-based
+raw codecs and no capability evaluator; unreleased Python source now includes
+static capability evaluation against the shared corpus. See the role-based
 [support profiles](../docs/support-profiles.md) and exact
 [release identities](../docs/released-packages.md); source metadata alone is not
 publication evidence.

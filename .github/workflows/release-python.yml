@@ -55,20 +55,24 @@ jobs:
       - name: Validate distribution metadata
         run: uv tool run --from twine==7.0.0 twine check --strict build/isolated/*.whl build/isolated/*.tar.gz
       - name: Require clean, complete evidence from this commit
+        env:
+          VERSION: ${{ steps.identity.outputs.version }}
         run: |
           test -z "$(git status --porcelain --untracked-files=all)"
           uv run --locked --group dev python - <<'PY'
           import json, os
           from pathlib import Path
-          for name in ("verification-report.json", "measurement-status-verification-report.json", "measurement-matrix-verification-report.json"):
+          for name in ("verification-report.json", "measurement-status-verification-report.json", "measurement-matrix-verification-report.json", "capability-verification-report.json"):
               report = json.loads((Path("build") / name).read_text())
               assert report["sourceCommit"] == os.environ["GITHUB_SHA"]
               assert report["dirty"] is False
               if name == "verification-report.json":
+                  assert report["packageVersion"] == os.environ["VERSION"]
                   assert report["runnerComplete"] and report["conformanceComplete"]
               else:
                   assert report["complete"]
           package = json.loads(Path("build/package-verification-report.json").read_text())
+          assert package["packageVersion"] == os.environ["VERSION"]
           assert package["complete"] and package["wheelReproducibleFromSdist"] and package["archiveManifestsVerified"]
           PY
       - name: Record distribution checksums

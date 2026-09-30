@@ -91,7 +91,7 @@ artifact identities and publication boundaries are in
 | C `ftms` 0.2.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly` | Published GitHub source archive |
 | Swift `FTMS` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, `NormalizedViews` | Published Git/SwiftPM release; revision pin required |
 | Kotlin/JVM `io.github.deancochran:ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection` | Published on Maven Central |
-| Python `deancochran-ftms` 0.1.0a1 | `FullWire` raw codecs | `RangeInspection` and selected `NormalizedViews`; no `CapabilityEvidence` | Published PyPI alpha |
+| Python `deancochran-ftms` 0.1.0a1 | `FullWire` raw codecs | Published alpha: `RangeInspection` and selected `NormalizedViews`; local unreleased source additionally implements `CapabilityEvidence` | Published PyPI alpha; local source additions are not publication evidence |
 | Rust `ftms` 0.1.0 source candidate | `FullWire` raw codecs | `RangeInspection`; no `CapabilityEvidence`, `RecordPlanning` or `RecordAssembly` | Implemented and verified in source; not tagged or published on crates.io |
 
 .NET and other future ports have no current package claim. A future port should
