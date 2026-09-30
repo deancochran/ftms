@@ -1,11 +1,7 @@
 name: Dart verification
 
 on:
-  pull_request:
-    paths: ['packages/dart/**', 'shared/**', 'LICENSE', '.github/workflows/dart.yml', '.github/workflows/release-dart.yml']
-  push:
-    branches: [main]
-    paths: ['packages/dart/**', 'shared/**', 'LICENSE', '.github/workflows/dart.yml', '.github/workflows/release-dart.yml']
+  workflow_dispatch:
   workflow_call:
 
 permissions:

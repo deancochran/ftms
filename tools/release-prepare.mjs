@@ -57,6 +57,18 @@ export const ports = {
     match: (s) => s.trim(),
     valid: validNuGetVersion,
   },
+  dart: {
+    version: "packages/dart/pubspec.yaml",
+    changelog: "packages/dart/CHANGELOG.md",
+    match: (s) => s.match(/^version:\s*([^\s#]+)\s*$/m)?.[1],
+  },
+  go: {
+    // Go has no manifest package-version field: the release heading is the
+    // candidate identity; only the nested-module tag establishes publication.
+    version: "packages/go/CHANGELOG.md",
+    changelog: "packages/go/CHANGELOG.md",
+    match: (s) => s.match(/^## (\S+)(?: — .+)?$/m)?.[1],
+  },
 };
 
 export function validateMetadata(port, source, changelog, candidate) {
@@ -74,7 +86,9 @@ export function validateMetadata(port, source, changelog, candidate) {
       .some((line) =>
         headings.some(
           (heading) =>
-            line === heading || (port === "typescript" && line.startsWith(`${heading} - `)),
+            line === heading ||
+            (port === "typescript" && line.startsWith(`${heading} - `)) ||
+            (port === "go" && line.startsWith(`${heading} — `)),
         ),
       )
   )
@@ -86,7 +100,12 @@ export function validateMetadata(port, source, changelog, candidate) {
   return {
     port,
     version,
-    tag: port === "typescript" ? `v${version}` : `${port}-v${version}`,
+    tag:
+      port === "typescript"
+        ? `v${version}`
+        : port === "go"
+          ? `packages/go/v${version}`
+          : `${port}-v${version}`,
     remoteMutation: false,
   };
 }
@@ -100,11 +119,38 @@ export async function readiness(port, candidate) {
     candidate,
   );
 }
+// Report every package even if one fails; metadata success is not publication evidence.
+export async function allReadiness(check = readiness) {
+  const packages = await Promise.all(
+    Object.keys(ports).map(async (port) => {
+      try {
+        return { ...(await check(port)), status: "passed" };
+      } catch (error) {
+        return { port, status: "failed", error: error.message };
+      }
+    }),
+  );
+  return {
+    schemaVersion: 1,
+    scope: "metadata-only",
+    remoteMutation: false,
+    passed: packages.every((result) => result.status === "passed"),
+    packages,
+  };
+}
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const [port, supplied, suppliedMode] = process.argv.slice(2);
+  const [port, supplied, suppliedMode, ...extra] = process.argv.slice(2);
   const candidate = supplied === "--dry-run" ? undefined : supplied;
   const mode = supplied === "--dry-run" ? supplied : suppliedMode;
-  if (!port || ![undefined, "--dry-run"].includes(mode))
-    throw new Error("usage: pnpm release:prepare PORT [VERSION] [--dry-run] (read-only)");
-  console.log(JSON.stringify(await readiness(port, candidate)));
+  if (
+    !port ||
+    extra.length ||
+    (supplied === "--dry-run" && suppliedMode !== undefined) ||
+    ![undefined, "--dry-run"].includes(mode) ||
+    (port === "all" && candidate)
+  )
+    throw new Error("usage: pnpm release:prepare PORT|all [VERSION] [--dry-run] (read-only)");
+  const result = port === "all" ? await allReadiness() : await readiness(port, candidate);
+  console.log(JSON.stringify(result, null, 2));
+  if (result.passed === false) process.exitCode = 1;
 }

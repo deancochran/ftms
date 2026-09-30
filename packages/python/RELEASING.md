@@ -55,10 +55,12 @@ publisher does not reserve the package name or publish anything.
    published. The same check can be rerun manually with
    `scripts/verify_public.py` and the two digests from the tag workflow.
 
-The workflow deliberately fails on duplicate uploads; do not overwrite or move a
-release tag. On a partial upload or network failure, inspect PyPI and compare
-existing artifact digests before deciding how to recover. Never bypass a failed
-verification gate or claim publication from a pushed tag alone.
+The retry gate compares existing PyPI artifacts with the exact verified digests;
+matching files may be retained and missing files uploaded, while different bytes
+fail closed. Do not overwrite or move a release tag. On a partial upload or
+network failure, inspect PyPI and compare existing artifact digests before an
+authorized retry. Never bypass a failed verification gate or claim publication
+from a pushed tag alone. See the [coordinated release and triage process](../../docs/releasing.md).
 
 The source archive is installable without shared fixtures. Full repository
 verification requires a checkout containing the canonical `shared/conformance/`

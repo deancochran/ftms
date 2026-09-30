@@ -13,7 +13,10 @@ embedded integration, or protocol tool without taking on another connection stac
 | Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
 | Kotlin / Java | Independent JVM codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
 | Python | Published 0.1.0a2 alpha with static capability evidence | [Python package guide](../packages/python/README.md) |
-| Rust | Unpublished allocation-free `no_std` raw-codec source | [Rust package guide](../packages/rust/README.md) |
+| Rust | Published 0.1.0 allocation-free `no_std` codecs; 0.1.1 source candidate | [Rust package guide](../packages/rust/README.md) |
+| Dart / Flutter | Published pure Dart codecs and capabilities | [Dart package guide](../packages/dart/README.md) |
+| Go | Published nested module with raw codecs and capabilities | [Go package guide](../packages/go/README.md) |
+| C# / .NET | Published 0.1.0-alpha.1 codecs and capabilities | [C# package guide](../packages/csharp/README.md) |
 
 ## A focused boundary
 

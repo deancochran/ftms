@@ -18,6 +18,16 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
   await expect(page.getByText("speedMps=10 cadenceRpm=90", { exact: false })).toBeVisible();
   await page.goto("/ftms/start/c/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("C / C++");
+  await page.goto("/ftms/start/dart/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Dart / Flutter");
+  await page.goto("/ftms/start/go/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Go");
+  await page.goto("/ftms/start/csharp/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("C# / .NET (alpha)");
+  await page.goto("/ftms/project/releasing/");
+  await expect(
+    page.getByRole("heading", { name: "Coordinated release checklist", exact: true }),
+  ).toBeVisible();
   await page.goto("/ftms/reference/api/");
   await page.getByRole("link", { name: "Open the generated TypeScript API reference" }).click();
   await expect(page).toHaveURL(/\/ftms\/api\/typescript\/$/);

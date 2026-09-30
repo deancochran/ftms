@@ -1,6 +1,53 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { ports, readiness, validateMetadata, validNuGetVersion } from "./release-prepare.mjs";
+import {
+  allReadiness,
+  ports,
+  readiness,
+  validateMetadata,
+  validNuGetVersion,
+} from "./release-prepare.mjs";
+
+test("CLI rejects extra arguments after dry-run", () => {
+  const result = spawnSync(process.execPath, [
+    "tools/release-prepare.mjs",
+    "all",
+    "--dry-run",
+    "unexpected",
+  ]);
+  assert.notEqual(result.status, 0);
+});
+
+test("all-package readiness includes every implemented distribution", async () => {
+  const result = await allReadiness();
+  assert.equal(result.passed, true);
+  assert.equal(result.scope, "metadata-only");
+  assert.deepEqual(result.packages.map((p) => p.port).sort(), [
+    "c",
+    "csharp",
+    "dart",
+    "go",
+    "kotlin",
+    "python",
+    "rust",
+    "swift",
+    "typescript",
+  ]);
+  assert.equal(result.packages.find((p) => p.port === "dart").tag, "dart-v0.1.0");
+  assert.equal(result.packages.find((p) => p.port === "go").tag, "packages/go/v0.1.0");
+});
+
+test("all-package readiness retains failures and continues independent checks", async () => {
+  const result = await allReadiness(async (port) => {
+    if (port === "c") throw new Error("missing changelog");
+    return readiness(port);
+  });
+  assert.equal(result.passed, false);
+  assert.equal(result.packages.length, 9);
+  assert.equal(result.packages.find((p) => p.port === "c").error, "missing changelog");
+  assert.equal(result.packages.filter((p) => p.status === "passed").length, 8);
+});
 
 for (const port of Object.keys(ports))
   test(`${port} readiness reads current metadata`, async () => {
@@ -43,4 +90,13 @@ test("C# accepts only canonical NuGet release identities", () => {
     assert.equal(validNuGetVersion(version), false, version);
   }
   assert.throws(() => validateMetadata("csharp", "1.2.3+build.7", "## 1.2.3+build.7"));
+});
+
+test("Go release identity comes from its changelog and nested-module tag", () => {
+  assert.equal(
+    validateMetadata("go", "## 1.2.3 — 2026-09-30", "## 1.2.3 — 2026-09-30").tag,
+    "packages/go/v1.2.3",
+  );
+  assert.throws(() => validateMetadata("go", "go 1.24", "## 1.24.0"));
+  assert.throws(() => validateMetadata("go", "## 1.2.3", "## 1.2.30"));
 });

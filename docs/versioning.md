@@ -5,7 +5,7 @@ have independent version histories. Do not synchronize them by implication.
 
 | Boundary | Meaning | Current evidence |
 | --- | --- | --- |
-| Package semantic version | A package's public interface and distribution compatibility | TypeScript 0.4.0, C 0.2.0, Swift 0.1.0, Kotlin 0.1.0, Python 0.1.0a2 and Rust 0.1.0 are published independently; later Rust range/control/status projections and expanded runner evidence are unreleased. Verified identities are tracked in [released packages](released-packages.md). Swift, Python and Rust use `swift-vVERSION`, `python-vVERSION` and `rust-vVERSION` tags respectively; Kotlin uses `kotlin-vVERSION` and Maven Central coordinates. |
+| Package semantic version | A package's public interface and distribution compatibility | TypeScript 0.4.0, C 0.2.0, Swift 0.1.0, Kotlin 0.1.0, Python 0.1.0a2, Rust 0.1.0, Dart 0.1.0, Go v0.1.0 and C# 0.1.0-alpha.1 are published independently. Rust 0.1.1 is an unreleased candidate. Verified identities are tracked in [released packages](released-packages.md). TypeScript uses `vVERSION`, Go uses `packages/go/vVERSION`, and the remaining packages use their language-prefixed tags listed in the [release process](releasing.md). |
 | FTMS specification and errata | Bluetooth SIG service semantics and corrections used to review behavior | FTMS 1.0 plus ESR11 and EC23224 provenance; [1.0.1 annotated-redline reconciliation](specification-audit.md), with all nine incorporated errata attributed and remaining source conflicts explicitly recorded. |
 | Corpus schema format | Shape and comparison rules for fixtures | `schemaVersion: 1`, under `shared/conformance/v1/`. |
 | Corpus content revision | The exact schema/vector/contract bytes and checkout consumed by a runner | Pin immutable source commit, dirty indicator, and SHA-256 of both JSON assets plus `shared/conformance/README.md`. |
@@ -77,9 +77,9 @@ consumer results establish publication evidence. See the
 
 ## Dart release policy
 
-The Dart source candidate uses its own `packages/dart/pubspec.yaml` version and
-`dart-vVERSION` namespace. Its future pub.dev releases use tag-push OIDC after a
-separately approved first manual publication. The manifest and workflow do not
+The Dart package uses its own `packages/dart/pubspec.yaml` version and
+`dart-vVERSION` namespace. Version 0.1.0 was published by the approved manual
+bootstrap; subsequent pub.dev releases use protected tag-push OIDC. The manifest and workflow do not
 establish publication; see [Dart release gates](../packages/dart/RELEASING.md).
 Existing package tags and corpus identities are unchanged.
 

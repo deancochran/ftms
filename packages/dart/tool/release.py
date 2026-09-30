@@ -7,11 +7,28 @@ import os
 import subprocess
 import sys
 import tempfile
+import urllib.error
 from pathlib import Path
 
 from corpus import PACKAGE, ROOT, git, provenance, sha256
 from verify import dart, run
-from verify_package import distribution_files, extract_checked, version
+from verify_package import NAME, distribution_files, extract_checked, version
+from verify_public import fetch
+
+
+def public_version_exists(release_version: str, fetch_metadata=fetch) -> bool:
+    """Only a definitive 404 permits upload; all other failures block it."""
+    try:
+        metadata = json.loads(fetch_metadata(
+            f"https://pub.dev/api/packages/{NAME}/versions/{release_version}", 1_000_000))
+    except urllib.error.HTTPError as error:
+        error.close()
+        if error.code == 404:
+            return False
+        raise
+    if metadata.get("version") != release_version:
+        raise ValueError("Registry version mismatch")
+    return True
 
 
 def validate_tag(tag: str) -> None:
@@ -77,6 +94,11 @@ def main() -> None:
     archive = PACKAGE / f"build/distribution/deancochran_ftms-{version()}.tar.gz"
     if sha256(archive) != evidence["archiveSha256"]:
         raise ValueError("Verified archive changed")
+    if public_version_exists(version()):
+        # An existing version is acceptable only after exact-file and hosted
+        # consumer verification, including retries after an ambiguous upload.
+        run(sys.executable, "tool/verify_public.py")
+        return
     with tempfile.TemporaryDirectory(prefix="ftms-dart-publish-", dir=Path.home() / ".cache") as temporary:
         stage = Path(temporary)
         extract_checked(archive, stage, evidence["files"])

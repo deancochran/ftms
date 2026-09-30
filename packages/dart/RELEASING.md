@@ -5,8 +5,9 @@ placeholder, reserve a name with empty code, push tags or configure an account
 merely because local verification passes.
 
 Identity: `pubspec.yaml` is authoritative; tags are `dart-vVERSION`, independent
-of npm, Swift, Kotlin, Python, Rust, FTMS and corpus versions. Initially this is
-an **unpublished 0.1.0 candidate**. No package name or publisher is reserved here.
+of npm, Swift, Kotlin, Python, Rust, FTMS and corpus versions. Version **0.1.0 is
+published**; the approved manual bootstrap, public consumer evidence and subsequent
+OIDC setup are recorded in the [release matrix](../../docs/released-packages.md#published-dart-010).
 
 ## Release gate
 
@@ -34,6 +35,12 @@ mismatch and archive/content differences fail closed. A successful upload follow
 by failed public verification means **published, verification failed**; do not
 attempt to overwrite the version or claim it never published.
 
+For an authorized retry, the publisher queries the exact public version first.
+Only HTTP 404 permits an upload. An existing version must pass extracted-file
+identity and a hosted consumer without another upload; mismatches, authentication
+errors and network failures stop the job. This does not bypass first-publication
+bootstrap or approve rerunning a workflow.
+
 ## First publication bootstrap
 
 pub.dev currently requires a first manual upload before GitHub OIDC can be enabled:
@@ -53,9 +60,10 @@ Subsequent tag-push releases use `.github/workflows/release-dart.yml` and the
 explicit `publish --execute` action. Its verification dependencies have no
 publishing credentials. Local `prepare` and dry runs cannot upload anything.
 
-The workflow has not been run just by adding its source. Account setup, first
-publication, live device checks and post-publication verification are pending
-until explicitly authorized and actually executed.
+The first publication and its public verification are recorded in the release
+matrix. The bootstrap tag's automatic upload was cancelled; do not rerun that old
+upload. Subsequent versions must independently pass the protected tag workflow.
+Local tests do not prove a live release workflow or real-device interoperability.
 
 References: [pub.dev publishing](https://dart.dev/tools/pub/publishing),
 [OIDC automation](https://dart.dev/tools/pub/automated-publishing).

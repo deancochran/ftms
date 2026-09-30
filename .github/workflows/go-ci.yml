@@ -1,9 +1,7 @@
 name: Go CI
 on:
-  push:
-    paths: ["packages/go/**", ".github/workflows/go-ci.yml", "shared/conformance/**", "shared/protocol/**", "LICENSE"]
-  pull_request:
-    paths: ["packages/go/**", ".github/workflows/go-ci.yml", "shared/conformance/**", "shared/protocol/**", "LICENSE"]
+  workflow_call:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
