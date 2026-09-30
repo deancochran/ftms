@@ -27,7 +27,8 @@ recording that profile. No option grants permission to issue a control command.
 
 This is a bounded audit, not a claim to identify every firmware variant. Both
 implemented ports (TypeScript and C) share the raw format options and regression
-corpus. Swift and Kotlin remain scaffolds, not validated implementations.
+corpus. Kotlin now has separate [host and artifact validation](../packages/kotlin/docs/verification.md),
+not live Kotlin device evidence. Swift remains a scaffold.
 
 | Gap | Evidence and limits | Disposition across implemented ports |
 | --- | --- | --- |

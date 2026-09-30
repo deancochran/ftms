@@ -1,5 +1,14 @@
 # TypeScript / C parity audit and closure
 
+## Kotlin 0.1.0 follow-up
+
+The Kotlin/JVM port implements the shared bidirectional raw codecs, inspection
+and static capability contracts. Its historical normalized-v1 mapping is a test
+adapter, not a public clone of the TypeScript API. C-only planning/assembly and
+the host session-simulation harness are not Kotlin production APIs. See
+[Kotlin verification](../packages/kotlin/docs/verification.md). Scaffold statements
+in the dated audit below describe that earlier milestone, not current Kotlin state.
+
 ## Subsequent C additions
 
 The later C measurement packet planner and bounded receive-record assembler

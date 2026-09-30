@@ -3,7 +3,10 @@
 Status: TypeScript has a published client release plus unreleased bidirectional
 raw codecs and static capability interpretation. C has unreleased Feature/range
 encoding/decoding, measurement/control/status codecs and static capability
-interpretation. Swift/Kotlin remain scaffolds.
+interpretation. These original status statements are historical; current public
+identities are in [released packages](released-packages.md). Kotlin 0.1.0 now has
+an implemented JVM protocol surface and artifact-consumer checks; Swift remains
+a scaffold. See [Kotlin](../packages/kotlin/README.md) for its independent scope.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
@@ -26,7 +29,7 @@ identity and public export paths remain stable. Published TypeScript is
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented protocol surface, unreleased |
 | `packages/swift/` | Native Apple package | Reserved |
-| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Reserved |
+| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Implemented; registry publication tracked separately |
 | `examples/` | Future integration examples outside the core packages | Reserved |
 
 Rust and other language ports are deferred. The existing TypeScript package

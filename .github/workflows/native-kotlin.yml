@@ -1,0 +1,33 @@
+name: Kotlin JVM
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/kotlin/**'
+      - 'shared/**'
+      - '.github/workflows/native-kotlin.yml'
+  pull_request:
+    paths:
+      - 'packages/kotlin/**'
+      - 'shared/**'
+      - '.github/workflows/native-kotlin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Select the runner's Java 17
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+      - name: Install Android compilation components
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Verify codecs and isolated Kotlin, Java and Android consumers
+        run: bash packages/kotlin/verification/verify.sh

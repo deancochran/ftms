@@ -3,7 +3,10 @@
 Status: this is an audit of the current TypeScript exports, unit tests, and v1
 corpus. It is not a claim of complete FTMS conformance, device interoperability,
 or Bluetooth qualification. C has unreleased bidirectional codecs and static
-capability interpretation; Swift and Kotlin have no implementation yet.
+capability interpretation in the original audit. Kotlin now implements the shared
+raw surface and static capability evaluation; see its separately scoped
+[verification matrix](../packages/kotlin/docs/verification.md). Swift remains
+unimplemented. Public release identities are in [released packages](released-packages.md).
 
 ## Current codec surface
 
