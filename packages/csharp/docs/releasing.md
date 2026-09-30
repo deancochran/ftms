@@ -1,6 +1,6 @@
 # C# release prerequisites
 
-Current state: the tag-only `release-csharp.yml` workflow can publish an authorized
+Current state: `release-csharp.yml` can publish an authorized
 `csharp-vVERSION` tag through the protected `nuget` environment. This document does
 not claim that any version is public; inspect NuGet.org and the completed public job.
 
@@ -47,6 +47,29 @@ Windows. The release gate runs the full verifier plus Linux NativeAOT once, then
 uploads exactly one main package, one symbols package, and an SHA-256/size/source
 identity manifest. The publish job downloads and validates it; it never rebuilds and
 does not use `--skip-duplicate`.
+
+### Recover an existing immutable tag
+
+The normal trigger is a signed `csharp-v*` tag push. A maintainer may also dispatch
+the workflow **on main only**, supplying an existing signed tag. This permits
+release-tooling fixes without replacing a tag or changing its package source:
+
+```sh
+gh workflow run release-csharp.yml --ref main -f tag=csharp-v0.1.0-alpha.1
+```
+
+Recovery checks out tooling from the reviewed workflow commit and package source
+in a separate `release-source` checkout at the exact signed tag. All native checks,
+signature/main-ancestry validation, packing, clean-source artifact verification and
+the protected environment approval still apply. `sourceCommit` identifies package
+source; `workflowCommit` separately identifies the tooling execution. The `nuget`
+environment allows C# tags and the protected main branch for this explicit recovery.
+Neither trigger rewrites tags. A duplicate published version still fails closed.
+
+The initial attempt (run 36786323699) stopped before publication because GitHub's
+tag-push `after` field was the annotated tag object, not its peeled commit. The
+corrected gate separately binds that object and verifies its signature, target
+commit, checkout identity and main ancestry. Do not replace the signed alpha.1 tag.
 
 ## Required public verification
 

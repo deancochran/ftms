@@ -2,14 +2,20 @@ name: Native C#
 
 on:
   workflow_call:
+    inputs:
+      source-ref:
+        description: Exact source ref to verify (release recovery only)
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: csharp-verify-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+  group: csharp-verify-${{ github.workflow }}-${{ inputs.source-ref || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' && inputs.source-ref == '' }}
 
 jobs:
   verify:
@@ -30,6 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.source-ref || github.ref }}
           persist-credentials: false
       - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
