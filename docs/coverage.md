@@ -15,7 +15,7 @@ assembly; capability-v1 passes 63/63 exact reports. Unreleased source adds range
 control and status projections and normalized codec-v1 execution of all 97 cases
 with zero unsupported/skipped cases; that newer evidence is not a release claim.
 
-Dart has an unpublished [full-wire source candidate](../packages/dart/README.md)
+Dart has a published [0.1.0 full-wire package](../packages/dart/README.md)
 with static capability evidence, range inspection and normalized measurement
 views. Its [package-owned evidence](../packages/dart/doc/verification.md) covers
 the canonical codec, raw, capability and structural corpora separately from

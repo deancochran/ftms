@@ -27,6 +27,8 @@ jobs:
       swift: ${{ steps.select.outputs.swift }}
       python: ${{ steps.select.outputs.python }}
       csharp: ${{ steps.select.outputs.csharp }}
+      dart: ${{ steps.select.outputs.dart }}
+      go: ${{ steps.select.outputs.go }}
       docs: ${{ steps.select.outputs.docs }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -89,7 +91,17 @@ jobs:
         run: |
           python3 -m unittest discover -s tools -p 'test_*.py' -v
           python3 -m unittest discover -s packages/python/tests -p test_release_retry.py -v
-          node --test tools/release-prepare.test.mjs packages/typescript/scripts/test-npm-release.mjs
+          node --test tools/release-prepare.test.mjs packages/typescript/scripts/test-npm-release.mjs packages/typescript/scripts/test-verify-public.mjs
+      - name: Validate all package release metadata
+        if: always()
+        run: node tools/release-prepare.mjs all --dry-run > release-readiness.json
+      - name: Retain metadata readiness report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-metadata-readiness
+          path: release-readiness.json
+          if-no-files-found: warn
 
   c:
     needs: changes
@@ -133,10 +145,15 @@ jobs:
       id-token: write
     uses: ./.github/workflows/docs.yml
 
+  dart:
+    needs: changes
+    if: needs.changes.outputs.dart == 'true'
+    uses: ./.github/workflows/dart.yml
+
   summary:
     name: CI summary
     if: always()
-    needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, csharp, docs]
+    needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, csharp, dart, go, docs]
     runs-on: ubuntu-latest
     steps:
       - name: Require all selected verification jobs
@@ -145,3 +162,8 @@ jobs:
         run: |
           echo "$RESULTS"
           case "$RESULTS" in *failure*|*cancelled*) exit 1;; esac
+
+  go:
+    needs: changes
+    if: needs.changes.outputs.go == 'true'
+    uses: ./.github/workflows/go-ci.yml

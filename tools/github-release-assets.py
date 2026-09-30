@@ -15,6 +15,7 @@ def plan_release(tag: str, commit: str, local: dict[str, str], release: dict | N
     if release["commit"] != commit: raise ValueError("release tag resolves to a different commit")
     if release.get("exists") is False: return ["create"]
     remote = release["assets"]
+    if set(remote) - set(local): raise ValueError("unexpected public release assets")
     actions = []
     for name, digest in local.items():
         if name not in remote: actions.append(f"upload:{name}")
@@ -26,7 +27,7 @@ def command(args: list[str], *, binary=False):
     if result.returncode: raise RuntimeError(result.stderr if not binary else result.stderr.decode())
     return result.stdout
 
-def remote_release(repo: str, tag: str, call=command) -> dict | None:
+def remote_release(repo: str, tag: str, call=command, *, download=False) -> dict | None:
     # Resolve the tag through GitHub's commits API, which peels annotated tags.
     commit = call(["gh", "api", f"repos/{repo}/commits/{tag}", "--jq", ".sha"]).strip()
     try:
@@ -38,8 +39,9 @@ def remote_release(repo: str, tag: str, call=command) -> dict | None:
     for asset in data.get("assets", []):
         name = asset.get("name")
         if not isinstance(name, str): raise ValueError("release asset without name")
+        if name in assets: raise ValueError("duplicate public release asset name")
         digest = asset.get("digest")
-        if isinstance(digest, str) and digest.startswith("sha256:"):
+        if not download and isinstance(digest, str) and digest.startswith("sha256:"):
             assets[name] = digest.removeprefix("sha256:")
         else:
             # Old GitHub API payloads omit digest. Download and hash rather than
@@ -62,6 +64,9 @@ def run(args):
         if action.startswith("upload:"):
             name = action.split(":", 1)[1]
             subprocess.run(["gh", "release", "upload", args.tag, "--repo", args.repo, str(next(p for p in files if p.name == name)), "--clobber=false"], check=True)
+    verified = remote_release(args.repo, args.tag, download=True)
+    if plan_release(args.tag, args.commit, local, verified) != ["continue"]:
+        raise ValueError("public release remains incomplete after upload")
     print(json.dumps({"tag": args.tag, "actions": actions, "sha256": local}, sort_keys=True))
 
 if __name__ == "__main__":

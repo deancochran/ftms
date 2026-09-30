@@ -1,8 +1,9 @@
 # FTMS capability discovery contract
 
-Status: language-neutral contract. TypeScript, C, Swift and Kotlin independently
-implement the static evidence interpretation described here; Python 0.1.0a1 does
-not, while the Rust 0.1.0 source candidate does. Interfaces use each language's native byte
+Status: language-neutral contract. Current per-package implementation and publication
+claims are recorded in [support profiles](../../docs/support-profiles.md) and the
+[release matrix](../../docs/released-packages.md), rather than inferred from this
+contract. Interfaces use each language's native byte
 representation and corpus mapping. No implementation performs discovery or
 authorizes control.
 

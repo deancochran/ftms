@@ -146,6 +146,21 @@ jobs:
           tag=$(node --input-type=module -e "import { releaseChannel } from './packages/typescript/scripts/npm-release.mjs'; console.log(releaseChannel('${{ steps.release.outputs.version }}'))")
           npm publish '${{ steps.package.outputs.archive }}' --access public --provenance --tag "$tag" --ignore-scripts --loglevel verbose
 
+      - name: Verify public archive and isolated installed consumer
+        env:
+          ARCHIVE: ${{ steps.package.outputs.archive }}
+        run: node packages/typescript/scripts/verify-public.mjs "$ARCHIVE" "$RUNNER_TEMP/npm-public-verification.json"
+
+      - name: Retain tested archive and public verification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-release-evidence
+          path: |
+            ${{ runner.temp }}/ftms-release.tgz
+            ${{ runner.temp }}/npm-public-verification.json
+          if-no-files-found: warn
+
       - name: Record release
         if: steps.decision.outputs.publish == 'true'
         env:

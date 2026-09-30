@@ -4,14 +4,27 @@ Pure Dart codecs for the Bluetooth **Fitness Machine Service**, usable from
 Flutter and standalone Dart. No Flutter, BLE, FFI, platform-channel or runtime
 package dependencies. Requires Dart 3.11 or newer, below Dart 4.
 
-**Status: unpublished 0.1.0 source candidate.** This manifest is not evidence of
-pub.dev publication. See the repository's
+**Status: 0.1.0 published on pub.dev.** See the repository's
 [release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md)
 for published identities.
 
-## Use from a source checkout
+## Install
 
-Until a release is published, use a local path dependency:
+Use the published package from Dart or Flutter:
+
+```sh
+dart pub add deancochran_ftms
+# Or: flutter pub add deancochran_ftms
+```
+
+For an exact release pin:
+
+```yaml
+dependencies:
+  deancochran_ftms: 0.1.0
+```
+
+For development against a source checkout, use a local path dependency:
 
 ```yaml
 dependencies:
@@ -34,8 +47,8 @@ final metrics = normalizeMeasurement(raw);
 
 The bytes are synthetic, not an equipment capture. Run the complete example with
 `dart run example/main.dart`. The example checks results even when Dart assertions
-are disabled. Once independently verified on pub.dev, consumers can use
-`dart pub add deancochran_ftms` / `flutter pub add deancochran_ftms` instead.
+are disabled. Branch source can differ from the published package; the release
+matrix records the verified public archive and consumer identity.
 
 ## Scope and interface
 

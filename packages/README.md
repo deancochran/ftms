@@ -19,7 +19,7 @@ publication evidence.
 | [C#](csharp/README.md) | .NET applications and protocol tools | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1; evolving prerelease |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a2; evolving alpha |
 | [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` 0.1.0; newer source capabilities unreleased |
-| [Dart](dart/README.md) | Flutter applications and standalone Dart tools | `deancochran_ftms` 0.1.0 source candidate; not published on pub.dev |
+| [Dart](dart/README.md) | Flutter applications and standalone Dart tools | pub.dev: `deancochran_ftms` 0.1.0 |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must

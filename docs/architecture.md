@@ -7,7 +7,7 @@ capability evaluation; its convenience API remains language-specific and evolvin
 Rust 0.1.0 is a released `no_std` crate with static capability interpretation,
 normalized Feature/measurement views and record planning/assembly; only the newer
 range/control/status projections and 97-case runner evidence are unreleased.
-Dart is an implemented, unpublished full-wire source candidate with static
+Dart 0.1.0 is a published full-wire package with static
 capability evidence, range inspection and normalized measurement views.
 See the [canonical release matrix](released-packages.md) for versions and distribution
 and [support profiles](support-profiles.md) for role-based direction claims; source
@@ -18,7 +18,7 @@ universal FTMS device compatibility.
 
 Keep protocol decisions and cross-language regression evidence in one repository.
 Consumers must be able to use one implementation without installing the others.
-TypeScript, C, Swift, Kotlin, Python, Rust, and Dart occupy sibling directories under `packages/`.
+TypeScript, C, Swift, Kotlin, Python, Rust, Dart, Go and C# occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
 `pnpm-workspace.yaml` includes the TypeScript package and private documentation
 website under `site/`. The site's Node 22.12+ build requirement does not change
@@ -40,7 +40,9 @@ establish publication; consult the release matrix above.
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Published alpha 0.1.0a2 with static capability evidence |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.1.0 released with capabilities, normalized Feature/measurement views and records; newer range/control/status projections are unreleased |
-| `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Implemented 0.1.0 source candidate; not published on pub.dev |
+| `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Published on pub.dev as `deancochran_ftms` 0.1.0 |
+| `packages/go/` | Independent Go codecs and static capability interpreter | Published nested module v0.1.0 |
+| `packages/csharp/` | Native .NET codecs and static capability interpreter | Published NuGet 0.1.0-alpha.1 |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 

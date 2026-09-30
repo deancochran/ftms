@@ -98,7 +98,7 @@ artifact identities and publication boundaries are in
 | Go `github.com/deancochran/ftms/packages/go` v0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, range-only normalized views | Published nested Go module; public consumers verified on Go 1.24.0 and 1.27.1, Linux/amd64 |
 | Python `deancochran-ftms` 0.1.0a2 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection` and selected `NormalizedViews` | Published PyPI alpha; public wheel/sdist consumers verified |
 | Rust `ftms` 0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.0 / `rust-v0.1.0` released; newer range/control/status projections and 97-case evidence are unreleased |
-| Dart `deancochran_ftms` 0.1.0 source candidate | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Implemented in source; not tagged or published on pub.dev; see [Dart evidence](../packages/dart/doc/verification.md) |
+| Dart `deancochran_ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Published on pub.dev; see [release evidence](released-packages.md#published-dart-010) |
 
 C# `DeanCochran.Ftms` **0.1.0-alpha.1** is published on NuGet with `FullWire`,
 `CapabilityEvidence`, `RangeInspection` and `NormalizedViews`. Its

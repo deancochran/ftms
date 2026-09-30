@@ -9,6 +9,24 @@ export const sitePath = (route = "") => `${base}/${route ? `${route}/` : ""}`;
 export const pages = [
   { source: "site/landing.md", slug: "", title: "FTMS Protocol Libraries", group: null },
   {
+    source: "packages/dart/README.md",
+    slug: "start/dart",
+    title: "Dart / Flutter",
+    group: "Getting started",
+  },
+  {
+    source: "packages/go/README.md",
+    slug: "start/go",
+    title: "Go",
+    group: "Getting started",
+  },
+  {
+    source: "packages/csharp/README.md",
+    slug: "start/csharp",
+    title: "C# / .NET (alpha)",
+    group: "Getting started",
+  },
+  {
     source: "packages/swift/README.md",
     slug: "start/swift",
     title: "Swift",
@@ -23,13 +41,13 @@ export const pages = [
   {
     source: "packages/python/README.md",
     slug: "start/python",
-    title: "Python (partial alpha)",
+    title: "Python (alpha)",
     group: "Getting started",
   },
   {
     source: "packages/rust/README.md",
     slug: "start/rust",
-    title: "Rust (source candidate)",
+    title: "Rust",
     group: "Getting started",
   },
   {
@@ -114,6 +132,18 @@ export const pages = [
     group: "Project",
   },
   { source: "SECURITY.md", slug: "project/security", title: "Security", group: "Project" },
+  {
+    source: "docs/releasing.md",
+    slug: "project/releasing",
+    title: "Release process",
+    group: "Project",
+  },
+  {
+    source: "docs/versioning.md",
+    slug: "project/versioning",
+    title: "Versioning",
+    group: "Project",
+  },
 ];
 
 export const sidebar = [

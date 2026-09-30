@@ -113,8 +113,10 @@ codec-v1 or npm export semantics.
 Previous source-byte-unchanged statements predate this explicitly authorized
 TypeScript extension and are historical, not statements about current source.
 
-These are local source capabilities, not additions already available in published
-0.2.0. Package version/publication is unchanged. Neither port provides BLE
+At that historical milestone, these were local source capabilities, not additions
+already available in published TypeScript 0.2.0; publication was unchanged by the
+audit itself. Current publication status is recorded in [released packages](released-packages.md).
+Neither port provides BLE
 transport, permissions, connection/control ownership or actuator safety. Embedded
 runtime/board, real-device interoperability and Bluetooth qualification remain
 unverified; Swift's subsequent host implementation has separate evidence in its
