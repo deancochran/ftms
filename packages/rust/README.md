@@ -6,8 +6,8 @@ runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, 
 control safety.
 
 **Support profile:** [`FullWire`](https://github.com/deancochran/ftms/blob/main/docs/support-profiles.md)
-raw codecs with `RangeInspection`. The crate does not implement
-`CapabilityEvidence`, `RecordPlanning`, `RecordAssembly` or `NormalizedViews`.
+raw codecs with `RangeInspection`, `CapabilityEvidence`, `RecordPlanning`,
+`RecordAssembly`, and `NormalizedViews`.
 This is implemented source scope, not crates.io publication evidence.
 
 ## Implemented surface
@@ -35,8 +35,21 @@ caller-owned options; neither is inferred from bytes, ranges, features, or a
 device. Encoders take caller-owned mutable buffers and return
 `Error::InsufficientStorage` without writing when capacity is inadequate.
 
-Not implemented: normalized feature/capability interpretation, measurement
-fragment planning/reassembly, or BLE/GATT operations. Rust real-device
+`capabilities::evaluate_capabilities` evaluates only caller-owned discovery/read
+evidence with caller-selected `RangeOptions` and a fixed diagnostic capacity. Its
+result has declarations, prerequisites and reason flags, but deliberately has no
+`canExecute`/permission result. UUIDs are native 16-byte display-order values;
+read bytes remain borrowed by the caller.
+
+`normalized::normalized_measurement` projects selected raw fields to named
+physical units. It returns `None` for absent/incomplete fields and
+`NormalizedValue::Unavailable` for selected sentinel values, never a fabricated
+physical zero. `records::plan_measurement` emits bounded characteristic values
+for a caller byte budget, and `RecordAssembler` combines caller-delivered
+fragments under explicit generation and caller-clock age inputs. Neither owns a
+timer, connection, subscription, or BLE/GATT operation.
+
+Not implemented: BLE/GATT operations. Rust real-device
 interoperability remains unverified. This is partial FTMS conformance evidence,
 not Bluetooth qualification.
 
@@ -145,9 +158,9 @@ Fixture hashes and source identity remain run evidence, not package or
 specification versions.
 
 The immutable codec-v1 corpus has 97 cases, including 35 normalized Feature
-boolean cases. This crate does **not** implement that normalized interpretation
-or claim any codec-v1 case as passed; the former byte-only 35-case check has
-been removed rather than misreported as codec-v1 conformance.
+boolean cases. `normalize_features` exposes typed `MachineFeature` and
+`TargetFeature` queries plus ERG/SIM/resistance compatibility helpers; its runner
+passes those 35 cases and explicitly reports the remaining 62 as unsupported.
 
 From this package directory, verify with:
 

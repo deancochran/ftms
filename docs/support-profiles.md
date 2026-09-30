@@ -92,7 +92,7 @@ artifact identities and publication boundaries are in
 | Swift `FTMS` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, `NormalizedViews` | Published Git/SwiftPM release; revision pin required |
 | Kotlin/JVM `io.github.deancochran:ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection` | Published on Maven Central |
 | Python `deancochran-ftms` 0.1.0a1 | `FullWire` raw codecs | `RangeInspection` and selected `NormalizedViews`; no `CapabilityEvidence` | Published PyPI alpha |
-| Rust `ftms` 0.1.0 source candidate | `FullWire` raw codecs | `RangeInspection`; no `CapabilityEvidence`, `RecordPlanning` or `RecordAssembly` | Implemented and verified in source; not tagged or published on crates.io |
+| Rust `ftms` 0.1.0 source candidate | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | Implemented in source; not tagged or published on crates.io |
 
 .NET and other future ports have no current package claim. A future port should
 select the smallest profile justified by a named consumer. A first .NET package

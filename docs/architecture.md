@@ -3,8 +3,8 @@
 Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
 range inspection and static capability interpretation. Python 0.1.0a1 is a
 published partial alpha with bidirectional raw codecs and no capability evaluator.
-Rust 0.1.0 is an implemented `no_std` raw-codec source candidate with no registry
-publication or capability evaluator.
+Rust 0.1.0 is an implemented `no_std` source candidate with static capability
+interpretation and no registry publication.
 See the [canonical release matrix](released-packages.md) for versions and distribution
 and [support profiles](support-profiles.md) for role-based direction claims; source
 metadata is not publication evidence. This document defines boundaries, not

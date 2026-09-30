@@ -8,9 +8,12 @@ evaluation. See the role-based [support profiles](support-profiles.md) and each
 package's verification record. Historical TypeScript/C tables below do not
 substitute for language-specific evidence.
 
-Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md);
-it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
-or registry publication.
+Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md).
+Its source candidate now has allocation-free static capability evidence, normalized
+measurement views, bounded More Data planning and caller-clocked assembly. Its
+capability-v1 runner passes 63/63 exact reports; its normalized codec-v1 runner
+passes 35 Feature cases and explicitly marks 62 other cases unsupported. Registry
+publication remains unclaimed.
 
 ## Current codec surface
 

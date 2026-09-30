@@ -316,6 +316,17 @@ fn selected(flags: u32, field: Field) -> bool {
         flags & (1 << field.bit) != 0
     }
 }
+/// Returns the raw-field mask selected by a measurement flag word.  This is
+/// useful to bounded planners; it does not inspect packet bytes.
+pub fn selected_fields(kind: MeasurementKind, flags: u32, options: MeasurementOptions) -> u32 {
+    let (_, _, fields) = layout(kind);
+    fields
+        .iter()
+        .copied()
+        .map(|f| formatted(f, kind, options))
+        .filter(|f| selected(flags, *f))
+        .fold(0, |mask, f| mask | f.id.mask())
+}
 fn sentinel(field: Field) -> u32 {
     if field.signed {
         0x7fff
