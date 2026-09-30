@@ -104,6 +104,10 @@ no extra manual reviewer gate: a valid tag push triggers the automated gates.
 
 ## Preparing a release
 
+The current source prepares **0.1.1** with additive normalized range/control/status
+views and all 97 codec-v1 cases accounted for. The public release remains 0.1.0
+until `rust-v0.1.1` is explicitly pushed and its publication checks succeed.
+
 1. Complete the intended scope; review public interfaces, crate name, version,
    changelog, docs and supported-toolchain claims. Publication is permanent.
 2. Commit and integrate into `main`, preserving the other ports' release paths.
@@ -144,7 +148,7 @@ directory. Set `TMPDIR` to a writable temporary directory when necessary.
 For an already prepared archive:
 
 ```sh
-python3 scripts/consumer.py --archive target/distribution/ftms-0.1.0.crate
+python3 scripts/consumer.py --archive target/distribution/ftms-0.1.1.crate
 ```
 
 `tests/consumer.sh` remains a local convenience wrapper; it permits a dirty

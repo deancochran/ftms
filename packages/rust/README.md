@@ -1,7 +1,9 @@
 # FTMS Rust
 
-`ftms` is an unpublished, independent Rust crate for pure FTMS binary data. It
-is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
+`ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.0 is
+published on crates.io; newer source capabilities described below are unreleased.
+This checkout prepares 0.1.1; the version bump is not publication evidence.
+It is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
 runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, or
 control safety.
 
@@ -157,10 +159,16 @@ shared corpus and is not coverage-guided fuzzing or device evidence.
 Fixture hashes and source identity remain run evidence, not package or
 specification versions.
 
-The immutable codec-v1 corpus has 97 cases, including 35 normalized Feature
-boolean cases. `normalize_features` exposes typed `MachineFeature` and
-`TargetFeature` queries plus ERG/SIM/resistance compatibility helpers; its runner
-passes those 35 cases and explicitly reports the remaining 62 as unsupported.
+The immutable codec-v1 corpus has 97 cases. The unreleased host-only adapter validates the
+canonical schema and executes all categories with 97 passes, zero failures,
+unsupported cases or skips. `normalized` exposes typed Features, `normalize_range`,
+`normalize_control_request`, `normalize_control_response`, and
+`normalize_machine_status`, plus measurement metrics. Range/control/status
+projections are new since 0.1.0; that release already includes Feature and
+measurement views, capability evidence, and record planning/assembly.
+The adapter's mappings retain raw codec APIs: codec-v1 wheel circumference
+millimetres maps to its 0.1 mm wire integer, and rejected raw responses map to the
+contract's `malformed_response` result rather than changing raw `Error` variants.
 
 From this package directory, verify with:
 

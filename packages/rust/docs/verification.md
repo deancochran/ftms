@@ -46,9 +46,11 @@ schema/vector/contract hashes and every case/direction outcome.
 
 All listed executions have **zero failures, unsupported cases, skips and runner
 errors**. Capability-v1 is separately executed as 63/63 exact reports with zero
-non-passes. The normalized codec-v1 runner executes all 35 Feature cases exactly
-and explicitly reports the remaining 62 cases unsupported; it does not claim a
-complete 97-case codec-v1 result.
+non-passes. Unreleased source's normalized codec-v1 runner validates the exact
+schema and executes all **97/97** cases with zero unsupported/skipped cases. It
+prints HEAD, dirty state, schemaVersion and SHA-256 identities for schema, vectors
+and this comparison contract; this is local source evidence, not a retroactive
+claim about the released 0.1.0 artifact.
 Schema format v1, FTMS
 specification revisions, package versions and these fixture content hashes are
 independent identities.

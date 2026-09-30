@@ -8,8 +8,10 @@ is authoritative for what is available from this source tree.
 - TypeScript, C, Swift and Kotlin `FullWire` protocol codecs with static capability
   evidence; Python provides a partial-alpha `FullWire` raw-codec surface without
   capability evaluation in the published artifact, plus an unreleased source
-  evaluator verified against the shared capability corpus; Rust provides an unpublished `no_std` `FullWire` raw-codec
-  source candidate with range inspection and no capability evaluator.
+  evaluator verified against the shared capability corpus; Rust 0.1.0 is a released
+  `no_std` `FullWire` crate with range inspection, evaluator, normalized
+  Feature/measurement views and record modules. Later unreleased Rust source adds
+  range/control/status normalized projections and expanded codec-v1 evidence.
 - Installed-consumer examples, versioned fixtures and host verification.
 - Explicit malformed-input diagnostics and caller-selected format options.
 - Role-based [support profiles](support-profiles.md) that separate wire directions
