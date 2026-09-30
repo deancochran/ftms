@@ -127,6 +127,7 @@ class PublishingTest(unittest.TestCase):
 
     def test_staged_bytes_must_match_signed_manifest(self):
         manifest, _ = self.bundle()
+        manifest["sourceCommit"] = "commit"
         with patch.object(release, "central", return_value=b"artifact"):
             release.verify_staged(self.config, manifest, "id")
         with patch.object(release, "central", return_value=b"different"), self.assertRaises(release.ReleaseError):
@@ -158,7 +159,7 @@ class PublishingTest(unittest.TestCase):
     def test_wrong_or_extra_central_coordinates_rejected(self):
         expected = "pkg:maven/io.github.deancochran/ftms@0.1.0"
         for state in ("VALIDATED", "PUBLISHING", "PUBLISHED"):
-            for purls in ([], ["pkg:maven/other/project@0.1.0"], [expected, expected]):
+            for purls in (["pkg:maven/other/project@0.1.0"], [expected, expected]):
                 response = {"deploymentId": "id", "deploymentState": state, "purls": purls}
                 with self.subTest(state=state, purls=purls), \
                         patch.object(release, "central", return_value=json.dumps(response).encode()), \
@@ -168,13 +169,29 @@ class PublishingTest(unittest.TestCase):
         with patch.object(release, "central", return_value=json.dumps(response).encode()):
             self.assertEqual("VALIDATED", release.status(self.config, "id", {"version": "0.1.0"}))
 
+    def test_empty_coordinates_only_allowed_after_publish_transition(self):
+        for state in ("VALIDATED", "PUBLISHING", "PUBLISHED"):
+            for purls in (None, []):
+                response = {"deploymentId": "id", "deploymentState": state, "purls": purls}
+                with self.subTest(state=state, purls=purls), \
+                        patch.object(release, "central", return_value=json.dumps(response).encode()):
+                    if state == "VALIDATED":
+                        with self.assertRaises(release.ReleaseError):
+                            release.status(self.config, "id", {"version": "0.1.0"})
+                    else:
+                        self.assertEqual(state, release.status(self.config, "id", {"version": "0.1.0"}))
+
     def test_signed_tag_object_must_match_remote(self):
         key = "A" * 40
         manifest = {"sourceCommit": "commit", "signingFingerprint": key, "tag": "kotlin-v0.1.0"}
         release.write_json(self.output / "manifest.json", manifest)
-        for kind, signing_key, remote_object, valid in (
-            ("tag", key, "tag-object", True), ("commit", key, "tag-object", False),
-            ("tag", "B" * 40, "tag-object", False), ("tag", key, "changed-tag-object", False)
+        for kind, signing_key, remote_object, checkout, strict, valid in (
+            ("tag", key, "tag-object", "commit", True, True),
+            ("commit", key, "tag-object", "commit", True, False),
+            ("tag", "B" * 40, "tag-object", "commit", True, False),
+            ("tag", key, "changed-tag-object", "commit", True, False),
+            ("tag", key, "tag-object", "new-tooling-commit", True, False),
+            ("tag", key, "tag-object", "new-tooling-commit", False, True)
         ):
             def git(*args):
                 if args[0] == "cat-file":
@@ -187,13 +204,13 @@ class PublishingTest(unittest.TestCase):
             with self.subTest(kind=kind, signing_key=signing_key, remote_object=remote_object), \
                     patch.object(release, "verify_signature"), patch.object(release, "validate_bundle"), \
                     patch.object(release, "fingerprint", return_value=key), \
-                    patch.object(release, "clean_commit", return_value="commit"), \
+                    patch.object(release, "clean_commit", return_value=checkout), \
                     patch.object(release, "git", side_effect=git), patch.object(release, "run", return_value=verification):
                 if valid:
-                    self.assertEqual("tag-object", release.load_release(self.config)["tagObject"])
+                    self.assertEqual("tag-object", release.load_release(self.config, require_prepared_checkout=strict)["tagObject"])
                 else:
                     with self.assertRaises(release.ReleaseError):
-                        release.load_release(self.config)
+                        release.load_release(self.config, require_prepared_checkout=strict)
 
 
 if __name__ == "__main__":

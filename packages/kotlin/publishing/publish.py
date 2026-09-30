@@ -172,6 +172,8 @@ def prepare(config):
     version, repo, files = publication()
     RELEASE.mkdir(parents=True)
     shutil.copyfile(log, RELEASE / "verification.log")
+    for relative in ("conformance", "reports/conformance", "test-results/test"):
+        shutil.copytree(PACKAGE / "build" / relative, RELEASE / "evidence" / relative)
     with (RELEASE / "signing-public.asc").open("wb") as output:
         run(signing_command(config) + ["--armor", "--export", fingerprint(config)],
             stdout=output, stderr=subprocess.DEVNULL)
@@ -219,10 +221,12 @@ def validate_bundle(manifest, bundle):
                 raise ReleaseError("Bundle artifact hash mismatch")
 
 
-def load_release(config):
+def load_release(config, *, require_prepared_checkout=True):
     verify_signature(config, RELEASE / "manifest.json")
     manifest = json.loads((RELEASE / "manifest.json").read_text())
-    if manifest["sourceCommit"] != clean_commit() or manifest["signingFingerprint"] != fingerprint(config):
+    current_commit = clean_commit()
+    if ((require_prepared_checkout and manifest["sourceCommit"] != current_commit)
+            or manifest["signingFingerprint"] != fingerprint(config)):
         raise ReleaseError("Prepared release does not identify this clean checkout/signing key")
     validate_bundle(manifest, RELEASE / "central-bundle.zip")
     # Verify a signed, already-pushed tag. Remote tag protection is separate;
@@ -261,7 +265,12 @@ def status(config, deployment_id, manifest):
         raise ReleaseError("Unexpected deployment identity in Central response")
     if result.get("deploymentState") in {"VALIDATED", "PUBLISHING", "PUBLISHED"}:
         expected = f"pkg:maven/{NAMESPACE}/{ARTIFACT}@{manifest['version']}"
-        if result.get("purls") != [expected]:
+        purls = result.get("purls")
+        # Central can clear purls after the publish transition. Require exact
+        # coordinates before the irreversible request; reject conflicting lists
+        # afterwards, but use exact public bytes as the final artifact evidence.
+        required = result["deploymentState"] == "VALIDATED" or purls not in (None, [])
+        if required and purls != [expected]:
             raise ReleaseError("Central deployment coordinates differ from the prepared release")
     # Retain only public release metadata, not raw HTTP responses.
     safe = {key: result[key] for key in ("deploymentId", "deploymentState", "purls") if key in result}
@@ -305,12 +314,17 @@ def upload(config, manifest, timeout):
 
 def verify_staged(config, manifest, deployment_id):
     # Compare the actual server-side artifacts, not just a locally recorded UUID.
+    verified = {}
     for name, expected in manifest["files"].items():
         if name.endswith((".md5", ".sha1", ".sha256", ".sha512")):
             continue
         data = central(config, f"/deployment/{deployment_id}/download/{name}", method="GET")
         if sha256(data) != expected:
             raise ReleaseError("Staged Central artifact differs from the signed/tested bundle")
+        verified[name] = expected
+    write_json(RELEASE / "staged-verification.json", {"deploymentId": deployment_id,
+        "sourceCommit": manifest["sourceCommit"], "bundleSha256": manifest["bundleSha256"],
+        "files": verified})
 
 
 def publish(config, manifest, timeout):
@@ -357,7 +371,10 @@ def main():
         if args.action == "prepare":
             prepare(args.config)
         else:
-            manifest = load_release(args.config)
+            # Read-only verification may use newer tooling; upload/publish still
+            # require the prepared source checkout. The original signed tag and
+            # manifest remain mandatory and are never rewritten.
+            manifest = load_release(args.config, require_prepared_checkout=args.action != "verify")
             if args.action == "upload":
                 upload(args.config, manifest, args.timeout)
             elif args.action == "publish":
