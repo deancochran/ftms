@@ -48,6 +48,13 @@ implicit passes.
 | Measurement matrix | 181,760 structural, 46 sentinel, 47 reserved-flag, and 315 incomplete-prefix checks |
 | Consumer installation | Passed through an isolated local-path SwiftPM consumer |
 
+**Published-release evidence:** `swift-v0.1.0` passed the full native suite on
+Linux (Swift 6.0.3) and macOS (Swift 6.1.2 / Xcode 16.4), plus independent public
+tag consumers and macOS/iOS/tvOS/watchOS/visionOS SDK builds. The published
+reports and checksums were downloaded and independently verified. See the
+[release record](../../docs/released-packages.md#published-swift-010) for exact
+source identity, hashes, CI history and verification boundaries.
+
 Python and jsonschema are test tooling, not library dependencies. A Swift 6.0+
 toolchain must be on PATH. Local verification used Swift 6.0.3 on Linux x86_64;
 the official Ubuntu toolchain required local library compatibility shims on the

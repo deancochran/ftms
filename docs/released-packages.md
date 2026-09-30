@@ -122,3 +122,49 @@ It used the earlier local 0.1.0-based C installation, not the newly published
 0.2.0 artifact. Publication and host replay do not expand that device evidence.
 Do not advertise compatibility with specific equipment until reviewed evidence
 names the actual model, firmware, platform and installed package version.
+
+## Published: Swift 0.1.0
+
+Verified against public GitHub release assets and a fresh public-tag SwiftPM
+consumer on **2026-09-30**. Implementation [PR #7](https://github.com/deancochran/ftms/pull/7)
+and release-hardening [PR #8](https://github.com/deancochran/ftms/pull/8) are merged.
+The annotated tag **`swift-v0.1.0`** identifies
+**`a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8`**. No existing npm/C tag or artifact
+was changed and no separate repository was created.
+
+- [Release Swift run 36662538259](https://github.com/deancochran/ftms/actions/runs/36662538259)
+  succeeded, including tag identity, clean-source/main ancestry, complete corpus
+  identity checks, Linux/macOS native verification and public **tag-pinned** consumers.
+- Both hosts passed 16 native tests and all **282** canonical fixture IDs with
+  zero failures, skips, unsupported or unresolved cases. The shared measurement
+  matrix passed **181,760** layouts, 46 sentinels, 47 RFU cases and 315 incomplete
+  prefixes. A deterministic 2,080-payload malformed-input exercise did not trap.
+- Linux used Swift **6.0.3**; macOS used Apple Swift **6.1.2**, Xcode **16.4 (16F6)**.
+  Installed-consumer release builds passed for **macOS 13, iOS 16, tvOS 16,
+  watchOS 9 and visionOS 1** deployment targets. The reports retain resolved Git
+  identities, SDK inventory, toolchains and canonical schema/vector/contract hashes.
+- Downloaded all four public JSON reports and verified **SHA256SUMS** and every
+  reported canonical-file hash against the tagged source. A second fresh public
+  tag consumer on Linux compiled and ran after publication, resolving the exact
+  commit above.
+- Early gates exposed a local consumer's missing macOS minimum, hidden artifact
+  upload filtering, incomplete older Xcode platform components and Git line-ending
+  attributes that made clean checkouts appear dirty. All were fixed before the
+  tag. The generated Kotlin launcher bytes were preserved unchanged. CI now
+  requires clean evidence; no failed gate was bypassed. Pinned artifact actions
+  still emit non-fatal Node-runtime deprecation notices.
+
+| Public evidence asset | Verified SHA-256 |
+| --- | --- |
+| `swift-linux-verification.json` | `a96c426d6e98df20263bdcbdcd3ee9f8ff70f61b6a48f9b34f63c772d4c0b9f7` |
+| `swift-linux-consumer.json` | `0fb205e5ad9854e0849c95d6e7a126f2b8a6298e920253fa5123c86473d3f59c` |
+| `swift-apple-verification.json` | `0587679c91659c967378ecd4c341f6b5d4ec479904e4b7b6edb10c48c3a1640c` |
+| `swift-apple-consumer.json` | `f5b0705208f62c49d1e31399e9f4a1370b93b59de90adfba9be47931aeeecf0d` |
+
+Use `.package(url: "https://github.com/deancochran/ftms.git", revision: "swift-v0.1.0")`
+and product `FTMS`; use the full commit above for an immutable pin. Normal
+SwiftPM version requirements are intentionally unsupported because ordinary
+`v*` tags in this repository identify npm releases. This is native compiler,
+host-runtime and SDK-build evidence, **not** Swift BLE device interoperability,
+runtime coverage of every Apple OS version, physical accuracy or Bluetooth qualification.
+See the [Swift release runbook](../packages/swift/RELEASING.md).
