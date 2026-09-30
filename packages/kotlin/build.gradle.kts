@@ -48,8 +48,15 @@ publishing {
         description.set("Transport-independent Kotlin/JVM Fitness Machine Service protocol codecs")
         url.set("https://github.com/deancochran/ftms")
         licenses { license { name.set("MIT License"); url.set("https://opensource.org/licenses/MIT") } }
-        developers { developer { id.set("deancochran"); name.set("Dean Cochran") } }
+        developers {
+          developer {
+            id.set("deancochran")
+            name.set("Dean Cochran")
+            url.set("https://github.com/deancochran")
+          }
+        }
         scm {
+          tag.set("kotlin-v${project.version}")
           url.set("https://github.com/deancochran/ftms")
           connection.set("scm:git:https://github.com/deancochran/ftms.git")
           developerConnection.set("scm:git:ssh://git@github.com/deancochran/ftms.git")

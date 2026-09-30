@@ -6,6 +6,6 @@ repositories {
     }
     mavenCentral()
 }
-dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+dependencies { implementation("io.github.deancochran:ftms:${providers.gradleProperty("ftmsVersion").orElse("0.1.0").get()}") }
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
 application { mainClass.set("example.Consumer") }

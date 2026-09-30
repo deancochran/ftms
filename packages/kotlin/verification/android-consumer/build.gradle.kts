@@ -14,4 +14,4 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+dependencies { implementation("io.github.deancochran:ftms:${providers.gradleProperty("ftmsVersion").orElse("0.1.0").get()}") }

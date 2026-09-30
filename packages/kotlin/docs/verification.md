@@ -60,6 +60,16 @@ Verified locally on Linux x86_64 with JDK 17, Kotlin 2.2.0 and Gradle 8.14.3:
   This is a packaging/compilation check, not an emulator or real-device run.
 - Dependency locks, checksum verification metadata and wrapper checksum are
   package-owned. Binary/source archives use reproducible ordering/timestamps.
+- The publishing client has a separate offline Python regression suite covering
+  credential permissions, secret-free error reporting, redirect rejection, bundle
+  integrity/path validation, clean-source requirements and two-phase deployment
+  state handling. `verification/verify.sh` runs it before the JVM checks.
+
+The standard release client signs a clean-commit manifest and the exact artifacts
+tested by these consumers. Its separate public-verification stage compares all
+published hashes/signatures and executes the same consumers against Maven Central.
+See [release gates](releasing.md) for commands and evidence retention. Local tests
+alone do not establish that a public upload has completed.
 
 Run the complete gate with:
 
