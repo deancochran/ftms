@@ -26,6 +26,7 @@ jobs:
       rust: ${{ steps.select.outputs.rust }}
       swift: ${{ steps.select.outputs.swift }}
       python: ${{ steps.select.outputs.python }}
+      csharp: ${{ steps.select.outputs.csharp }}
       docs: ${{ steps.select.outputs.docs }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -110,6 +111,11 @@ jobs:
     if: needs.changes.outputs.swift == 'true'
     uses: ./.github/workflows/native-swift.yml
 
+  csharp:
+    needs: changes
+    if: needs.changes.outputs.csharp == 'true'
+    uses: ./.github/workflows/native-csharp.yml
+
   python:
     needs: changes
     if: needs.changes.outputs.python == 'true'
@@ -130,7 +136,7 @@ jobs:
   summary:
     name: CI summary
     if: always()
-    needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, docs]
+    needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, csharp, docs]
     runs-on: ubuntu-latest
     steps:
       - name: Require all selected verification jobs

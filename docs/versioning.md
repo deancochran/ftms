@@ -66,6 +66,16 @@ compatibility: `0.x` minor versions are treated as potentially breaking. This is
 local source-package metadata only, not a git tag, published artifact, or release
 record.
 
+## C# version identity
+
+C# has an independent `packages/csharp/VERSION` authority and reserved
+`csharp-vVERSION` tag namespace. Its initial source version is a NuGet prerelease,
+not a public release. C# versions must already be canonical three-component
+SemVer with lowercase prerelease labels and no build metadata, so NuGet
+normalization cannot silently change the release identity. Registry publishing
+requires separate authorization and verified ownership/trusted-publisher setup.
+Local package validation never establishes public availability.
+
 ## C release policy
 
 The C package is independently tagged `c-vVERSION`; existing `v*` npm tags remain

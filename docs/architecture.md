@@ -14,7 +14,7 @@ universal FTMS device compatibility.
 
 Keep protocol decisions and cross-language regression evidence in one repository.
 Consumers must be able to use one implementation without installing the others.
-TypeScript, C, Swift, Kotlin, Python, and Rust occupy sibling directories under `packages/`.
+TypeScript, C, Swift, Kotlin, Python, Rust, and C# occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
 `pnpm-workspace.yaml` includes the TypeScript package and private documentation
 website under `site/`. The site's Node 22.12+ build requirement does not change
@@ -36,12 +36,16 @@ establish publication; consult the release matrix above.
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Published partial alpha 0.1.0a1 |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
+| `packages/csharp/` | Pure managed .NET protocol library and NuGet tooling | Local prerelease development; not published on NuGet |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-.NET and other language ports are deferred until a named consumer justifies a
-specific support profile. The existing TypeScript package continues to serve
-JavaScript and React Native consumers.
+C# implementation is explicitly approved with a `FullWire` parity objective,
+range inspection, capability interpretation and normalized views. The package's
+own coverage and verification records distinguish implemented behavior from that
+objective; local package metadata is not a NuGet release. Other future ports
+remain deferred until a consumer justifies a specific support profile. The
+existing TypeScript package continues to serve JavaScript and React Native consumers.
 
 The C port has package-owned build, installation, verification and source-release
 tooling. Its release does not establish vcpkg or ConanCenter registration.

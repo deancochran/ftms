@@ -94,13 +94,17 @@ artifact identities and publication boundaries are in
 | Python `deancochran-ftms` 0.1.0a1 | `FullWire` raw codecs | `RangeInspection` and selected `NormalizedViews`; no `CapabilityEvidence` | Published PyPI alpha |
 | Rust `ftms` 0.1.0 source candidate | `FullWire` raw codecs | `RangeInspection`; no `CapabilityEvidence`, `RecordPlanning` or `RecordAssembly` | Implemented and verified in source; not tagged or published on crates.io |
 
-.NET and other future ports have no current package claim. A future port should
-select the smallest profile justified by a named consumer. A first .NET package
-should target `ControllerClient`, optionally with `CapabilityEvidence`, unless an
-adopter supplies an equipment-side requirement; it need not implement
-`EquipmentServer` merely for parity. C is the primary lane for future embedded
-equipment/server runtime validation because it already has bounded planning and
-assembly interfaces.
+C# development now has an explicitly approved `FullWire` parity objective with
+`CapabilityEvidence`, `RangeInspection` and normalized views. This supersedes the
+earlier client-first recommendation for this port, not the requirement for
+complete directional evidence. Its package-owned coverage record distinguishes
+that objective from verified behavior; there is no NuGet publication claim.
+`RecordPlanning` and `RecordAssembly` remain outside its initial scope.
+
+Other future ports should select the smallest profile justified by a consumer;
+they need not implement `EquipmentServer` merely for parity. C is the primary
+lane for future embedded equipment/server runtime validation because it already
+has bounded planning and assembly interfaces.
 
 ## Claim and verification rules
 

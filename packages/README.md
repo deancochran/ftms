@@ -16,6 +16,7 @@ publication evidence.
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a1; evolving alpha |
 | [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
+| [C#](csharp/README.md) | .NET applications and protocol tooling | Local prerelease development; not published on NuGet |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must
@@ -34,8 +35,10 @@ from a directory or deferred-port mention.
 Rust now implements bidirectional raw codecs with independent `no_std` sources,
 conformance tests and gated publishing. It does not yet implement capability
 interpretation or fragment assembly; see its [coverage and evidence](rust/docs/verification.md).
-.NET and other ports remain deferred until a named consumer justifies a specific
-support profile. The TypeScript npm build/release remains independent;
+C# is being implemented with an explicitly approved full-wire parity objective;
+see its package-owned coverage and verification evidence before relying on a
+particular module. Other future ports remain deferred until a consumer justifies
+a specific support profile. The TypeScript npm build/release remains independent;
 the private root pnpm workspace orchestrates TypeScript and the documentation site,
 not native package builds.
 Ports and package tooling consume the independent [shared layer](../shared/README.md),

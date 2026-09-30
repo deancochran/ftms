@@ -12,6 +12,12 @@ Rust has separate [raw-codec conformance and package evidence](../packages/rust/
 it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
 or registry publication.
 
+C# has an unpublished `FullWire` source candidate with range inspection,
+normalized views and static capability interpretation. Its separate
+[verification record](../packages/csharp/docs/verification.md) covers both target
+assemblies, canonical corpora, local NuGet consumers and Linux NativeAOT. This
+does not establish NuGet publication or Windows/macOS/mobile execution.
+
 ## Current codec surface
 
 | Family | TypeScript decode | TypeScript encode | Tests and v1 vectors | Equipment-side direction |

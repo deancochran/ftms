@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net10.0</TargetFrameworks>
+    <AssemblyName>DeanCochran.Ftms</AssemblyName>
+    <PackageId>DeanCochran.Ftms</PackageId>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../VERSION').Trim())</Version>
+    <Authors>Dean Cochran</Authors>
+    <Description>Transport-independent Bluetooth Fitness Machine Service codecs and static capability evidence.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>bluetooth;ftms;fitness;protocol</PackageTags>
+    <PackageProjectUrl>https://github.com/deancochran/ftms</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/deancochran/ftms</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup><None Include="../../README.md" Pack="true" PackagePath="" /></ItemGroup>
+  <Target Name="ValidatePackageVersion" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <_CanonicalVersion>$([System.Text.RegularExpressions.Regex]::IsMatch('$(Version)', '\A(0|[1-9][0-9]{0,9})\.(0|[1-9][0-9]{0,9})\.(0|[1-9][0-9]{0,9})(?:-(?:0|[1-9][0-9]*|[0-9]*[a-z-][0-9a-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[a-z-][0-9a-z-]*))*)?\z'))</_CanonicalVersion>
+    </PropertyGroup>
+    <Error Condition="'$(_CanonicalVersion)' != 'True'" Text="VERSION must be canonical NuGet SemVer without build metadata." />
+    <PropertyGroup>
+      <_VersionMajor>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '^([0-9]+)\..*', '$1'))</_VersionMajor>
+      <_VersionMinor>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '^[0-9]+\.([0-9]+)\..*', '$1'))</_VersionMinor>
+      <_VersionPatch>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '^[0-9]+\.[0-9]+\.([0-9]+).*', '$1'))</_VersionPatch>
+    </PropertyGroup>
+    <Error Condition="$(_VersionMajor) &gt; 2147483647 Or $(_VersionMinor) &gt; 2147483647 Or $(_VersionPatch) &gt; 2147483647" Text="VERSION release components must fit Int32." />
+  </Target>
+</Project>
