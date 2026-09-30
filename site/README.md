@@ -77,7 +77,8 @@ is introduced; Astro's checker handles its framework-specific types.
 
 ## GitHub Pages deployment
 
-[The workflow](../.github/workflows/docs.yml) builds/tests on PRs and main pushes.
+[The reusable workflow](../.github/workflows/docs.yml) builds/tests when selected
+by [CI](../.github/workflows/ci.yml) on PRs and main pushes, or on manual dispatch.
 PRs never receive deployment permissions or publish artifacts. Main deployment
 also requires repository variable `PAGES_ENABLED=true` so merely merging the
 workflow does not activate a public site unexpectedly.

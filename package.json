@@ -10,6 +10,7 @@
     "check-types": "pnpm --filter @deancochran/ftms check-types",
     "build": "pnpm --filter @deancochran/ftms build",
     "verify:package": "pnpm --filter @deancochran/ftms verify:package",
+    "release:prepare": "node tools/release-prepare.mjs",
     "docs:check": "node --test tools/check-docs.test.mjs && node tools/check-docs.mjs",
     "docs:build": "pnpm --filter @deancochran/ftms docs:build",
     "site:dev": "pnpm docs:build && pnpm --filter @ftms/site dev",

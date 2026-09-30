@@ -2,19 +2,8 @@ name: Python verification and release
 
 on:
   push:
-    branches: ["**"]
     tags: ["python-v*"]
-    paths:
-      - "packages/python/**"
-      - "shared/conformance/**"
-      - "shared/protocol/**"
-      - ".github/workflows/release-python.yml"
-  pull_request:
-    paths:
-      - "packages/python/**"
-      - "shared/conformance/**"
-      - "shared/protocol/**"
-      - ".github/workflows/release-python.yml"
+  workflow_call:
 
 permissions:
   contents: read
@@ -37,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
@@ -55,6 +45,7 @@ jobs:
           version=$(uv run --python 3.11 --locked --group dev python -c 'import tomllib; p=tomllib.load(open("pyproject.toml", "rb"))["project"]; assert p["name"] == "deancochran-ftms"; print(p["version"])')
           if [ "$REF_TYPE" = tag ]; then
             test "$REF_NAME" = "python-v$version"
+            git merge-base --is-ancestor HEAD origin/main
           fi
           grep -Fx "## $version" CHANGELOG.md
           test -z "$(git status --porcelain --untracked-files=all)"
@@ -115,6 +106,9 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: python-dist-${{ github.sha }}
@@ -128,10 +122,19 @@ jobs:
           set -euo pipefail
           printf '%s  %s\n' "$WHEEL_SHA256" "dist/deancochran_ftms-$VERSION-py3-none-any.whl" "$SDIST_SHA256" "dist/deancochran_ftms-$VERSION.tar.gz" | sha256sum --check --strict
           test "$(find dist -type f | wc -l)" -eq 2
+      - name: Plan immutable PyPI retry
+        id: retry
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+          WHEEL_SHA256: ${{ needs.verify.outputs.wheel-sha256 }}
+          SDIST_SHA256: ${{ needs.verify.outputs.sdist-sha256 }}
+        run: |
+          python packages/python/scripts/release_retry.py --version "$VERSION" --wheel-sha256 "$WHEEL_SHA256" --sdist-sha256 "$SDIST_SHA256" --dist dist --output publish-dist >> "$GITHUB_OUTPUT"
       - name: Publish to PyPI with Trusted Publishing and attestations
+        if: steps.retry.outputs.publish == 'true'
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
-          packages-dir: dist/
+          packages-dir: publish-dist/
           print-hash: true
 
   verify-public:
@@ -145,7 +148,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-      - uses: actions/setup-python@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
       - name: Download, hash and execute the public PyPI artifacts

@@ -99,37 +99,55 @@ jobs:
           PACKAGE_VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
-          versions_file="$RUNNER_TEMP/npm-versions.json"
-          npm view "$PACKAGE_NAME" versions --json > "$versions_file"
-
-          if node --input-type=module - "$versions_file" "$PACKAGE_VERSION" <<'NODE'
-          import { readFileSync } from "node:fs";
-
-          const versions = JSON.parse(readFileSync(process.argv[2], "utf8"));
-          process.exit(Array.isArray(versions) && versions.includes(process.argv[3]) ? 0 : 1);
-          NODE
-          then
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "$PACKAGE_NAME@$PACKAGE_VERSION is already published; no publication was attempted." >> "$GITHUB_STEP_SUMMARY"
+          # A missing package/version is a normal first-release condition. Do
+          # not turn authentication, DNS, or registry failures into a publish.
+          if integrity=$(npm view "$PACKAGE_NAME@$PACKAGE_VERSION" dist.integrity 2>"$RUNNER_TEMP/npm-view.err"); then
+            test -n "$integrity" || { echo '::error::Registry response is missing integrity'; exit 1; }
+            echo "remote_integrity=$integrity" >> "$GITHUB_OUTPUT"
+          elif grep -Eq 'E404|404 Not Found' "$RUNNER_TEMP/npm-view.err"; then
+            echo "remote_integrity=" >> "$GITHUB_OUTPUT"
           else
-            echo "publish=true" >> "$GITHUB_OUTPUT"
+            cat "$RUNNER_TEMP/npm-view.err" >&2; exit 1
           fi
 
       - name: Install dependencies
-        if: steps.registry.outputs.publish == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Verify source and packed artifact
-        if: steps.registry.outputs.publish == 'true'
-        run: pnpm verify
+        env:
+          FTMS_PACKAGE_ARCHIVE: ${{ runner.temp }}/ftms-release.tgz
+        run: pnpm --filter @deancochran/ftms verify
+
+      - name: Hash the exact tested archive
+        id: package
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/ftms-release.tgz"
+          test -f "$archive"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "integrity=sha512-$(openssl dgst -sha512 -binary "$archive" | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Require existing immutable version to match this archive
+        id: decision
+        env:
+          REMOTE: ${{ steps.registry.outputs.remote_integrity }}
+          LOCAL: ${{ steps.package.outputs.integrity }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - "$REMOTE" "$LOCAL" >> "$GITHUB_OUTPUT" <<'NODE'
+          import { publicationDecision } from "./packages/typescript/scripts/npm-release.mjs";
+          const decision = publicationDecision(process.argv[2], process.argv[3]);
+          console.log(`publish=${decision.publish}`);
+          NODE
 
       - name: Publish with npm trusted publishing
-        if: steps.registry.outputs.publish == 'true'
-        working-directory: packages/typescript
-        run: npm publish --access public --provenance --loglevel verbose
+        if: steps.decision.outputs.publish == 'true'
+        run: |
+          tag=$(node --input-type=module -e "import { releaseChannel } from './packages/typescript/scripts/npm-release.mjs'; console.log(releaseChannel('${{ steps.release.outputs.version }}'))")
+          npm publish '${{ steps.package.outputs.archive }}' --access public --provenance --tag "$tag" --ignore-scripts --loglevel verbose
 
       - name: Record release
-        if: steps.registry.outputs.publish == 'true'
+        if: steps.decision.outputs.publish == 'true'
         env:
           PACKAGE_NAME: ${{ steps.release.outputs.name }}
           PACKAGE_VERSION: ${{ steps.release.outputs.version }}

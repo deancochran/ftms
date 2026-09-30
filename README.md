@@ -22,6 +22,7 @@ Created and maintained by Dean Cochran; contributions are welcome.
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.
+See [releasing](docs/releasing.md) for independent package tags and release steps.
 The role-based [support profiles](docs/support-profiles.md) distinguish client and
 equipment wire directions from optional package modules.
 

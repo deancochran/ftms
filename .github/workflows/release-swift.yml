@@ -35,7 +35,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: |
-          gh release create "$RELEASE_TAG" .build/swift-release/*.json .build/swift-release/SHA256SUMS \
-            --verify-tag --title "FTMS Swift ${RELEASE_TAG#swift-v}" \
-            --notes-file .build/swift-release/notes.md --latest=false
+        run: python3 tools/github-release-assets.py --repo '${{ github.repository }}' --not-latest --tag "$RELEASE_TAG" --commit "$(git rev-parse HEAD)" --title "FTMS Swift ${RELEASE_TAG#swift-v}" --notes .build/swift-release/notes.md .build/swift-release/*.json .build/swift-release/SHA256SUMS

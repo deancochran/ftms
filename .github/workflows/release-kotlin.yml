@@ -2,25 +2,8 @@ name: Release Kotlin
 
 on:
   push:
-    branches: [main]
     tags: ['kotlin-v*']
-    paths:
-      - 'packages/kotlin/VERSION'
-      - 'packages/kotlin/publishing/**'
-      - '.github/workflows/release-kotlin.yml'
-  pull_request:
-    paths:
-      - 'packages/kotlin/VERSION'
-      - 'packages/kotlin/publishing/**'
-      - '.github/workflows/release-kotlin.yml'
   workflow_dispatch:
-    inputs:
-      mode:
-        description: Verify setup/current release without mutations, or publish the current version
-        type: choice
-        options: [verify, publish]
-        default: verify
-        required: true
 
 permissions:
   contents: read
@@ -75,7 +58,9 @@ jobs:
   publish:
     name: Sign, publish and verify Maven Central
     needs: gate
-    if: github.event_name != 'pull_request' && github.repository == 'deancochran/ftms'
+    # Main and manual verify runs are deliberately gate-only. Publication is
+    # possible only from the immutable, matching Kotlin tag.
+    if: github.repository == 'deancochran/ftms' && github.event_name == 'push' && github.ref_type == 'tag' && github.ref_name == format('kotlin-v{0}', needs.gate.outputs.version)
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     concurrency:
@@ -111,7 +96,7 @@ jobs:
       - name: Resume or publish the verified version, then verify public consumers
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
+          RELEASE_MODE: publish
           EXPECTED_GATE_SHA256: ${{ needs.gate.outputs.gate_sha256 }}
         run: python3 packages/kotlin/publishing/ci_release.py release --mode "$RELEASE_MODE" --gate-sha256 "$EXPECTED_GATE_SHA256"
       - name: Remove ephemeral signing and publishing credentials
