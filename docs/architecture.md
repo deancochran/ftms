@@ -43,9 +43,12 @@ establish publication; consult the release matrix above.
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-.NET and other language ports are deferred until a named consumer justifies a
-specific support profile. The existing TypeScript package continues to serve
-JavaScript and React Native consumers.
+C# implementation is explicitly approved with a `FullWire` parity objective,
+range inspection, capability interpretation and normalized views. The package's
+own coverage and verification records distinguish implemented behavior from that
+objective; local package metadata is not a NuGet release. Other future ports
+remain deferred until a consumer justifies a specific support profile. The
+existing TypeScript package continues to serve JavaScript and React Native consumers.
 
 The C port has package-owned build, installation, verification and source-release
 tooling. Its release does not establish vcpkg or ConanCenter registration.

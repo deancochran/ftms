@@ -4,7 +4,7 @@ import argparse
 import json
 import subprocess
 
-PORTS = ("typescript", "c", "kotlin", "rust", "swift", "python")
+PORTS = ("typescript", "c", "kotlin", "rust", "swift", "python", "csharp")
 
 
 def select(paths, force=False):

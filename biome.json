@@ -12,6 +12,7 @@
       "!**/coverage",
       "!**/dist",
       "!shared/conformance",
+      "!packages/csharp/**/packages.lock.json",
       "!packages/typescript/conformance",
       "!packages/typescript/LICENSE",
       "!packages/typescript/SECURITY.md"

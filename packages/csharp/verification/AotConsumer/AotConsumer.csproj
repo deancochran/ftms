@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <PublishAot>true</PublishAot>
+    <IsPackable>false</IsPackable>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DeanCochran.Ftms" Version="[$(FtmsVersion)]" />
+    <Compile Include="../PackageConsumer/Program.cs" Link="Program.cs" />
+    <TrimmerRootAssembly Include="DeanCochran.Ftms" />
+  </ItemGroup>
+</Project>
