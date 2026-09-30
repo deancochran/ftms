@@ -50,10 +50,12 @@ jobs:
           set -euo pipefail
           python publishing/release.py gate --tag "$RELEASE_TAG" --pushed-commit "$PUSHED_COMMIT"
           manifest=artifacts/release-manifest.json
-          echo "commit=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["sourceCommit"])')" >> "$GITHUB_OUTPUT"
-          echo "version=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["version"])')" >> "$GITHUB_OUTPUT"
-          echo "manifest_sha256=$(sha256sum "$manifest" | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
-          echo "artifact_name=csharp-release-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          {
+            echo "commit=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["sourceCommit"])')"
+            echo "version=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["version"])')"
+            echo "manifest_sha256=$(sha256sum "$manifest" | cut -d ' ' -f 1)"
+            echo "artifact_name=csharp-release-${GITHUB_SHA}"
+          } >> "$GITHUB_OUTPUT"
       - name: Upload only the exact tested packages and identity evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
