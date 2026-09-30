@@ -151,7 +151,8 @@ version; no release step silently selects `latest`.
    Before the irreversible publish request, the client checks the deployment's
    exact Maven PURL and downloads its staged artifacts/signatures to compare with
    the signed bundle manifest. The saved source commit and tag object must also
-   match. `publish` waits for `PUBLISHED`; `verify` downloads the exact coordinates from
+   match. Staged hash evidence is saved in `staged-verification.json`.
+   `publish` waits for `PUBLISHED`; `verify` downloads the exact coordinates from
    Maven Central, compares all file hashes, verifies OpenPGP signatures and runs
    the isolated Java/Kotlin/Android consumers against that public repository.
    FTMS resolution remains exclusive, and dependency refresh is forced.
@@ -165,12 +166,16 @@ version; no release step silently selects `latest`.
 ### Resume and evidence retention
 
 Release evidence lives at `packages/kotlin/.releases/current/` (Git-ignored and
-not removed by Gradle `clean`). Once delivered, archive this directory as
+not removed by Gradle `clean`), including corpus reports and JUnit XML under
+`evidence/`. Once delivered, archive this directory as
 `.releases/kotlin-vVERSION/` before preparing another release. Preparation refuses
 to replace existing release evidence. Retain a durable backup of public receipts
 and signed manifests, for example the GitHub release assets above.
 
 `upload`, `publish` and `verify` can be resumed from the same prepared commit.
+Read-only `verify` may also use a newer clean tooling checkout, while still
+verifying the original signed manifest/tag. It never changes the released source
+identity. Upload and publish continue to require the exact prepared commit.
 An existing deployment record prevents a second upload; an already-published
 deployment is not republished. If an upload's connection fails **before** the
 deployment ID is saved, inspect Central's deployment history before retrying—
@@ -178,6 +183,12 @@ the server might have accepted it. Never blindly retry an ambiguous upload or
 delete failed evidence while investigating. `--timeout SECONDS` controls waiting;
 a timeout is not a deployment failure. Public CDN propagation can lag Portal
 publication; retry `verify`, not `upload`, when public files are not yet visible.
+
+The first live Portal deployment returned its exact PURL at `VALIDATED`, but an
+empty `purls` list at `PUBLISHING` and `PUBLISHED`. The client therefore requires
+the exact PURL **before** publication and rejects any conflicting nonempty list
+afterwards. It does not infer public coordinates from an empty list: public-path
+downloads, signed-manifest hashes and executable consumers supply that evidence.
 
 The client intentionally has no delete/redeploy, automatic version bump, automatic
 merge, or credential-upload feature. Published Maven versions are immutable.

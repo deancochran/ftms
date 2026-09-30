@@ -1,5 +1,13 @@
 # Kotlin 0.1.0 verification
 
+Public release verified **2026-09-30**: signed tag `kotlin-v0.1.0`, source commit
+`1fdfefb62f5c1b6a6b3e757cf24deb9d5c09560a`. Final clean-source JUnit accounting:
+**87 tests, zero failures/errors/skips**. All 30 Maven Central files matched the
+signed manifest; signatures and public Kotlin/Java execution plus Android APK
+compilation passed. See [release identities](../../../docs/released-packages.md)
+for the deployment and artifact hashes. The publisher subsequently has 18 passing
+offline safety regressions, including observed Portal status behavior.
+
 Implementation source base: `8a0006671df3babf4276ed3a97607ef7bc4fd46e`.
 Initial integrated verification was performed on the dirty `feat/kotlin-delivery`
 checkout. Each runner records its actual HEAD/dirty state and exact corpus hashes;

@@ -5,9 +5,14 @@ Machine Service 1.0 plus the applicable errata recorded in the repository's
 [specification audit](../../docs/specification-audit.md).
 
 Package version: **0.1.0**. Coordinates: `io.github.deancochran:ftms:0.1.0`.
-Public registry availability is recorded separately in
-[released packages](../../docs/released-packages.md); building a local artifact
-does not imply Maven Central publication.
+Published on [Maven Central](https://central.sonatype.com/artifact/io.github.deancochran/ftms/0.1.0).
+Exact source, signed artifact hashes and public-consumer evidence are recorded in
+[released packages](../../docs/released-packages.md).
+
+```kotlin
+repositories { mavenCentral() }
+dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+```
 
 ## Scope
 
@@ -74,8 +79,9 @@ byte[] bytes = ControlCodec.encodeCommand(new ControlCommand.TargetPower(75));
 ```
 
 The independent builds in [verification](verification/README.md) resolve the
-produced Maven artifact, not project-source dependencies. To consume a local
-verification repository, add its file URL as a Maven repository and use:
+produced Maven artifact, not project-source dependencies. They also pass against
+the public Maven Central release. For local development, add the verification
+repository's file URL as a Maven repository and use the same coordinates:
 
 ```kotlin
 dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
