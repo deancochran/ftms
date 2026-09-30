@@ -1,6 +1,6 @@
 # Released packages and executable examples
 
-Last checked read-only against npm, GitHub, Maven Central, PyPI and crates.io:
+Last checked against npm, GitHub, Maven Central, PyPI, crates.io and the Go module proxy:
 **2026-09-30 UTC**.
 This is a point-in-time record, not a promise that branch source is published.
 
@@ -16,6 +16,54 @@ candidate, but no `rust-v0.1.0` tag or crates.io package exists as of this check
 The [Dart package](../packages/dart/README.md) is published on pub.dev as
 `deancochran_ftms` **0.1.0**; see its release evidence below.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
+## Published: Go v0.1.0
+
+The public Go module proxy and checksum database serve
+**`github.com/deancochran/ftms/packages/go@v0.1.0`**. The annotated tag
+**`packages/go/v0.1.0`** identifies verified clean source
+**`bb470e951694bbcaa092fad9a03a3c1c9bb6a757`**, merged into `main` by
+[PR #26](https://github.com/deancochran/ftms/pull/26) at
+`45e77b89b54d903932ad9b3da3edf929f4ea6324`. The tag identifies the reviewed source
+commit, not the merge commit. No separate repository or root Go manifest is needed.
+
+```sh
+go get github.com/deancochran/ftms/packages/go@v0.1.0
+```
+
+- [Go CI](https://github.com/deancochran/ftms/actions/runs/36773096393) and
+  [project CI](https://github.com/deancochran/ftms/actions/runs/36773097111) passed
+  before merge. Local clean-source gates passed on Go **1.24.0** and **1.27.1**.
+- Fresh public consumers on both toolchains downloaded through
+  `proxy.golang.org` with `sum.golang.org` enabled, without `replace` or a workspace.
+  Telemetry, control and capability code ran; downloaded-module tests/build and
+  license verification passed independently of sibling shared fixtures.
+- Public download provenance reports the exact repository, `packages/go` subdir,
+  tag and source commit above. Module sum:
+  `h1:Hmy4+bHNO3r0Tzs0Vpm5E04aWPv9wfSnhywjyDfM7vw=`.
+  `go.mod` sum: `h1:ulbbeannQPoraddmBFBr7H6l2cxWlAINU8HEKtTDmoE=`.
+  Module zip SHA-256:
+  `907ee6e66d6b2eae75196831917a92735cc958a6eabea84ba20433743503fe9f`.
+- All **63 capability cases** passed exact whole-report comparison with zero
+  failed/unsupported/skipped cases. Additional gates passed 122 additive raw
+  cases / 216 directional assertions, 9 range-inspection reports, 181,760
+  structural layouts in both directions, 46 sentinel positions, 47 RFU cases,
+  and 315 incomplete prefixes. Both bounded fuzz targets passed.
+- The [GitHub release](https://github.com/deancochran/ftms/releases/tag/packages/go/v0.1.0)
+  retains clean-source corpus identities, all four capability-contract hashes,
+  public consumer evidence, matrix/inspection accounting, fuzz results and
+  `SHA256SUMS`.
+- [pkg.go.dev](https://pkg.go.dev/github.com/deancochran/ftms/packages/go@v0.1.0)
+  displays the exact v0.1.0 package documentation and executable examples.
+
+Scope is raw bidirectional codecs, range inspection, normalized ranges and static
+capability interpretation. Normalized measurement views, original normalized
+codec-v1 comparison, and record planning/assembly remain outside this release.
+Minimum Go is 1.24; current executed consumer evidence is Linux/amd64. This does
+not establish real-device interoperability, BLE lifecycle, physical-control
+permission, or Bluetooth qualification. See the [Go guide](../packages/go/README.md),
+[coverage](../packages/go/docs/coverage.md) and
+[repeatable verification](../packages/go/docs/verification.md).
 
 ## Published: Dart 0.1.0
 

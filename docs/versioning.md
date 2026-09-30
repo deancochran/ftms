@@ -66,6 +66,15 @@ compatibility: `0.x` minor versions are treated as potentially breaking. This is
 local source-package metadata only, not a git tag, published artifact, or release
 record.
 
+## Go release policy
+
+Go releases use nested-module tags `packages/go/vVERSION`, such as
+`packages/go/v0.1.0`. Consumers use `github.com/deancochran/ftms/packages/go`;
+the `go` directive is the minimum toolchain, not a package version. The immutable
+tag identifies the source. Public proxy/checksum-database downloads and isolated
+consumer results establish publication evidence. See the
+[Go release process](../packages/go/docs/releasing.md).
+
 ## Dart release policy
 
 The Dart source candidate uses its own `packages/dart/pubspec.yaml` version and
