@@ -1,0 +1,2 @@
+# Development/release schema validation only; not a Dart runtime dependency.
+jsonschema==4.26.0
