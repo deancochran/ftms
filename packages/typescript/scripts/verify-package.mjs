@@ -199,7 +199,7 @@ for (const [subpath, canonical] of [
   );
   await run(
     "npm",
-    ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball],
+    ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball, "base64-js@1.5.1"],
     consumerDirectory,
     packEnvironment,
   );
@@ -290,6 +290,40 @@ if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
     path.join(consumerDirectory, "example.mjs"),
   );
   await run("node", ["example.mjs"], consumerDirectory);
+
+  // Current adoption examples run against the packed artifact, never workspace source.
+  for (const name of ["main.mjs", "recipes.mjs", "transport.mjs"]) {
+    await copyFile(
+      path.resolve(packageRoot, "../../examples/typescript-quickstart", name),
+      path.join(consumerDirectory, name),
+    );
+  }
+  await run("node", ["main.mjs"], consumerDirectory);
+  await run("node", ["recipes.mjs"], consumerDirectory);
+
+  // Execute the root README's copy/paste JS and assert its documented output.
+  const readme = await readFile(path.resolve(packageRoot, "../../README.md"), "utf8");
+  const snippet = readme.match(/```js\n([\s\S]*?)\n```/);
+  if (!snippet) throw new Error("Root README must contain its runnable JS quickstart");
+  await writeFile(
+    path.join(consumerDirectory, "readme.mjs"),
+    `import assert from "node:assert/strict";\nconst output = [];\nconsole.log = (...values) => output.push(values);\n${snippet[1]}\nassert.deepEqual(output, [[10], [90], [250], [false]]);\n`,
+  );
+  await run("node", ["readme.mjs"], consumerDirectory);
+
+  const apiIndex = await readFile(path.resolve(packageRoot, "../../docs/api.md"), "utf8");
+  const documentedFunctions = [
+    ...apiIndex.matchAll(
+      /`((?:parseFtms|parseRegisteredFtms|decodeFtms|encodeFtms|tryEncodeFtms|evaluateFtms|inspectFtms|decodeSupported)[A-Za-z]+)`/g,
+    ),
+  ].map((match) => match[1]);
+  if (documentedFunctions.length < 20)
+    throw new Error("API index unexpectedly lost public functions");
+  await writeFile(
+    path.join(consumerDirectory, "api-index.mjs"),
+    `import assert from "node:assert/strict";\nimport * as api from "${sourceManifest.name}";\nfor (const name of ${JSON.stringify(documentedFunctions)}) assert.equal(typeof api[name], "function", name);\n`,
+  );
+  await run("node", ["api-index.mjs"], consumerDirectory);
 
   await writeFile(
     path.join(consumerDirectory, "conformance.mjs"),

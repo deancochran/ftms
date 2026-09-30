@@ -1,0 +1,23 @@
+/* Starlight's documented theme variables; no framework/reset overrides. */
+:root {
+  --sl-color-accent-low: #082f49;
+  --sl-color-accent: #0284c7;
+  --sl-color-accent-high: #bae6fd;
+  --sl-content-width: 48rem;
+  --sl-sidebar-width: 18rem;
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: #e0f2fe;
+  --sl-color-accent: #0369a1;
+  --sl-color-accent-high: #0c4a6e;
+}
+
+.hero h1 {
+  max-width: 14ch;
+  letter-spacing: -0.035em;
+}
+
+.hero .tagline {
+  max-width: 48ch;
+}

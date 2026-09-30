@@ -1,4 +1,13 @@
-# Embedded C / C++ port
+# FTMS for C / C++
+
+Portable C99 codecs for Bluetooth Fitness Machine Service telemetry, features,
+ranges, statuses and control messages. Keep your existing Bluetooth stack.
+
+**Start here:** [install the released archive](INSTALL.md), then run the
+[installed C/C++ quickstart](https://github.com/deancochran/ftms/blob/main/examples/c-client/README.md).
+See the [release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md)
+for publication identity and evidence limits. This library does not manage BLE
+connections or authorize physical controls.
 
 ## Additive range inspection in 0.2.0
 
@@ -22,7 +31,7 @@ checkout `shared/conformance/{inspection,measurement-matrix}/v1/README.md` for
 contract identities, accounting and limitations. These assets are test-only,
 not dependencies of installed C consumers.
 
-## Local source candidate
+## Contributor-only local source candidate
 
 `python3 packages/c/scripts/source-bundle.py` (from the repository root) builds
 `packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz` and its SHA-256 sidecar.
@@ -71,8 +80,8 @@ provide. The tested Cortex-M0 build does so. Compatible C/C++ compiler ABI is
 required; no universal vendor-toolchain compatibility is implied.
 
 The package has a CMake 3.16+ manifest for ordinary C99 builds and installs. Its
-source-only package version is `0.2.0` (`VERSION` is the sole version
-authority); it is not a tag, publication, or release claim. The CMake package
+source package version is recorded in `VERSION` (the sole source-version
+authority); publication is recorded separately in the release matrix. The CMake package
 config and `ftms.pc` metadata read that file; no public version header is added.
 `find_package(ftms CONFIG REQUIRED)`
 exports `ftms::ftms`; package-version compatibility is same-major-and-minor, so
@@ -90,7 +99,8 @@ and run C/C++ `find_package` consumers plus a C `pkg-config --static` consumer.
 It also builds a small planner consumer through `add_subdirectory`. Python is
 only a verification dependency, not a library build or use dependency.
 
-A Make install target is also provided:
+A Make install target is also provided **in repository checkouts only**; the
+minimal released archive ships CMake files, not the repository Makefile:
 
 ```sh
 make -C packages/c
@@ -220,8 +230,8 @@ make -C packages/c check-embedded  # optional Clang Cortex-M0 compile-only evide
 
 Host tests require GCC/G++, Clang/Clang++, `ar`, Python 3 and `jsonschema`.
 Neither Python nor Node is required for ordinary library compilation/use. CMake
-packaging evidence is host-only; no Android/iOS SDK manifest, device test, or
-native package publication is added or claimed.
+packaging evidence is host-only; no Android/iOS SDK manifest or device test is
+established by those commands. Source-archive publication is recorded separately.
 The tests read canonical corpora directly:
 
 - codec v1: **97 passed, zero failed/unsupported/skipped**;

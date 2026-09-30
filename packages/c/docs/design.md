@@ -1,10 +1,12 @@
-# C first-slice design
+# C protocol design
 
-Status: partial, unreleased C99 source library. It decodes the FTMS Feature value
-and the five Supported Range values and includes a static aggregate capability
-resolver in `ftms/capabilities.h`. It has no measurement/control/status codecs,
-BLE/OS API, allocator, I/O, global mutable
-state, package manifest, or CMake promise.
+The released C99 library provides bidirectional Feature, range, measurement,
+control and status codecs, plus static capability interpretation. It has no
+BLE/OS API, allocator, I/O or global mutable state. CMake installation is provided
+in the source archive. See [release status](../../../docs/released-packages.md),
+[installation](../INSTALL.md), and the [public API index](../../../docs/api.md).
+The design notes below focus on representation and ownership; each public header
+is authoritative for its operation-specific argument and output contracts.
 
 ## API and representation
 
@@ -22,27 +24,30 @@ canonical bits only for v1 comparison.
 
 Ranges use scaled integers (`int32_t minimum/maximum/increment`) plus a divisor
 and unit: speed `u16 / 100`, inclination `s16 / 10`, power `s16`, resistance
-`u8`, and heart rate `u8`. This preserves the wire meaning without an FPU. A
+`u8` by default (explicit signed16-tenths profile also available), and heart rate
+`u8`. This preserves the wire meaning without an FPU. A
 zero increment or reversed bounds is rejected. Range characteristic layouts are
 not reused for control operands.
 
-All decoders require non-null input/output and exact lengths. Invalid range kind
+The Feature and supported-range decoders require non-null input/output and exact
+lengths. Measurement/status diagnostics have different contracts. Invalid range kind
 is reported before any input access. Outputs are assigned only after complete
 validation and thus remain unchanged on failure. Byte reads are individually
 assembled with explicitly widened operands, so unaligned input is safe; signed
 16-bit values use `int32_t` subtraction rather than a potentially
 implementation-defined unsigned-to-signed narrowing conversion. Input/output
-may overlap because bytes are read into locals before the output write. No pointer
-is retained.
+may overlap for these Feature/range operations because bytes are read into locals
+before the output write; do not generalize that permission to other APIs. No
+pointer is retained.
 
 ## References and choices
 
 * https://isocpp.org/wiki/faq/mixing-c-and-cpp — C linkage guard and C-object /
   C++-driver test.
 * https://wiki.sei.cmu.edu/confluence/display/c/EXP36-C.+Do+not+cast+pointers+into+more+strictly+aligned+pointer+types — no typed casts of packet bytes.
-* https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html — no
-  root CMake exists here, so this slice uses a port-local Makefile/direct source
-  integration rather than claiming an untested CMake install.
+* https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html — the
+  package-owned CMake project exports `ftms::ftms`; installed C/C++ consumers are
+  tested independently of the source directory. Make tooling is checkout-only.
 * FTMS 1.0 local project context and EC23224; canonical vectors are regression
   evidence, not the protocol oracle.
 
@@ -60,6 +65,10 @@ Bluetooth base UUID, so arbitrary 128-bit UUIDs are copied rather than truncated
 The caller retains the snapshot/raw bytes and scopes it to one service instance and
 generation. Discovery/read/malformed/property/duplicate evidence is distinct from
 an API argument error. Reports never contain a `canExecute` claim.
+
+For explicit C.7 evidence use the matching `_with_c7` requirements and evaluation
+APIs with identical options. Omitted evidence remains unknown, not false; read
+the [capability contract](../../../shared/protocol/capability-discovery.md).
 
 Unlike the two byte decoders, snapshot inputs and output objects/buffers must not
 overlap. Each call validates arguments before evaluating; a first evaluation

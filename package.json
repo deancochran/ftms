@@ -10,7 +10,14 @@
     "check-types": "pnpm --filter @deancochran/ftms check-types",
     "build": "pnpm --filter @deancochran/ftms build",
     "verify:package": "pnpm --filter @deancochran/ftms verify:package",
-    "verify": "pnpm --filter @deancochran/ftms verify",
+    "docs:check": "node --test tools/check-docs.test.mjs && node tools/check-docs.mjs",
+    "docs:build": "pnpm --filter @deancochran/ftms docs:build",
+    "site:dev": "pnpm docs:build && pnpm --filter @ftms/site dev",
+    "site:build": "pnpm docs:build && pnpm --filter @ftms/site build",
+    "site:preview": "pnpm --filter @ftms/site preview",
+    "site:test:browser": "pnpm --filter @ftms/site test:browser",
+    "site:verify": "pnpm lint && pnpm docs:check && pnpm --filter @ftms/site test && pnpm docs:build && pnpm --filter @ftms/site check && pnpm --filter @ftms/site build && pnpm --filter @ftms/site verify:output",
+    "verify": "pnpm --filter @deancochran/ftms verify && pnpm docs:check && pnpm docs:build",
     "prepare": "lefthook install"
   },
   "devDependencies": {

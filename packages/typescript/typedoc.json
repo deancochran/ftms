@@ -1,0 +1,12 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "tsconfig": "tsconfig.build.json",
+  "out": "docs/api",
+  "name": "FTMS TypeScript API",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "validation": { "notExported": false },
+  "treatWarningsAsErrors": true
+}

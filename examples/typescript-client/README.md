@@ -1,5 +1,9 @@
 # TypeScript FTMS client example
 
+> Historical **0.2.0 compatibility fixture**. New users should start with the
+> [current-release quickstart](../typescript-quickstart/README.md). This example
+> deliberately retains its older dependency to test compatibility.
+
 This runnable Node ESM example uses the released `@deancochran/ftms@0.2.0`
 package through its public package name. It decodes Feature and Supported Power
 Range characteristic values, parses Indoor Bike and Treadmill characteristic

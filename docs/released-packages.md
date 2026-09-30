@@ -4,6 +4,15 @@ Last checked read-only against npm and GitHub: **2026-09-29**.
 Kotlin Maven Central publication and public consumers verified: **2026-09-30**.
 This is a point-in-time record, not a promise that branch source is published.
 
+This is the **canonical current release matrix**. Begin with the
+[current TypeScript quickstart](../examples/typescript-quickstart/README.md),
+[C/C++ archive quickstart](../examples/c-client/README.md),
+[Swift guide](../packages/swift/README.md), or
+[Kotlin guide](../packages/kotlin/README.md).
+The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
+with an evolving API and no capability APIs; consult its separate release evidence.
+Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
 ## Published: TypeScript 0.4.0 / C 0.2.0
 
 PR [#5](https://github.com/deancochran/ftms/pull/5) merged at
@@ -85,22 +94,21 @@ are verified without another upload. See the runbook for recovery and rotation.
 | --- | --- | --- | --- |
 | TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native implementations are separate packages, not npm exports |
 | C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
-| Swift | None | None | Implementation and SwiftPM release |
+| Swift | GitHub `swift-v0.1.0` | [Swift guide and public consumer evidence](../packages/swift/README.md) | BLE transport and universal equipment compatibility |
 | Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 
 ## Start with the released TypeScript package
 
 ```sh
-cd examples/typescript-client
+cd examples/typescript-quickstart
 npm install --ignore-scripts --no-audit --no-fund
 npm start
+npm test
 ```
 
-The example decodes feature declarations, a supported power range, indoor-bike
-and treadmill measurements, and constructs Request Control bytes without sending
-them. It uses only APIs present in npm 0.2.0. It passed against a fresh registry
-installation and separately against the current candidate tarball. Neither test
-communicates with equipment.
+The current-release quickstart asserts normalized metrics, truncation behavior,
+capabilities, ranges and byte conversions without communicating with equipment.
+The separate `typescript-client` example preserves the historical npm 0.2.0 baseline.
 
 ## C installation evidence
 
