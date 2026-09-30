@@ -1,0 +1,41 @@
+name: Release Swift
+
+on:
+  push:
+    tags: ["swift-v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: swift-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    uses: ./.github/workflows/native-swift.yml
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: swift-*-evidence
+          path: .build/evidence
+      - name: Validate release identity and completed evidence
+        run: python3 packages/swift/Verification/release.py "$GITHUB_REF_NAME" .build/evidence
+      - name: Publish verified source tag and evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" .build/swift-release/*.json .build/swift-release/SHA256SUMS \
+            --verify-tag --title "FTMS Swift ${RELEASE_TAG#swift-v}" \
+            --notes-file .build/swift-release/notes.md --latest=false
