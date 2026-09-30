@@ -16,7 +16,7 @@ import time
 import urllib.error
 import urllib.request
 
-HERE = Path(__file__).resolve().parents[1]
+HERE = Path(os.environ.get("FTMS_CSHARP_PACKAGE_ROOT", Path(__file__).resolve().parents[1])).resolve()
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE / "verification"))
 import importlib.util
@@ -42,13 +42,15 @@ def require_clean():
     if run("git", "status", "--porcelain", "--untracked-files=all").strip():
         raise ValueError("Release source must be clean before verification artifacts are created")
 
-def validate_tag(value, release_version, pushed_commit):
+def validate_tag(value, release_version, tag_object):
     if value != f"csharp-v{release_version}":
         raise ValueError("Release tag must exactly match csharp-vVERSION")
     if run("git", "cat-file", "-t", f"refs/tags/{value}").strip() != "tag":
         raise ValueError("Release tag must be an annotated tag")
-    if run("git", "rev-parse", f"{value}^{{commit}}").strip() != pushed_commit:
-        raise ValueError("Push event commit does not match the signed tag target")
+    # Observed GitHub tag push payload: `after` is the annotated tag object,
+    # whereas the Actions run head_sha and checked-out HEAD are the commit.
+    if run("git", "rev-parse", f"{value}^{{tag}}").strip() != tag_object:
+        raise ValueError("Release tag object does not match the signed annotated tag")
     signer = os.environ.get("CSHARP_RELEASE_SIGNER", "").strip()
     if not signer.startswith("ssh-") or len(signer.split()) != 2:
         raise ValueError("CSHARP_RELEASE_SIGNER must be the pinned SSH public key (type and base64 only)")
@@ -75,16 +77,17 @@ def identity_manifest(release_version):
         if report["artifactSha256"].get(path.name) != sha(path):
             raise ValueError("Package bytes changed after consumer verification")
     manifest = {"packageId": PACKAGE_ID, "version": release_version, "sourceCommit": commit,
+                "workflowCommit": os.environ.get("GITHUB_SHA"),
                 "dirty": False, "files": {p.name: {"sha256": sha(p), "size": p.stat().st_size} for p in files},
                 "payloads": {p.name: verify_package.audit_archive(p, release_version, p.suffix == ".snupkg") for p in files}}
     output = HERE / "artifacts/release-manifest.json"
     output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     return manifest
 
-def gate(tag, pushed_commit):
+def gate(tag, tag_object):
     release_version = version()
     require_clean()
-    validate_tag(tag, release_version, pushed_commit)
+    validate_tag(tag, release_version, tag_object)
     if not re.search(r"^## " + re.escape(release_version) + r"\s*$", (HERE / "CHANGELOG.md").read_text(), re.MULTILINE):
         raise ValueError("CHANGELOG must contain the release version heading")
     env = dict(os.environ, FTMS_VERIFY_AOT="1", FTMS_AOT_RID="linux-x64")
@@ -157,10 +160,10 @@ def public_verify(manifest_path, existing=False):
 def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
-    p = sub.add_parser("gate"); p.add_argument("--tag", required=True); p.add_argument("--pushed-commit", required=True)
+    p = sub.add_parser("gate"); p.add_argument("--tag", required=True); p.add_argument("--tag-object", required=True)
     p = sub.add_parser("public-verify"); p.add_argument("--manifest", required=True); p.add_argument("--existing", action="store_true")
     args = parser.parse_args()
-    if args.command == "gate": gate(args.tag, args.pushed_commit)
+    if args.command == "gate": gate(args.tag, args.tag_object)
     else: public_verify(args.manifest, args.existing)
 
 if __name__ == "__main__":
