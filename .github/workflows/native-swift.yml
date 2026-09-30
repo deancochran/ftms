@@ -32,7 +32,7 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swift --version
-          /tmp/swift-verification/bin/python packages/swift/Verification/verify.py
+          /tmp/swift-verification/bin/python packages/swift/Verification/verify.py --require-clean
       - name: Verify isolated Git revision consumer
         shell: bash
         run: |
@@ -51,7 +51,9 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     env:
-      DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
+      # The macOS 15 image guarantees the complete SDK set for its default Xcode.
+      # Older installed Xcodes can lack tvOS/watchOS platform components.
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -64,7 +66,7 @@ jobs:
         run: |
           swift --version
           xcodebuild -version
-          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/verify.py
+          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/verify.py --require-clean
       - name: Verify Git consumer on macOS and Apple SDKs
         run: |
           revision=$(git rev-parse HEAD)

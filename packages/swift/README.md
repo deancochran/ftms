@@ -52,7 +52,7 @@ Python and jsonschema are test tooling, not library dependencies. A Swift 6.0+
 toolchain must be on PATH. Local verification used Swift 6.0.3 on Linux x86_64;
 the official Ubuntu toolchain required local library compatibility shims on the
 Arch-derived host. The Linux CI definition uses the matching Ubuntu toolchain
-container instead. The macOS job selects Xcode 16.2 on macOS 15, runs the same
+container instead. The macOS job selects Xcode 16.4 on macOS 15, runs the same
 native suite and builds an isolated Git consumer against the Apple SDKs. Release
 publication is blocked until both jobs pass for the tag; attached release reports
 record the actual toolchain, source revision and SDK results.
