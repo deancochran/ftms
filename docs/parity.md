@@ -17,7 +17,7 @@ capability parity below does not imply a corresponding TypeScript packet-plannin
 or assembly API. They form a transport-independent convenience layer above codecs, not a missing
 TypeScript wire codec. This release-packaging milestone records that difference
 rather than claiming renewed complete API parity or silently expanding protocol
-scope. Swift now has a separate unreleased native implementation; its evidence is
+scope. Swift now has a separately released native 0.1.0 implementation; its evidence is
 documented in [the Swift package](../packages/swift/README.md), not inferred from
 this TypeScript/C audit. Kotlin remains scaffold-only in this checkout.
 

@@ -2,7 +2,7 @@
 
 Published versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
 codecs, static capability interpretation and additive range inspection. Swift
-has an unreleased native implementation with Linux host verification; Kotlin's
+**0.1.0** is published with Linux/macOS and Apple SDK verification; Kotlin's
 state in this checkout remains a README-only scaffold. See the
 [Swift package](swift/README.md) for exact limits and [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.
