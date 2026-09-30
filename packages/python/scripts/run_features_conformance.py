@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import tomllib
 from pathlib import Path
 from typing import Any, cast
 
@@ -219,7 +220,9 @@ def run(v1_directory: Path | None = None, values_directory: Path | None = None) 
     inspect = ROOT / "shared/conformance/inspection/v1"
     report: dict[str, Any] = {
         "package": "deancochran-ftms",
-        "packageVersion": "0.1.0a1",
+        "packageVersion": tomllib.loads(
+            (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+        )["project"]["version"],
         "sourceCommit": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),

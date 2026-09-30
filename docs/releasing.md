@@ -10,11 +10,21 @@ Packages are independently versioned; a version in one package does not imply a 
 | Rust | `rust-vVERSION` | crates.io |
 | Swift | `swift-vVERSION` | GitHub source/evidence release |
 | C | `c-vVERSION` | GitHub source release |
+| C# | `csharp-vVERSION` (reserved) | Local NuGet prerelease artifacts only; publication not configured and requires separate authorization |
 
 Run `pnpm release:prepare PORT --dry-run` first. It is deliberately read-only:
 version/changelog updates can require package-specific lockfile or metadata changes,
 so make them in a reviewed PR using the package runbook. It never tags, pushes,
 publishes, or contacts credentials; Python readiness retains PEP 440 validation.
+
+C# readiness validates canonical NuGet version identity, not NuGet ownership or
+publication readiness. Its credential-free native workflow verifies local
+artifacts only. Before enabling a tag publisher, review account/package ownership,
+signed-tag identity, the protected NuGet environment and trusted-publishing policy.
+Public verification must compare the tested archive's payload with the downloaded
+package and verify NuGet's repository signature: repository signing changes the
+archive hash without changing its payload. Never accept an existing version solely
+because a push reports a duplicate.
 
 Retries are idempotent only for the exact tag commit and exact artifact hashes: an absent GitHub release is created, matching assets continue, missing assets upload, and a different asset or target commit fails. PyPI and npm releases likewise verify public artifact integrity before accepting an existing version; retries never replace published bytes.
 

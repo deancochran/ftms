@@ -7,7 +7,8 @@ is authoritative for what is available from this source tree.
 
 - TypeScript, C, Swift and Kotlin `FullWire` protocol codecs with static capability
   evidence; Python provides a partial-alpha `FullWire` raw-codec surface without
-  capability evaluation; Rust provides an unpublished `no_std` `FullWire` raw-codec
+  capability evaluation in the published artifact, plus an unreleased source
+  evaluator verified against the shared capability corpus; Rust provides an unpublished `no_std` `FullWire` raw-codec
   source candidate with range inspection and no capability evaluator.
 - Installed-consumer examples, versioned fixtures and host verification.
 - Explicit malformed-input diagnostics and caller-selected format options.

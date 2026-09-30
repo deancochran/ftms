@@ -3,6 +3,21 @@
 // ecosystem-specific lockfile and metadata consequences and are reviewed in PRs.
 import { readFile } from "node:fs/promises";
 
+// Deliberately narrower than NuGet's accepted input: VERSION must already be
+// canonical. NuGet ignores build metadata and normalizes abbreviated versions.
+export function validNuGetVersion(version) {
+  return (
+    version === version.trim() &&
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[a-z-][0-9a-z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-z-][0-9a-z-]*))*)?$/.test(
+      version,
+    ) &&
+    version
+      .split("-")[0]
+      .split(".")
+      .every((part) => Number(part) <= 2147483647)
+  );
+}
+
 export const ports = {
   typescript: {
     version: "packages/typescript/package.json",
@@ -35,6 +50,12 @@ export const ports = {
     version: "packages/swift/VERSION",
     changelog: "packages/swift/CHANGELOG.md",
     match: (s) => s.trim(),
+  },
+  csharp: {
+    version: "packages/csharp/VERSION",
+    changelog: "packages/csharp/CHANGELOG.md",
+    match: (s) => s.trim(),
+    valid: validNuGetVersion,
   },
 };
 

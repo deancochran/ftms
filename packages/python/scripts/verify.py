@@ -24,6 +24,7 @@ COMMANDS = (
         "scripts/run_measurement_status_conformance.py",
     ],
     ["uv", "run", "--locked", "--group", "dev", "python", "scripts/run_measurement_matrix.py"],
+    ["uv", "run", "--locked", "--group", "dev", "python", "scripts/run_capability_conformance.py"],
     ["uv", "run", "--locked", "--group", "dev", "python", "scripts/verify_package.py"],
 )
 

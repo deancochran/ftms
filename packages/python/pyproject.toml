@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "deancochran-ftms"
-version = "0.1.0a1"
-description = "Pure Python FTMS feature, range, control, measurement, and status codecs (alpha)"
+version = "0.1.0a2"
+description = "Pure Python FTMS codecs and static capability evidence evaluation (alpha)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -24,7 +24,7 @@ dependencies = []
 [project.urls]
 Source = "https://github.com/deancochran/ftms"
 Issues = "https://github.com/deancochran/ftms/issues"
-Documentation = "https://github.com/deancochran/ftms/blob/python-v0.1.0a1/packages/python/README.md"
+Documentation = "https://github.com/deancochran/ftms/blob/python-v0.1.0a2/packages/python/README.md"
 
 [dependency-groups]
 dev = ["jsonschema>=4.23", "mypy>=1.13", "pytest>=8.3", "ruff>=0.8", "types-jsonschema>=4.23"]
@@ -43,6 +43,7 @@ only-include = [
   "uv.lock",
   "src/deancochran_ftms/__init__.py",
   "src/deancochran_ftms/_binary.py",
+  "src/deancochran_ftms/capabilities.py",
   "src/deancochran_ftms/_errors.py",
   "src/deancochran_ftms/control.py",
   "src/deancochran_ftms/features.py",
@@ -51,11 +52,13 @@ only-include = [
   "src/deancochran_ftms/ranges.py",
   "src/deancochran_ftms/statuses.py",
   "scripts/run_features_conformance.py",
+  "scripts/run_capability_conformance.py",
   "scripts/run_measurement_matrix.py",
   "scripts/run_measurement_status_conformance.py",
   "scripts/verify.py",
   "scripts/verify_package.py",
   "tests/test_binary.py",
+  "tests/test_capabilities.py",
   "tests/test_conformance.py",
   "tests/test_features.py",
   "tests/test_measurement_validation.py",
