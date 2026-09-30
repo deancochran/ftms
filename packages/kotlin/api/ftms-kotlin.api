@@ -1,0 +1,856 @@
+public final class io/github/deancochran/ftms/ControlCodec {
+	public static final field INSTANCE Lio/github/deancochran/ftms/ControlCodec;
+	public static final fun decodeCommand ([B)Lio/github/deancochran/ftms/ControlCommand;
+	public static final fun decodeCommand ([BLio/github/deancochran/ftms/ResistanceControlFormat;)Lio/github/deancochran/ftms/ControlCommand;
+	public static synthetic fun decodeCommand$default ([BLio/github/deancochran/ftms/ResistanceControlFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand;
+	public static final fun decodeRequest ([B)Lio/github/deancochran/ftms/ControlRequest;
+	public static final fun decodeRequest ([BLio/github/deancochran/ftms/ResistanceControlFormat;)Lio/github/deancochran/ftms/ControlRequest;
+	public static synthetic fun decodeRequest$default ([BLio/github/deancochran/ftms/ResistanceControlFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/ControlRequest;
+	public static final fun decodeResponse ([B)Lio/github/deancochran/ftms/ControlResponse;
+	public static final fun encodeCommand (Lio/github/deancochran/ftms/ControlCommand;)[B
+	public static final fun encodeCommand (Lio/github/deancochran/ftms/ControlCommand;Lio/github/deancochran/ftms/ResistanceControlFormat;)[B
+	public static synthetic fun encodeCommand$default (Lio/github/deancochran/ftms/ControlCommand;Lio/github/deancochran/ftms/ResistanceControlFormat;ILjava/lang/Object;)[B
+	public static final fun encodeRequest (Lio/github/deancochran/ftms/ControlRequest;)[B
+	public static final fun encodeRequest (Lio/github/deancochran/ftms/ControlRequest;Lio/github/deancochran/ftms/ResistanceControlFormat;)[B
+	public static synthetic fun encodeRequest$default (Lio/github/deancochran/ftms/ControlRequest;Lio/github/deancochran/ftms/ResistanceControlFormat;ILjava/lang/Object;)[B
+	public static final fun encodeResponse (Lio/github/deancochran/ftms/ControlResponse;)[B
+}
+
+public abstract class io/github/deancochran/ftms/ControlCommand {
+	public synthetic fun <init> (Lio/github/deancochran/ftms/ControlRequest;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getRaw ()Lio/github/deancochran/ftms/ControlRequest;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$FiveZoneTime : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (IIIII)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun component5 ()I
+	public final fun copy (IIIII)Lio/github/deancochran/ftms/ControlCommand$FiveZoneTime;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$FiveZoneTime;IIIIIILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$FiveZoneTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getZone1Seconds ()I
+	public final fun getZone2Seconds ()I
+	public final fun getZone3Seconds ()I
+	public final fun getZone4Seconds ()I
+	public final fun getZone5Seconds ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$IndoorBikeSimulation : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (IIII)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun copy (IIII)Lio/github/deancochran/ftms/ControlCommand$IndoorBikeSimulation;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$IndoorBikeSimulation;IIIIILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$IndoorBikeSimulation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGradeHundredthsPercent ()I
+	public final fun getRollingResistanceTenThousandths ()I
+	public final fun getWindResistanceHundredths ()I
+	public final fun getWindThousandthsMetresPerSecond ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$RequestControl : io/github/deancochran/ftms/ControlCommand {
+	public static final field INSTANCE Lio/github/deancochran/ftms/ControlCommand$RequestControl;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$Reset : io/github/deancochran/ftms/ControlCommand {
+	public static final field INSTANCE Lio/github/deancochran/ftms/ControlCommand$Reset;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$SpinDown : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (Lio/github/deancochran/ftms/SpinDownAction;)V
+	public final fun component1 ()Lio/github/deancochran/ftms/SpinDownAction;
+	public final fun copy (Lio/github/deancochran/ftms/SpinDownAction;)Lio/github/deancochran/ftms/ControlCommand$SpinDown;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$SpinDown;Lio/github/deancochran/ftms/SpinDownAction;ILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$SpinDown;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Lio/github/deancochran/ftms/SpinDownAction;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$StartResume : io/github/deancochran/ftms/ControlCommand {
+	public static final field INSTANCE Lio/github/deancochran/ftms/ControlCommand$StartResume;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$StopPause : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (Lio/github/deancochran/ftms/StopPauseAction;)V
+	public final fun component1 ()Lio/github/deancochran/ftms/StopPauseAction;
+	public final fun copy (Lio/github/deancochran/ftms/StopPauseAction;)Lio/github/deancochran/ftms/ControlCommand$StopPause;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$StopPause;Lio/github/deancochran/ftms/StopPauseAction;ILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$StopPause;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Lio/github/deancochran/ftms/StopPauseAction;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetCadence : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetCadence;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetCadence;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetCadence;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHalfRevolutionsPerMinute ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetDistance : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetDistance;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetDistance;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetDistance;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMetres ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetEnergy : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetEnergy;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetEnergy;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetEnergy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKilocalories ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetHeartRate : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetHeartRate;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetHeartRate;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetHeartRate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBeatsPerMinute ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetInclination : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetInclination;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetInclination;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetInclination;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTenthsPercent ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetPower : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetPower;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetPower;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetPower;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getWatts ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetResistance : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetResistance;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetResistance;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetResistance;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTenthsLevel ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetSpeed : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetSpeed;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetSpeed;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetSpeed;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHundredthsKmh ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetSteps : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetSteps;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetSteps;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetSteps;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSteps ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetStrides : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetStrides;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetStrides;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetStrides;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStrides ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TargetTrainingTime : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$TargetTrainingTime;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TargetTrainingTime;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TargetTrainingTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSeconds ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$ThreeZoneTime : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (III)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (III)Lio/github/deancochran/ftms/ControlCommand$ThreeZoneTime;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$ThreeZoneTime;IIIILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$ThreeZoneTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getZone1Seconds ()I
+	public final fun getZone2Seconds ()I
+	public final fun getZone3Seconds ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$TwoZoneTime : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lio/github/deancochran/ftms/ControlCommand$TwoZoneTime;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$TwoZoneTime;IIILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$TwoZoneTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getZone1Seconds ()I
+	public final fun getZone2Seconds ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlCommand$WheelCircumference : io/github/deancochran/ftms/ControlCommand {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/deancochran/ftms/ControlCommand$WheelCircumference;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/ControlCommand$WheelCircumference;IILjava/lang/Object;)Lio/github/deancochran/ftms/ControlCommand$WheelCircumference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTenthsMillimetres ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/ControlRequest {
+	public fun <init> (I[J)V
+	public final fun getOpcode ()I
+	public final fun operands ()[J
+}
+
+public final class io/github/deancochran/ftms/ControlResponse {
+	public fun <init> (IIIIIIII)V
+	public final fun getHigh ()I
+	public final fun getLow ()I
+	public final fun getParameter ()I
+	public final fun getRequestOpcode ()I
+	public final fun getResultCode ()I
+	public final fun getUnexpectedParameters ()I
+	public final fun getUnknownRequest ()I
+	public final fun getUnknownResult ()I
+}
+
+public final class io/github/deancochran/ftms/FeatureCodec {
+	public static final field INSTANCE Lio/github/deancochran/ftms/FeatureCodec;
+	public static final fun decode ([B)Lio/github/deancochran/ftms/Features;
+	public static final fun encode (Lio/github/deancochran/ftms/Features;)[B
+}
+
+public final class io/github/deancochran/ftms/Features {
+	public fun <init> (JJ)V
+	public final fun getMachine ()J
+	public final fun getTarget ()J
+}
+
+public final class io/github/deancochran/ftms/FtmsError : java/lang/Enum {
+	public static final field KIND Lio/github/deancochran/ftms/FtmsError;
+	public static final field LENGTH Lio/github/deancochran/ftms/FtmsError;
+	public static final field RANGE Lio/github/deancochran/ftms/FtmsError;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/FtmsError;
+	public static fun values ()[Lio/github/deancochran/ftms/FtmsError;
+}
+
+public final class io/github/deancochran/ftms/FtmsException : java/lang/IllegalArgumentException {
+	public fun <init> (Lio/github/deancochran/ftms/FtmsError;Ljava/lang/String;)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/FtmsError;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getError ()Lio/github/deancochran/ftms/FtmsError;
+}
+
+public final class io/github/deancochran/ftms/InspectionStatus : java/lang/Enum {
+	public static final field LENGTH Lio/github/deancochran/ftms/InspectionStatus;
+	public static final field RANGE Lio/github/deancochran/ftms/InspectionStatus;
+	public static final field VALID Lio/github/deancochran/ftms/InspectionStatus;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/InspectionStatus;
+	public static fun values ()[Lio/github/deancochran/ftms/InspectionStatus;
+}
+
+public final class io/github/deancochran/ftms/RangeCandidate {
+	public fun <init> (Lio/github/deancochran/ftms/RangeProfile;ILio/github/deancochran/ftms/InspectionStatus;Lio/github/deancochran/ftms/SupportedRange;)V
+	public final fun getExpectedLength ()I
+	public final fun getProfile ()Lio/github/deancochran/ftms/RangeProfile;
+	public final fun getStatus ()Lio/github/deancochran/ftms/InspectionStatus;
+	public final fun getValue ()Lio/github/deancochran/ftms/SupportedRange;
+}
+
+public final class io/github/deancochran/ftms/RangeCodec {
+	public static final field INSTANCE Lio/github/deancochran/ftms/RangeCodec;
+	public static final fun decode (Lio/github/deancochran/ftms/RangeKind;[B)Lio/github/deancochran/ftms/SupportedRange;
+	public static final fun decode (Lio/github/deancochran/ftms/RangeKind;[BLio/github/deancochran/ftms/ResistanceRangeFormat;)Lio/github/deancochran/ftms/SupportedRange;
+	public static synthetic fun decode$default (Lio/github/deancochran/ftms/RangeKind;[BLio/github/deancochran/ftms/ResistanceRangeFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/SupportedRange;
+	public static final fun encode (Lio/github/deancochran/ftms/SupportedRange;)[B
+	public static final fun encode (Lio/github/deancochran/ftms/SupportedRange;Lio/github/deancochran/ftms/ResistanceRangeFormat;)[B
+	public static synthetic fun encode$default (Lio/github/deancochran/ftms/SupportedRange;Lio/github/deancochran/ftms/ResistanceRangeFormat;ILjava/lang/Object;)[B
+	public static final fun inspect (Lio/github/deancochran/ftms/RangeKind;[B)Lio/github/deancochran/ftms/RangeInspection;
+	public static final fun inspect (Lio/github/deancochran/ftms/RangeKind;[BLio/github/deancochran/ftms/ResistanceRangeFormat;)Lio/github/deancochran/ftms/RangeInspection;
+	public static synthetic fun inspect$default (Lio/github/deancochran/ftms/RangeKind;[BLio/github/deancochran/ftms/ResistanceRangeFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/RangeInspection;
+}
+
+public final class io/github/deancochran/ftms/RangeInspection {
+	public fun <init> (Lio/github/deancochran/ftms/RangeProfile;IILio/github/deancochran/ftms/InspectionStatus;Lio/github/deancochran/ftms/SupportedRange;Ljava/util/List;)V
+	public final fun getActualLength ()I
+	public final fun getCandidates ()Ljava/util/List;
+	public final fun getExpectedLength ()I
+	public final fun getSelectedProfile ()Lio/github/deancochran/ftms/RangeProfile;
+	public final fun getStatus ()Lio/github/deancochran/ftms/InspectionStatus;
+	public final fun getValue ()Lio/github/deancochran/ftms/SupportedRange;
+}
+
+public final class io/github/deancochran/ftms/RangeKind : java/lang/Enum {
+	public static final field HEART_RATE Lio/github/deancochran/ftms/RangeKind;
+	public static final field INCLINATION Lio/github/deancochran/ftms/RangeKind;
+	public static final field POWER Lio/github/deancochran/ftms/RangeKind;
+	public static final field RESISTANCE Lio/github/deancochran/ftms/RangeKind;
+	public static final field SPEED Lio/github/deancochran/ftms/RangeKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/RangeKind;
+	public static fun values ()[Lio/github/deancochran/ftms/RangeKind;
+}
+
+public final class io/github/deancochran/ftms/RangeProfile : java/lang/Enum {
+	public static final field SINT16_TENTHS Lio/github/deancochran/ftms/RangeProfile;
+	public static final field SINT16_WATTS Lio/github/deancochran/ftms/RangeProfile;
+	public static final field UINT16_HUNDREDTHS Lio/github/deancochran/ftms/RangeProfile;
+	public static final field UINT8_BPM Lio/github/deancochran/ftms/RangeProfile;
+	public static final field UINT8_WHOLE Lio/github/deancochran/ftms/RangeProfile;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/RangeProfile;
+	public static fun values ()[Lio/github/deancochran/ftms/RangeProfile;
+}
+
+public final class io/github/deancochran/ftms/RangeUnit : java/lang/Enum {
+	public static final field BEATS_PER_MINUTE Lio/github/deancochran/ftms/RangeUnit;
+	public static final field KILOMETRES_PER_HOUR Lio/github/deancochran/ftms/RangeUnit;
+	public static final field LEVEL Lio/github/deancochran/ftms/RangeUnit;
+	public static final field PERCENT Lio/github/deancochran/ftms/RangeUnit;
+	public static final field WATTS Lio/github/deancochran/ftms/RangeUnit;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getWire ()I
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/RangeUnit;
+	public static fun values ()[Lio/github/deancochran/ftms/RangeUnit;
+}
+
+public final class io/github/deancochran/ftms/ResistanceControlFormat : java/lang/Enum {
+	public static final field SINT16_TENTHS Lio/github/deancochran/ftms/ResistanceControlFormat;
+	public static final field UINT8_TENTHS Lio/github/deancochran/ftms/ResistanceControlFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/ResistanceControlFormat;
+	public static fun values ()[Lio/github/deancochran/ftms/ResistanceControlFormat;
+}
+
+public final class io/github/deancochran/ftms/ResistanceRangeFormat : java/lang/Enum {
+	public static final field SINT16_TENTHS Lio/github/deancochran/ftms/ResistanceRangeFormat;
+	public static final field UINT8_WHOLE Lio/github/deancochran/ftms/ResistanceRangeFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/ResistanceRangeFormat;
+	public static fun values ()[Lio/github/deancochran/ftms/ResistanceRangeFormat;
+}
+
+public final class io/github/deancochran/ftms/SpinDownAction : java/lang/Enum {
+	public static final field IGNORE Lio/github/deancochran/ftms/SpinDownAction;
+	public static final field START Lio/github/deancochran/ftms/SpinDownAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getWire ()I
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/SpinDownAction;
+	public static fun values ()[Lio/github/deancochran/ftms/SpinDownAction;
+}
+
+public final class io/github/deancochran/ftms/StopPauseAction : java/lang/Enum {
+	public static final field PAUSE Lio/github/deancochran/ftms/StopPauseAction;
+	public static final field STOP Lio/github/deancochran/ftms/StopPauseAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getWire ()I
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/StopPauseAction;
+	public static fun values ()[Lio/github/deancochran/ftms/StopPauseAction;
+}
+
+public final class io/github/deancochran/ftms/SupportedRange {
+	public fun <init> (Lio/github/deancochran/ftms/RangeKind;IIIILio/github/deancochran/ftms/RangeUnit;)V
+	public final fun getIncrement ()I
+	public final fun getKind ()Lio/github/deancochran/ftms/RangeKind;
+	public final fun getMaximum ()I
+	public final fun getMinimum ()I
+	public final fun getScaleDivisor ()I
+	public final fun getUnit ()Lio/github/deancochran/ftms/RangeUnit;
+}
+
+public final class io/github/deancochran/ftms/capability/C7Evidence {
+	public fun <init> ()V
+	public fun <init> (Lio/github/deancochran/ftms/capability/TruthValue;Lio/github/deancochran/ftms/capability/TruthValue;)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/capability/TruthValue;Lio/github/deancochran/ftms/capability/TruthValue;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getBondingSupported ()Lio/github/deancochran/ftms/capability/TruthValue;
+	public final fun getFeatureMayChangeOverLifetime ()Lio/github/deancochran/ftms/capability/TruthValue;
+}
+
+public final class io/github/deancochran/ftms/capability/CapabilityDiagnostic {
+	public final fun getCode ()Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public final fun getInputIndex ()Ljava/lang/Integer;
+	public final fun getKnownKind ()Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+}
+
+public final class io/github/deancochran/ftms/capability/CapabilityReport {
+	public final fun getDiagnosticCount ()I
+	public final fun getDiagnostics ()Ljava/util/List;
+	public final fun getDiscovery ()Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public final fun getFeature ()Lio/github/deancochran/ftms/capability/FeatureEvidence;
+	public final fun getGeneration ()J
+	public final fun getObservationCount ()I
+	public final fun getObservations ()Ljava/util/List;
+	public final fun getOperations ()Ljava/util/List;
+	public final fun getPresence ()Ljava/util/List;
+	public final fun getRanges ()Ljava/util/List;
+	public final fun getScope ()Lio/github/deancochran/ftms/capability/ServiceScope;
+}
+
+public final class io/github/deancochran/ftms/capability/CapabilitySnapshot {
+	public fun <init> (Lio/github/deancochran/ftms/capability/DiscoveryState;Lio/github/deancochran/ftms/capability/ServiceScope;JLjava/util/List;Lio/github/deancochran/ftms/capability/C7Evidence;)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/capability/DiscoveryState;Lio/github/deancochran/ftms/capability/ServiceScope;JLjava/util/List;Lio/github/deancochran/ftms/capability/C7Evidence;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getC7 ()Lio/github/deancochran/ftms/capability/C7Evidence;
+	public final fun getCharacteristics ()Ljava/util/List;
+	public final fun getDiscovery ()Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public final fun getGeneration ()J
+	public final fun getScope ()Lio/github/deancochran/ftms/capability/ServiceScope;
+}
+
+public final class io/github/deancochran/ftms/capability/CharacteristicEvidence {
+	public fun <init> (Ljava/lang/String;ILio/github/deancochran/ftms/capability/ReadState;Lio/github/deancochran/ftms/capability/ReadReason;[B)V
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/deancochran/ftms/capability/ReadState;Lio/github/deancochran/ftms/capability/ReadReason;[BILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getProperties ()I
+	public final fun getReadReason ()Lio/github/deancochran/ftms/capability/ReadReason;
+	public final fun getReadState ()Lio/github/deancochran/ftms/capability/ReadState;
+	public final fun getUuid ()Ljava/lang/String;
+	public final fun readBytes ()[B
+}
+
+public final class io/github/deancochran/ftms/capability/Declaration : java/lang/Enum {
+	public static final field NOT_SUPPORTED Lio/github/deancochran/ftms/capability/Declaration;
+	public static final field SUPPORTED Lio/github/deancochran/ftms/capability/Declaration;
+	public static final field UNKNOWN Lio/github/deancochran/ftms/capability/Declaration;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/Declaration;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/Declaration;
+}
+
+public final class io/github/deancochran/ftms/capability/DecodeState : java/lang/Enum {
+	public static final field FAILED Lio/github/deancochran/ftms/capability/DecodeState;
+	public static final field MALFORMED Lio/github/deancochran/ftms/capability/DecodeState;
+	public static final field NOT_ATTEMPTED Lio/github/deancochran/ftms/capability/DecodeState;
+	public static final field VALID Lio/github/deancochran/ftms/capability/DecodeState;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/DecodeState;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/DecodeState;
+}
+
+public final class io/github/deancochran/ftms/capability/DiagnosticCode : java/lang/Enum {
+	public static final field C7_EVIDENCE_INSUFFICIENT Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field DISCOVERY_FAILED Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field DISCOVERY_INCOMPLETE Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field DUPLICATE_CHARACTERISTIC Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field EXCLUDED_PROPERTY_PRESENT Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field MALFORMED_BYTES Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field READ_FAILED Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field READ_SECURITY_REQUIRED Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field REQUIRED_CHARACTERISTIC_MISSING Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field REQUIRED_PROPERTY_MISSING Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field REQUIRED_RANGE_MISSING Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field SCOPE_CONTRADICTION Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static final field SCOPE_UNAVAILABLE Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/DiagnosticCode;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/DiagnosticCode;
+}
+
+public final class io/github/deancochran/ftms/capability/DiscoveryState : java/lang/Enum {
+	public static final field COMPLETE Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public static final field FAILED Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public static final field NOT_ATTEMPTED Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public static final field PARTIAL Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/DiscoveryState;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/DiscoveryState;
+}
+
+public final class io/github/deancochran/ftms/capability/FeatureEvidence {
+	public final fun getDecode ()Lio/github/deancochran/ftms/capability/DecodeState;
+	public final fun getInputIndex ()Ljava/lang/Integer;
+	public final fun getMachineRaw ()J
+	public final fun getMachineUnknown ()J
+	public final fun getPresence ()Lio/github/deancochran/ftms/capability/Presence;
+	public final fun getTargetRaw ()J
+	public final fun getTargetUnknown ()J
+}
+
+public final class io/github/deancochran/ftms/capability/FtmsCapabilityEvaluator {
+	public static final field INSTANCE Lio/github/deancochran/ftms/capability/FtmsCapabilityEvaluator;
+	public static final fun evaluate (Lio/github/deancochran/ftms/capability/CapabilitySnapshot;)Lio/github/deancochran/ftms/capability/CapabilityReport;
+	public static final fun evaluate (Lio/github/deancochran/ftms/capability/CapabilitySnapshot;Lio/github/deancochran/ftms/capability/RangeFormatOptions;)Lio/github/deancochran/ftms/capability/CapabilityReport;
+}
+
+public final class io/github/deancochran/ftms/capability/KnownCharacteristicKind : java/lang/Enum {
+	public static final field CONTROL_POINT Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field CROSS_TRAINER_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field FEATURE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field HEART_RATE_RANGE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field INCLINATION_RANGE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field INDOOR_BIKE_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field MACHINE_STATUS Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field POWER_RANGE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field RESISTANCE_RANGE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field ROWER_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field SPEED_RANGE Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field STAIR_CLIMBER_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field STEP_CLIMBER_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field TRAINING_STATUS Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field TREADMILL_DATA Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static final field UNKNOWN Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+}
+
+public final class io/github/deancochran/ftms/capability/Observation {
+	public final fun getInputIndex ()I
+	public final fun getKnownKind ()Lio/github/deancochran/ftms/capability/KnownCharacteristicKind;
+	public final fun getProperties ()I
+	public final fun getReadReason ()Lio/github/deancochran/ftms/capability/ReadReason;
+	public final fun getReadSize ()I
+	public final fun getReadState ()Lio/github/deancochran/ftms/capability/ReadState;
+	public final fun getUuid ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/capability/OperationEvidence {
+	public final fun getDeclaration ()Lio/github/deancochran/ftms/capability/Declaration;
+	public final fun getOpcode ()I
+	public final fun getOptionalInTable ()Z
+	public final fun getPrerequisite ()Lio/github/deancochran/ftms/capability/Prerequisite;
+	public final fun getReasons ()I
+	public final fun getTargetBit ()Ljava/lang/Integer;
+}
+
+public final class io/github/deancochran/ftms/capability/Prerequisite : java/lang/Enum {
+	public static final field INCOMPLETE Lio/github/deancochran/ftms/capability/Prerequisite;
+	public static final field INCONSISTENT Lio/github/deancochran/ftms/capability/Prerequisite;
+	public static final field NOT_APPLICABLE Lio/github/deancochran/ftms/capability/Prerequisite;
+	public static final field SATISFIED Lio/github/deancochran/ftms/capability/Prerequisite;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/Prerequisite;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/Prerequisite;
+}
+
+public final class io/github/deancochran/ftms/capability/Presence : java/lang/Enum {
+	public static final field ABSENT Lio/github/deancochran/ftms/capability/Presence;
+	public static final field AMBIGUOUS Lio/github/deancochran/ftms/capability/Presence;
+	public static final field UNIQUE Lio/github/deancochran/ftms/capability/Presence;
+	public static final field UNKNOWN Lio/github/deancochran/ftms/capability/Presence;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/Presence;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/Presence;
+}
+
+public final class io/github/deancochran/ftms/capability/RangeEvidence {
+	public final fun getDecode ()Lio/github/deancochran/ftms/capability/DecodeState;
+	public final fun getInputIndex ()Ljava/lang/Integer;
+	public final fun getPresence ()Lio/github/deancochran/ftms/capability/Presence;
+	public final fun getValue ()Lio/github/deancochran/ftms/capability/RangeValue;
+}
+
+public final class io/github/deancochran/ftms/capability/RangeFormatOptions {
+	public fun <init> ()V
+	public fun <init> (Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getResistanceRangeFormat ()Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;
+}
+
+public final class io/github/deancochran/ftms/capability/RangeKind : java/lang/Enum {
+	public static final field HEART_RATE Lio/github/deancochran/ftms/capability/RangeKind;
+	public static final field INCLINATION Lio/github/deancochran/ftms/capability/RangeKind;
+	public static final field POWER Lio/github/deancochran/ftms/capability/RangeKind;
+	public static final field RESISTANCE Lio/github/deancochran/ftms/capability/RangeKind;
+	public static final field SPEED Lio/github/deancochran/ftms/capability/RangeKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/RangeKind;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/RangeKind;
+}
+
+public final class io/github/deancochran/ftms/capability/RangeValue {
+	public fun <init> (Lio/github/deancochran/ftms/capability/RangeKind;IIIILjava/lang/String;)V
+	public final fun getIncrement ()I
+	public final fun getKind ()Lio/github/deancochran/ftms/capability/RangeKind;
+	public final fun getMaximum ()I
+	public final fun getMinimum ()I
+	public final fun getScaleDivisor ()I
+	public final fun getUnit ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/capability/ReadReason : java/lang/Enum {
+	public static final field DISCONNECTED Lio/github/deancochran/ftms/capability/ReadReason;
+	public static final field GENERIC Lio/github/deancochran/ftms/capability/ReadReason;
+	public static final field NONE Lio/github/deancochran/ftms/capability/ReadReason;
+	public static final field SECURITY_REQUIRED Lio/github/deancochran/ftms/capability/ReadReason;
+	public static final field TIMEOUT Lio/github/deancochran/ftms/capability/ReadReason;
+	public static final field UNAVAILABLE Lio/github/deancochran/ftms/capability/ReadReason;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/ReadReason;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/ReadReason;
+}
+
+public final class io/github/deancochran/ftms/capability/ReadState : java/lang/Enum {
+	public static final field FAILED Lio/github/deancochran/ftms/capability/ReadState;
+	public static final field NOT_ATTEMPTED Lio/github/deancochran/ftms/capability/ReadState;
+	public static final field SUCCESS Lio/github/deancochran/ftms/capability/ReadState;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/ReadState;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/ReadState;
+}
+
+public final class io/github/deancochran/ftms/capability/ResistanceRangeFormat : java/lang/Enum {
+	public static final field SINT16_TENTHS Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;
+	public static final field UINT8_WHOLE Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/ResistanceRangeFormat;
+}
+
+public final class io/github/deancochran/ftms/capability/ServiceScope : java/lang/Enum {
+	public static final field ABSENT Lio/github/deancochran/ftms/capability/ServiceScope;
+	public static final field AMBIGUOUS Lio/github/deancochran/ftms/capability/ServiceScope;
+	public static final field PRESENT Lio/github/deancochran/ftms/capability/ServiceScope;
+	public static final field UNKNOWN Lio/github/deancochran/ftms/capability/ServiceScope;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/ServiceScope;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/ServiceScope;
+}
+
+public final class io/github/deancochran/ftms/capability/TruthValue : java/lang/Enum {
+	public static final field FALSE Lio/github/deancochran/ftms/capability/TruthValue;
+	public static final field TRUE Lio/github/deancochran/ftms/capability/TruthValue;
+	public static final field UNKNOWN Lio/github/deancochran/ftms/capability/TruthValue;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/capability/TruthValue;
+	public static fun values ()[Lio/github/deancochran/ftms/capability/TruthValue;
+}
+
+public final class io/github/deancochran/ftms/measurement/Measurement {
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[I)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZ)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZ)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZZ)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZZZ)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZZZZ)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZZZZI)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/measurement/MeasurementKind;IJJ[IZZZZZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getBackward ()Z
+	public final fun getBytesRead ()I
+	public final fun getFlags ()I
+	public final fun getKind ()Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public final fun getMoreData ()Z
+	public final fun getPresent ()J
+	public final fun getReservedFlags ()Z
+	public final fun getTrailingBytes ()Z
+	public final fun getTruncated ()Z
+	public final fun getUnavailable ()J
+	public final fun getValues ()[I
+	public final fun valueAt (I)I
+}
+
+public final class io/github/deancochran/ftms/measurement/MeasurementCodec {
+	public static final field INSTANCE Lio/github/deancochran/ftms/measurement/MeasurementCodec;
+	public static final fun decode (Lio/github/deancochran/ftms/measurement/MeasurementKind;[B)Lio/github/deancochran/ftms/measurement/Measurement;
+	public static final fun decode (Lio/github/deancochran/ftms/measurement/MeasurementKind;[BLio/github/deancochran/ftms/measurement/MeasurementFormat;)Lio/github/deancochran/ftms/measurement/Measurement;
+	public static synthetic fun decode$default (Lio/github/deancochran/ftms/measurement/MeasurementKind;[BLio/github/deancochran/ftms/measurement/MeasurementFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/measurement/Measurement;
+	public static final fun encode (Lio/github/deancochran/ftms/measurement/Measurement;)[B
+	public static final fun encode (Lio/github/deancochran/ftms/measurement/Measurement;Lio/github/deancochran/ftms/measurement/MeasurementFormat;)[B
+	public static synthetic fun encode$default (Lio/github/deancochran/ftms/measurement/Measurement;Lio/github/deancochran/ftms/measurement/MeasurementFormat;ILjava/lang/Object;)[B
+}
+
+public final class io/github/deancochran/ftms/measurement/MeasurementField {
+	public static final field AVERAGE_CADENCE I
+	public static final field AVERAGE_PACE I
+	public static final field AVERAGE_POWER I
+	public static final field AVERAGE_SPEED I
+	public static final field AVERAGE_STEP_RATE I
+	public static final field AVERAGE_STROKE_RATE I
+	public static final field CADENCE I
+	public static final field COUNT I
+	public static final field DISTANCE I
+	public static final field ELAPSED_TIME I
+	public static final field ENERGY_PER_HOUR I
+	public static final field ENERGY_PER_MINUTE I
+	public static final field FLOOR_COUNT I
+	public static final field FORCE_ON_BELT I
+	public static final field HEART_RATE I
+	public static final field INCLINATION I
+	public static final field INSTANCE Lio/github/deancochran/ftms/measurement/MeasurementField;
+	public static final field INSTANTANEOUS_PACE I
+	public static final field MET I
+	public static final field NEGATIVE_ELEVATION I
+	public static final field POSITIVE_ELEVATION I
+	public static final field POWER I
+	public static final field RAMP_ANGLE I
+	public static final field REMAINING_TIME I
+	public static final field RESISTANCE I
+	public static final field SPEED I
+	public static final field STEP_COUNT I
+	public static final field STEP_RATE I
+	public static final field STRIDE_COUNT I
+	public static final field STROKE_COUNT I
+	public static final field STROKE_RATE I
+	public static final field TOTAL_ENERGY I
+}
+
+public final class io/github/deancochran/ftms/measurement/MeasurementFormat {
+	public fun <init> ()V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/ResistanceFormat;)V
+	public fun <init> (Lio/github/deancochran/ftms/measurement/ResistanceFormat;Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;)V
+	public synthetic fun <init> (Lio/github/deancochran/ftms/measurement/ResistanceFormat;Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+	public final fun component2 ()Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+	public final fun copy (Lio/github/deancochran/ftms/measurement/ResistanceFormat;Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;)Lio/github/deancochran/ftms/measurement/MeasurementFormat;
+	public static synthetic fun copy$default (Lio/github/deancochran/ftms/measurement/MeasurementFormat;Lio/github/deancochran/ftms/measurement/ResistanceFormat;Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;ILjava/lang/Object;)Lio/github/deancochran/ftms/measurement/MeasurementFormat;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getResistance ()Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+	public final fun getTreadmillPace ()Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/deancochran/ftms/measurement/MeasurementKind : java/lang/Enum {
+	public static final field CROSS_TRAINER Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static final field INDOOR_BIKE Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static final field ROWER Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static final field STAIR_CLIMBER Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static final field STEP_CLIMBER Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static final field TREADMILL Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/measurement/MeasurementKind;
+	public static fun values ()[Lio/github/deancochran/ftms/measurement/MeasurementKind;
+}
+
+public final class io/github/deancochran/ftms/measurement/ResistanceFormat : java/lang/Enum {
+	public static final field SINT16_TENTHS Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+	public static final field UINT8_WHOLE Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+	public static fun values ()[Lio/github/deancochran/ftms/measurement/ResistanceFormat;
+}
+
+public final class io/github/deancochran/ftms/measurement/TreadmillPaceFormat : java/lang/Enum {
+	public static final field UINT16 Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+	public static final field UINT8_LEGACY Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+	public static fun values ()[Lio/github/deancochran/ftms/measurement/TreadmillPaceFormat;
+}
+
+public final class io/github/deancochran/ftms/status/MachineStatus {
+	public fun <init> (I)V
+	public fun <init> (II)V
+	public fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;)V
+	public fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;Z)V
+	public fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;ZZ)V
+	public fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;ZZZ)V
+	public fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;ZZZZ)V
+	public synthetic fun <init> (IILio/github/deancochran/ftms/status/MachineStatusParameter;ZZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getAction ()I
+	public final fun getOpcode ()I
+	public final fun getParameter ()Lio/github/deancochran/ftms/status/MachineStatusParameter;
+	public final fun getReservedValue ()Z
+	public final fun getTrailingBytes ()Z
+	public final fun getTruncated ()Z
+	public final fun getUnknownOpcode ()Z
+}
+
+public final class io/github/deancochran/ftms/status/MachineStatusParameter {
+	public fun <init> (I[I)V
+	public final fun getOperands ()[I
+	public final fun getRequestOpcode ()I
+	public final fun operandAt (I)I
+}
+
+public final class io/github/deancochran/ftms/status/StatusCodec {
+	public static final field INSTANCE Lio/github/deancochran/ftms/status/StatusCodec;
+	public static final fun decodeMachine ([B)Lio/github/deancochran/ftms/status/MachineStatus;
+	public static final fun decodeTraining ([B)Lio/github/deancochran/ftms/status/TrainingStatus;
+	public static final fun encodeMachine (Lio/github/deancochran/ftms/status/MachineStatus;)[B
+	public static final fun encodeTraining (Lio/github/deancochran/ftms/status/TrainingStatus;)[B
+	public static final fun encodeTraining (Lio/github/deancochran/ftms/status/TrainingStatus;Ljava/lang/String;)[B
+	public static synthetic fun encodeTraining$default (Lio/github/deancochran/ftms/status/TrainingStatus;Ljava/lang/String;ILjava/lang/Object;)[B
+}
+
+public final class io/github/deancochran/ftms/status/TrainingStatus {
+	public fun <init> (II)V
+	public fun <init> (II[B)V
+	public fun <init> (II[BI)V
+	public fun <init> (II[BIZ)V
+	public fun <init> (II[BIZZ)V
+	public fun <init> (II[BIZZI)V
+	public fun <init> (II[BIZZIZ)V
+	public fun <init> (II[BIZZIZZ)V
+	public fun <init> (II[BIZZIZZZ)V
+	public fun <init> (II[BIZZIZZZZ)V
+	public fun <init> (II[BIZZIZZZZZ)V
+	public synthetic fun <init> (II[BIZZIZZZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getCode ()I
+	public final fun getExtendedString ()Z
+	public final fun getFlags ()I
+	public final fun getInvalidFlags ()Z
+	public final fun getInvalidUtf8 ()Z
+	public final fun getReservedFlags ()I
+	public final fun getReservedValue ()Z
+	public final fun getText ()[B
+	public final fun getTextOffset ()I
+	public final fun getTextPresent ()Z
+	public final fun getTextSize ()I
+	public final fun getTrailingBytes ()Z
+	public final fun getTruncated ()Z
+}
+

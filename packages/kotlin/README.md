@@ -1,37 +1,120 @@
-# Kotlin / Java port
+# FTMS Kotlin/JVM
 
-Status: reserved, not implemented. No Maven artifact is available to install.
+Independent, transport-neutral Kotlin and Java codecs for Bluetooth Fitness
+Machine Service 1.0 plus the applicable errata recorded in the repository's
+[specification audit](../../docs/specification-audit.md).
 
-## Intended package
+Package version: **0.1.0**. Coordinates: `io.github.deancochran:ftms:0.1.0`.
+Public registry availability is recorded separately in
+[released packages](../../docs/released-packages.md); building a local artifact
+does not imply Maven Central publication.
 
-- A Kotlin/JVM protocol library usable from both Android and Java callers.
-- Byte-oriented APIs without Android framework, BLE library, or coroutine
-  requirements in the core; optional integration belongs outside it.
-- Java-friendly entry points and result types; explicitly handle signed JVM bytes
-  and unsigned FTMS values rather than exposing accidental sign extension.
-- Explicit units, unknown values, malformed-input diagnostics, and shared
-  capability semantics for all six FTMS measurement families.
+## Scope
 
-With the first implementation, add the Gradle build/settings, pinned wrapper,
-`src/main/`, and `src/test/` here. Choose Kotlin, Java, Gradle, and Android consumer
-baselines based on tested requirements. Kotlin Multiplatform is not part of this
-initial commitment; Swift remains an independent native package.
+- Bidirectional Features and all five Supported Ranges, including range inspection.
+- All 21 Control Point requests, raw and named command APIs, and responses.
+- Bidirectional Treadmill, Cross Trainer, Step Climber, Stair Climber, Rower and
+  Indoor Bike measurement codecs.
+- Training Status and Machine Status codecs, with raw diagnostics.
+- Static capability evaluation from caller-provided discovery/read evidence,
+  including unknown properties, duplicate observations and C.7 evidence.
 
-## Required evidence before release
+The library uses `ByteArray` (`byte[]` from Java). Its only intended runtime
+dependency is Kotlin's standard library. It contains no Android framework, BLE,
+coroutine, connection, permission, retry, control-ownership or cadence policy.
+It neither connects to equipment nor grants permission to execute controls.
 
-1. Run applicable shared vectors from `../../shared/conformance/v1/` with JVM tests.
-2. Compile and run Kotlin and Java consumer tests, including unsigned-byte and
-   unknown-value cases.
-3. Verify isolated consumption from a local Maven artifact without installing
-   Node, the C toolchain, or Swift.
-4. Build an Android integration example using the documented baseline while
-   keeping the core independent of the Android SDK.
-5. Separate JVM tests, Android builds/emulator results, and real-device Bluetooth
-   tests in the verification report.
+## Build and verify
 
-See the [architecture](../../docs/architecture.md) and
-[capability design](../../shared/protocol/capability-discovery.md). Connection management,
-security, control acquisition, timeouts, and physical safety remain caller-owned.
+Use JDK 17 and the checked-in Gradle 8.14.3 wrapper:
 
-This package will own its API docs and build/test tooling. It consumes the
-independent shared layer; shared assets do not depend on Kotlin or its tools.
+```sh
+cd packages/kotlin
+./gradlew clean check
+./gradlew publishMavenJavaPublicationToLocalVerificationRepository
+ANDROID_HOME=/path/to/android-sdk bash verification/verify.sh
+```
+
+Kotlin compiler: 2.2.0. JVM bytecode baseline: Java 17. Java 17 is required for
+desktop JVM callers; Android consumption is separately checked through D8 with
+min SDK 26, compile/target SDK 35 and AGP 8.10.1. No Android SDK is required to
+build or test the core. `verification/verify.sh` does require it for the APK gate.
+
+Tests read canonical files directly under `../../shared/`; they do not use copied
+fixtures or install another language port. Gson, NetworkNT and JUnit are test-only.
+`check` includes the checked-in binary API baseline. Regenerate that baseline with
+`apiDump` only after reviewing an intentional public API change.
+
+## Kotlin example
+
+```kotlin
+import io.github.deancochran.ftms.ControlCodec
+import io.github.deancochran.ftms.ControlCommand
+import io.github.deancochran.ftms.FeatureCodec
+
+val bytes = ControlCodec.encodeCommand(ControlCommand.TargetPower(75))
+check(bytes.contentEquals(byteArrayOf(0x05, 0x4b, 0x00)))
+
+// Feed bytes obtained by your transport; encoding does not transmit anything.
+val response = ControlCodec.decodeResponse(byteArrayOf(0x80.toByte(), 0x05, 0x01))
+check(response.requestOpcode == 5 && response.resultCode == 1)
+
+// Unsigned 32-bit Feature words are represented by non-negative Long values.
+val feature = FeatureCodec.decode(byteArrayOf(-1, -1, -1, -1, 0, 0, 0, 0))
+check(feature.machine == 0xffffffffL)
+```
+
+## Java example
+
+```java
+import io.github.deancochran.ftms.ControlCodec;
+import io.github.deancochran.ftms.ControlCommand;
+
+byte[] bytes = ControlCodec.encodeCommand(new ControlCommand.TargetPower(75));
+```
+
+The independent builds in [verification](verification/README.md) resolve the
+produced Maven artifact, not project-source dependencies. To consume a local
+verification repository, add its file URL as a Maven repository and use:
+
+```kotlin
+dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+```
+
+## Values, errors and compatibility
+
+Numeric codec values are **raw integer numerators**, not automatically normalized
+physical-unit values. Named command properties state their units; ranges include
+`scaleDivisor` and `unit`. Measurement indexes are named by `MeasurementField` and
+follow the [raw measurement contract](../../shared/conformance/measurements/README.md).
+The historical normalized-v1 adapter is test-only, not a second public API.
+
+Measurements preserve separate `present` and `unavailable` masks. An unavailable
+sentinel has a zero raw slot plus its unavailable bit; that is not an actual zero
+measurement. Check these masks before interpreting a value. `moreData` is retained;
+the library does not assemble multiple notifications into a session record.
+
+Invalid fixed layouts/arguments throw `IllegalArgumentException` (foundation
+codecs use `FtmsException` with `FtmsError`). Measurement and status payloads retain
+their supported malformed/truncated/trailing/unknown evidence; an incomplete
+mandatory header is rejected. Encoding rejects invalid widths and non-encodable
+diagnostics rather than silently narrowing values. See generated KDoc and shared
+contracts for each raw report.
+
+Range, control and measurement format selections are independent and explicit.
+Defaults match the shared contracts; alternative resistance widths and legacy
+treadmill pace are never inferred from payload length, device name or another
+characteristic. Structural range candidates do not prove physical units.
+
+Public command data classes describe fixed wire layouts; their generated methods
+are part of the checked API surface. Unknown future procedures are not silently
+cast to a known command. Byte arrays and retained report collections are copied
+or protected against mutation at the public boundary.
+
+## Evidence and limits
+
+See [verification evidence](docs/verification.md) and [release gates](docs/releasing.md).
+Kotlin host conformance and an Android APK build do not imply Android runtime,
+live Kotlin BLE interoperability or Bluetooth qualification. The published C and
+TypeScript KICKR tests are separate evidence. No additional live equipment testing
+is performed by this package's tests.
