@@ -1,7 +1,8 @@
 # C# release prerequisites
 
-Current state: **local unpublished `0.1.0-alpha.1` candidate**. There is no enabled
-NuGet publication workflow or configured account/trusted-publishing claim.
+Current state: the tag-only `release-csharp.yml` workflow can publish an authorized
+`csharp-vVERSION` tag through the protected `nuget` environment. This document does
+not claim that any version is public; inspect NuGet.org and the completed public job.
 
 `VERSION` owns the version; add the matching heading in `CHANGELOG.md`. C# reserves
 `csharp-vVERSION`, independent of every other port. Versions must already be
@@ -24,21 +25,28 @@ Both the local readiness command and the pack target validate that rule.
 Regular verification rebuilds ignored `artifacts/`. Archive authorized release
 evidence durably before another run; these local outputs are not registry receipts.
 
-## Before enabling publication
+## Release contract
 
-Explicitly authorize and verify:
+Trusted Publishing is bound to `deancochran/ftms`,
+`.github/workflows/release-csharp.yml`, the `nuget` environment, and the
+`DeanCochran.Ftms` package scope. `NUGET_USER` is an environment variable; the
+workflow uses OIDC via the pinned `NuGet/login` action and never stores an API key.
 
-- NuGet account ownership and availability of `DeanCochran.Ftms`.
-- Account author-signing requirements, if any.
-- Signed annotated tag and approved signer identity, matching VERSION/changelog,
-  clean source and reviewed main ancestry.
-- Protected GitHub `nuget` environment and NuGet Trusted Publishing binding to
-  the canonical repository, exact workflow filename, environment and package scope.
+`CSHARP_RELEASE_SIGNER` is a repository Actions variable containing the approved SSH
+public-key type and base64. The gate synthesizes an allowed-signers file for principal
+`deancochran`, namespace `git`, and requires `git verify-tag`. It rejects
+lightweight/unsigned tags, wrong tag/version/changelog, unclean source, a nonmatching
+target, and targets outside `origin/main`. After integration, create the tag with:
 
-The future tag-only publisher should use a commit-pinned `NuGet/login` action and
-short-lived OIDC credentials only in its publishing job. Normal PR/main/manual
-verification must remain credential-free. The publishing job must consume the
-hash-bound artifacts from its verification job, **without rebuilding** them.
+```sh
+git -c gpg.format=ssh -c user.signingkey=~/.ssh/id_ed25519.pub tag -s csharp-vVERSION
+```
+
+Normal native C# CI remains credential-free and reusable across Linux, macOS and
+Windows. The release gate runs the full verifier plus Linux NativeAOT once, then
+uploads exactly one main package, one symbols package, and an SHA-256/size/source
+identity manifest. The publish job downloads and validates it; it never rebuilds and
+does not use `--skip-duplicate`.
 
 ## Required public verification
 
@@ -48,13 +56,21 @@ with the official NuGet client and compare exact archive entry payloads, allowin
 only the expected root `.signature.p7s` signing change. Reject duplicate entries,
 unexpected entries, changed DLLs/metadata and wrong package ID/version.
 
-`verification/verify-package.py` already provides tested payload-manifest and
-local-artifact checks. Its signature-entry comparison is **not** cryptographic
-signature verification and is not a finished public-release verifier.
+The public job calls `dotnet nuget verify --all` with the explicitly pinned current
+NuGet.org repository certificate
+`1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D` and requires
+its output to name the NuGet.org repository service index, then compares payload manifests. Whole-file
+hashes intentionally differ because NuGet adds `.signature.p7s`; only that root entry
+may differ. It retries only 404/transient retrieval failures, restores exact-version
+fresh-cache consumers for both TFMs, and writes a separate public report.
 
-Restore and execute an exact-version public `PackageReference` consumer with a
-fresh cache, then record NuGet publication and installed-consumer evidence in the
-canonical release matrix. Existing versions and upload-conflict retries must be
-verified this same way, not accepted through `--skip-duplicate`. Until those gates
-and account settings are implemented and approved, do not push a release tag or
-describe this package as publicly available.
+The initial package is expected to be NuGet repository-primary signed. If author
+signing is enabled later, deliberately extend this policy with the approved author
+certificate pin and validation contract; do not assume the repository pin validates
+an author-primary package merely because it has a NuGet countersignature.
+
+Restore and execute exact-version public `PackageReference` consumers with fresh
+caches, then record NuGet publication and installed-consumer evidence in the canonical
+release matrix. Existing versions are checked for payload identity rather than hidden
+with `--skip-duplicate`. The `.snupkg` is submitted, but registry symbol indexing is
+asynchronous; the workflow does not claim public symbol receipt.

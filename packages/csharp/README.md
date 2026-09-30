@@ -2,9 +2,8 @@
 
 **Pure managed Bluetooth Fitness Machine Service protocol library for .NET.**
 
-Local, **unpublished** `0.1.0-alpha.1` source and NuGet candidate. The interface is
-still evolving. This is not an instruction to install a public NuGet package:
-package ownership and registry publication have not been established.
+`0.1.0-alpha.1` is an evolving prerelease. Check NuGet.org and the completed
+`csharp-v*` release workflow before treating any version as publicly available.
 
 ## Scope
 
@@ -89,5 +88,4 @@ Source-checkout documentation:
 - [Verification and exact evidence](https://github.com/deancochran/ftms/blob/main/packages/csharp/docs/verification.md)
 - [Release prerequisites](https://github.com/deancochran/ftms/blob/main/packages/csharp/docs/releasing.md)
 
-Those repository links identify intended main-branch locations; this local work
-has not been merged or released yet.
+Those repository links identify intended main-branch locations.

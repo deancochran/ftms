@@ -10,17 +10,18 @@ Packages are independently versioned; a version in one package does not imply a 
 | Rust | `rust-vVERSION` | crates.io |
 | Swift | `swift-vVERSION` | GitHub source/evidence release |
 | C | `c-vVERSION` | GitHub source release |
-| C# | `csharp-vVERSION` (reserved) | Local NuGet prerelease artifacts only; publication not configured and requires separate authorization |
+| C# | `csharp-vVERSION` | NuGet Trusted Publishing through the protected `nuget` environment |
 
 Run `pnpm release:prepare PORT --dry-run` first. It is deliberately read-only:
 version/changelog updates can require package-specific lockfile or metadata changes,
 so make them in a reviewed PR using the package runbook. It never tags, pushes,
 publishes, or contacts credentials; Python readiness retains PEP 440 validation.
 
-C# readiness validates canonical NuGet version identity, not NuGet ownership or
-publication readiness. Its credential-free native workflow verifies local
-artifacts only. Before enabling a tag publisher, review account/package ownership,
-signed-tag identity, the protected NuGet environment and trusted-publishing policy.
+C# readiness validates canonical NuGet version identity, not public availability.
+Its native verification remains credential-free. The tag-only release workflow
+requires a signed annotated tag, main ancestry, all-host native checks and the
+protected NuGet environment before publishing the exact tested artifacts.
+See the [C# release runbook](../packages/csharp/docs/releasing.md).
 Public verification must compare the tested archive's payload with the downloaded
 package and verify NuGet's repository signature: repository signing changes the
 archive hash without changing its payload. Never accept an existing version solely
