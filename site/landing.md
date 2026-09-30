@@ -12,7 +12,7 @@ embedded integration, or protocol tool without taking on another connection stac
 | C / C++ | Portable C99, fixed-point values, caller-owned memory | [Install the source archive](../examples/c-client/README.md) |
 | Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
 | Kotlin / Java | Independent JVM codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
-| Python | Partial alpha, evolving API; no capability APIs | [Python package guide](../packages/python/README.md) |
+| Python | Published partial alpha; capability evaluator added in unreleased source | [Python package guide](../packages/python/README.md) |
 | Rust | Unpublished allocation-free `no_std` raw-codec source | [Rust package guide](../packages/rust/README.md) |
 
 ## A focused boundary

@@ -66,9 +66,10 @@ def _step(report: dict[str, Any], name: str, *args: str, cwd: Path | None = None
 
 def main() -> int:
     build = PACKAGE / "build" / "isolated"
+    version = tomllib.loads((PACKAGE / "pyproject.toml").read_text())["project"]["version"]
     report: dict[str, Any] = {
         "package": "deancochran-ftms",
-        "packageVersion": "0.1.0a1",
+        "packageVersion": version,
         "steps": [],
         "artifacts": {},
         "errors": [],
@@ -151,7 +152,7 @@ def main() -> int:
 import importlib.metadata as m
 import deancochran_ftms as f
 assert f.__file__ and '/src/' not in f.__file__
-assert m.metadata('deancochran-ftms')['Version'] == '0.1.0a1'
+assert m.metadata('deancochran-ftms')['Version'] == EXPECTED_VERSION
 b = f.encode_features_raw(f.FeaturesRaw(0x80000000, 1 << 13))
 assert b == bytes([0, 0, 0, 128, 0, 32, 0, 0])
 assert f.decode_features_raw(b).machine == 0x80000000
@@ -164,8 +165,16 @@ assert f.decode_control_response_raw(bytes([128, 19, 1, 100, 0, 200, 0])).low ==
 assert f.encode_measurement_raw(f.MeasurementRaw(5, 0, 1, 0, (1234,) + (0,) * 29)) == bytes([0, 0, 210, 4])
 assert f.decode_machine_status_raw(bytes([7, 249, 255])).parameter == (4, (-7,))
 assert f.decode_training_status_raw(bytes([1, 13]) + b'manual').text == b'manual'
+e = f.CharacteristicEvidence('00002acc00001000800000805f9b34fb', 2, f.ReadState.SUCCESS, read_bytes=bytes(8))
+report = f.evaluate_capabilities(f.CapabilitySnapshot(f.DiscoveryState.COMPLETE, f.ServiceScope.PRESENT, 3, (e,)))
+assert report.to_wire()['feature'][1] == 1 and 'canExecute' not in report.to_wire()
+assert report.presence[1] is f.Presence.UNIQUE
+assert report.feature[1] == f.DecodeState.VALID
+r = f.CharacteristicEvidence('00002ad600001000800000805f9b34fb', 2, f.ReadState.SUCCESS, read_bytes=bytes.fromhex('f6ff64000a00'))
+selected = f.evaluate_capabilities(f.CapabilitySnapshot(f.DiscoveryState.COMPLETE, f.ServiceScope.PRESENT, 4, (r,)), f.RangeFormatOptions('signed16Tenths'))
+assert selected.ranges[2][3] == (2, -10, 100, 10, 10, 2)
 assert (m.distribution('deancochran-ftms').locate_file('deancochran_ftms/py.typed')).is_file()
-"""
+""".replace("EXPECTED_VERSION", repr(version))
             _step(
                 report,
                 "isolated-consumer-import-metadata-and-bytes",
@@ -177,11 +186,15 @@ assert (m.distribution('deancochran-ftms').locate_file('deancochran_ftms/py.type
             typed_consumer = temporary_path / "consumer.py"
             typed_consumer.write_text(
                 "from typing import assert_type\n"
-                "from deancochran_ftms import (FeaturesRaw, MeasurementRaw, TrainingStatusRaw,\n"
-                "    decode_features_raw, decode_measurement_raw, encode_training_status_raw)\n"
+                "from deancochran_ftms import (CapabilitySnapshot, CharacteristicEvidence, DiscoveryState,\n"
+                "    FeaturesRaw, MeasurementRaw, ReadState, ServiceScope, TrainingStatusRaw,\n"
+                "    decode_features_raw, decode_measurement_raw, encode_training_status_raw, evaluate_capabilities)\n"
                 "assert_type(decode_features_raw(bytes(8)), FeaturesRaw)\n"
                 "assert_type(decode_measurement_raw(bytes(4), 5), MeasurementRaw)\n"
                 "assert_type(encode_training_status_raw(TrainingStatusRaw(0, 1)), bytes)\n"
+                "snapshot = CapabilitySnapshot(DiscoveryState.COMPLETE, ServiceScope.PRESENT, 0,\n"
+                "    (CharacteristicEvidence('00002acc00001000800000805f9b34fb', 2, ReadState.SUCCESS, read_bytes=bytes(8)),))\n"
+                "assert_type(evaluate_capabilities(snapshot).to_wire(), dict[str, object])\n"
             )
             _step(
                 report,

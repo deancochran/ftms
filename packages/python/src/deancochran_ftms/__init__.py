@@ -1,6 +1,22 @@
 """Pure FTMS protocol codecs; this alpha intentionally has partial API coverage."""
 
 from ._errors import RawCodecError
+from .capabilities import (
+    C7Evidence,
+    CapabilityReport,
+    CapabilitySnapshot,
+    CharacteristicEvidence,
+    Declaration,
+    DecodeState,
+    DiscoveryState,
+    Prerequisite,
+    Presence,
+    ReadReason,
+    ReadState,
+    ServiceScope,
+    TruthValue,
+    evaluate_capabilities,
+)
 from .features import (
     FeatureDecodeResult,
     FeatureDiagnostic,
@@ -29,6 +45,20 @@ from .statuses import (
 )
 
 __all__ = [
+    "C7Evidence",
+    "CapabilityReport",
+    "CapabilitySnapshot",
+    "CharacteristicEvidence",
+    "Declaration",
+    "DecodeState",
+    "DiscoveryState",
+    "Presence",
+    "Prerequisite",
+    "ReadReason",
+    "ReadState",
+    "ServiceScope",
+    "TruthValue",
+    "evaluate_capabilities",
     "FeatureDecodeResult",
     "FeatureDiagnostic",
     "Features",

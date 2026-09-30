@@ -3,6 +3,19 @@
 Python distribution versions are independent of FTMS specification, shared
 conformance corpus, and other language-package versions.
 
+## 0.1.0a2
+
+- Add pure static capability evaluation with immutable discovery/read evidence,
+  C.7 facts, duplicate and unknown evidence, and all 21 operation prerequisites.
+- Support explicit resistance range profiles during capability evaluation.
+- Verify all 63 shared capability cases with exact expanded-schema/type checks,
+  full accounting, and canonical corpus/contract hashes.
+- Add input validation, immutability, fixture-runner regression tests, and
+  installed runtime/typed-consumer checks for capability APIs.
+
+The API remains alpha. Capability evidence is not permission to execute controls.
+No BLE, lifecycle, normalized control encoder, or record planning/assembly is added.
+
 ## 0.1.0a1
 
 Initial partial alpha; APIs may change before a stable release.
