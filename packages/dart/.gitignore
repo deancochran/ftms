@@ -1,0 +1,8 @@
+.dart_tool/
+pubspec.lock
+pubspec_overrides.yaml
+build/
+doc/api/
+coverage/
+tool/__pycache__/
+test/support/corpus_browser.g.dart

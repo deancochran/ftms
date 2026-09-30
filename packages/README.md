@@ -16,6 +16,7 @@ publication evidence.
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a1; evolving alpha |
 | [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
+| [Dart](dart/README.md) | Flutter applications and standalone Dart tools | `deancochran_ftms` 0.1.0 source candidate; not published on pub.dev |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must
@@ -38,6 +39,10 @@ interpretation or fragment assembly; see its [coverage and evidence](rust/docs/v
 support profile. The TypeScript npm build/release remains independent;
 the private root pnpm workspace orchestrates TypeScript and the documentation site,
 not native package builds.
+Dart's requested full-wire port additionally implements static capability evidence,
+range inspection and normalized measurement views. It has independent
+[verification](dart/doc/verification.md) and [release gates](dart/RELEASING.md);
+source/host evidence does not imply pub.dev publication or Flutter device testing.
 Ports and package tooling consume the independent [shared layer](../shared/README.md),
 which has no dependency on any port. TypeScript owns its npm staging/verification
 scripts, API README, and changelog; root policy and orchestration remain at root.

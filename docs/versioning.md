@@ -66,6 +66,14 @@ compatibility: `0.x` minor versions are treated as potentially breaking. This is
 local source-package metadata only, not a git tag, published artifact, or release
 record.
 
+## Dart release policy
+
+The Dart source candidate uses its own `packages/dart/pubspec.yaml` version and
+`dart-vVERSION` namespace. Its future pub.dev releases use tag-push OIDC after a
+separately approved first manual publication. The manifest and workflow do not
+establish publication; see [Dart release gates](../packages/dart/RELEASING.md).
+Existing package tags and corpus identities are unchanged.
+
 ## C release policy
 
 The C package is independently tagged `c-vVERSION`; existing `v*` npm tags remain

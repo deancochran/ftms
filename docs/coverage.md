@@ -15,6 +15,12 @@ capability-v1 runner passes 63/63 exact reports; its normalized codec-v1 runner
 passes 35 Feature cases and explicitly marks 62 other cases unsupported. Registry
 publication remains unclaimed.
 
+Dart has an unpublished [full-wire source candidate](../packages/dart/README.md)
+with static capability evidence, range inspection and normalized measurement
+views. Its [package-owned evidence](../packages/dart/doc/verification.md) covers
+the canonical codec, raw, capability and structural corpora separately from
+Flutter builds, physical devices and publication.
+
 ## Current codec surface
 
 | Family | TypeScript decode | TypeScript encode | Tests and v1 vectors | Equipment-side direction |

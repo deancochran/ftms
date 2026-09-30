@@ -1,0 +1,12 @@
+# Repository-only tests depend on canonical shared/ assets outside this package.
+# The distribution is intentionally source, documentation and runnable examples.
+test/
+tool/
+build/
+coverage/
+doc/api/
+.dart_tool/
+pubspec.lock
+pubspec_overrides.yaml
+analysis_options.yaml
+dart_test.yaml
