@@ -5,6 +5,8 @@ range inspection and static capability interpretation. Python 0.1.0a1 is a
 published partial alpha with bidirectional raw codecs and no capability evaluator.
 Rust 0.1.0 is an implemented `no_std` raw-codec source candidate with no registry
 publication or capability evaluator.
+Dart is an implemented, unpublished full-wire source candidate with static
+capability evidence, range inspection and normalized measurement views.
 See the [canonical release matrix](released-packages.md) for versions and distribution
 and [support profiles](support-profiles.md) for role-based direction claims; source
 metadata is not publication evidence. This document defines boundaries, not
@@ -14,7 +16,7 @@ universal FTMS device compatibility.
 
 Keep protocol decisions and cross-language regression evidence in one repository.
 Consumers must be able to use one implementation without installing the others.
-TypeScript, C, Swift, Kotlin, Python, and Rust occupy sibling directories under `packages/`.
+TypeScript, C, Swift, Kotlin, Python, Rust, and Dart occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
 `pnpm-workspace.yaml` includes the TypeScript package and private documentation
 website under `site/`. The site's Node 22.12+ build requirement does not change
@@ -36,6 +38,7 @@ establish publication; consult the release matrix above.
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Published partial alpha 0.1.0a1 |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
+| `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Implemented 0.1.0 source candidate; not published on pub.dev |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
@@ -46,6 +49,13 @@ JavaScript and React Native consumers.
 The C port has package-owned build, installation, verification and source-release
 tooling. Its release does not establish vcpkg or ConanCenter registration.
 Directory names for future ports are not promises of published artifacts.
+
+Dart is a native language implementation, not a Flutter plugin or C wrapper. Its
+manifest, sources, tests, development/release tools and documentation stay under
+`packages/dart/`; no root pub workspace is needed. Test runners consume shared
+assets directly; disposable browser test snapshots are generated from those exact
+bytes, ignored and excluded from publication. The Dart package has no runtime
+dependency on another port, Python schema tooling, Flutter or a BLE stack.
 
 Swift Package Manager is an ecosystem exception: a conventional Git URL
 dependency needs a repository-root `Package.swift`, even though Swift sources,
