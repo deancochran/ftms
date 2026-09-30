@@ -4,9 +4,9 @@ Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
 range inspection and static capability interpretation. Python 0.1.0a2 is a
 published alpha with bidirectional raw codecs, range inspection and static
 capability evaluation; its convenience API remains language-specific and evolving.
-Rust 0.1.0 is a released `no_std` crate with static capability interpretation,
-normalized Feature/measurement views and record planning/assembly; only the newer
-range/control/status projections and 97-case runner evidence are unreleased.
+Rust 0.1.1 is a released `no_std` crate with static capability interpretation,
+normalized Feature/measurement/range/control/status views and record planning/assembly,
+with all 97 normalized codec-v1 cases accounted for.
 Dart 0.1.0 is a published full-wire package with static
 capability evidence, range inspection and normalized measurement views.
 See the [canonical release matrix](released-packages.md) for versions and distribution
@@ -39,7 +39,7 @@ establish publication; consult the release matrix above.
 | `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Published alpha 0.1.0a2 with static capability evidence |
-| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.1.0 released with capabilities, normalized Feature/measurement views and records; newer range/control/status projections are unreleased |
+| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.1.1 released with capabilities, normalized views and records |
 | `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Published on pub.dev as `deancochran_ftms` 0.1.0 |
 | `packages/go/` | Independent Go codecs and static capability interpreter | Published nested module v0.1.0 |
 | `packages/csharp/` | Native .NET codecs and static capability interpreter | Published NuGet 0.1.0-alpha.1 |

@@ -46,11 +46,12 @@ schema/vector/contract hashes and every case/direction outcome.
 
 All listed executions have **zero failures, unsupported cases, skips and runner
 errors**. Capability-v1 is separately executed as 63/63 exact reports with zero
-non-passes. Unreleased source's normalized codec-v1 runner validates the exact
+non-passes. Version 0.1.1's normalized codec-v1 runner validates the exact
 schema and executes all **97/97** cases with zero unsupported/skipped cases. It
 prints HEAD, dirty state, schemaVersion and SHA-256 identities for schema, vectors
-and this comparison contract; this is local source evidence, not a retroactive
-claim about the released 0.1.0 artifact.
+and this comparison contract. The [0.1.1 release record](../../../docs/released-packages.md#published-rust-011)
+binds the public artifact to its tagged host checks; this does not retroactively
+change the 0.1.0 artifact's evidence.
 Schema format v1, FTMS
 specification revisions, package versions and these fixture content hashes are
 independent identities.

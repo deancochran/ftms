@@ -11,7 +11,7 @@ This is the **canonical current release matrix**. Begin with the
 [Kotlin guide](../packages/kotlin/README.md).
 The [Python package](../packages/python/README.md) is a published 0.1.0a2 alpha
 with an evolving API and static capability evidence; see its release evidence below.
-The [Rust crate](../packages/rust/README.md) **0.1.0** is published on crates.io;
+The [Rust crate](../packages/rust/README.md) **0.1.1** is published on crates.io;
 unreleased branch source must not be represented as part of that artifact.
 The [Dart package](../packages/dart/README.md) is published on pub.dev as
 `deancochran_ftms` **0.1.0**; see its release evidence below.
@@ -326,20 +326,57 @@ consumer job for future Python tags. A read-only rerun downloaded both artifacts
 matched the hashes above and executed independent isolated wheel and sdist
 consumers on Python 3.11.15; both completed successfully.
 
+## Published: Rust 0.1.1
+
+crates.io serves [`ftms` 0.1.1](https://crates.io/crates/ftms/0.1.1), with
+[docs.rs documentation](https://docs.rs/ftms/0.1.1/ftms/). Annotated tag
+`rust-v0.1.1` identifies **`97885265d28b22807499ada88882cda05f51ff9a`**, the
+reviewed merge of PR #34. [Release run 36790652901](https://github.com/deancochran/ftms/actions/runs/36790652901)
+passed identity, Linux MSRV/stable, macOS, Windows and publication gates.
+
+- The release adds allocation-free normalized range, control-request/response and
+  Machine Status projections. Normalized codec-v1 accounts for **97/97** cases;
+  capability-v1 accounts for **63/63** reports, with no unsupported/skipped cases.
+- The tested `.crate`, freshly downloaded crates.io archive and GitHub release
+  asset are byte-identical, SHA-256:
+  **`11186b0356d9cc0396d5806f7ec08191ecaeb0a9c80fa2350b580b4f3f3313fe`**.
+- The clean-source release record identifies Rust/Cargo **1.85.1** and an executed
+  isolated archive consumer. `registry-evidence.json` records the fresh public
+  registry consumer as passed for the same version, commit and digest.
+- The [GitHub release](https://github.com/deancochran/ftms/releases/tag/rust-v0.1.1)
+  retains the crate, `release.json`, `registry-evidence.json` and `SHA256SUMS`.
+  All checksum entries were independently verified after publication. Registry
+  metadata confirms the same digest and that the version is not yanked.
+- `release.json` records every corpus/schema/comparison-contract hash. Codec-v1
+  schema/vector hashes remain `e6d976172a32e3124602d17e46ed5fbab337f4f1d6535aec85a83069637268e0`
+  and `9b5b61353b191179cc629d8c459b2a185b9e03b7ce5f3f51b715520162e8a5c7`;
+  comparison contract `shared/conformance/README.md` is
+  `4ee407ecca3cdce77289ff15920bd831dc6687e5dff0ac9c0a8edf39d6034cc9`.
+  The capability contract's documentation-only status update is pinned separately
+  as `0eb4267e0a1c52c99738d6ccc22c9d62cb980d4d66b730ffc8ef2fd648e7c183`.
+
+The release notes quote the tagged changelog's pre-publication wording; the
+successful public verification above supersedes that preparation status. No tag
+or immutable package was changed to update this documentation. Cortex-M0 evidence
+is compilation only; real-device operation and Bluetooth qualification remain
+unverified.
+
 ## Published: Rust 0.1.0
+
+Historical release evidence; superseded by 0.1.1 above.
 
 crates.io serves [`ftms` 0.1.0](https://crates.io/crates/ftms/0.1.0). The annotated
 tag `rust-v0.1.0` identifies `58b9add0addea516769c6f01d4b117a1b02110e1`; its
 release archive SHA-256 is
 `fbb9cf806ba89441ef44bab25b65c7caab405c83efe8ededcfd42cc04011f86f`.
 [Release Rust run 36763795982](https://github.com/deancochran/ftms/actions/runs/36763795982)
-succeeded, and docs.rs is live. This verifies the released artifact, not later
-unreleased range/control/status normalized projections and expanded coverage.
+succeeded, and docs.rs is live. This verifies the 0.1.0 artifact, not the later
+range/control/status normalized projections and expanded coverage in 0.1.1.
 
 The released artifact provides `FullWire` raw codecs, `RangeInspection`, capability
 interpretation, normalized Feature/measurement views and record planning/assembly.
-Only the newer range/control/status normalized projections and 97-case runner
-evidence are unreleased. BLE, device runtime and control authorization are not
+The newer range/control/status normalized projections and 97-case runner
+evidence belong to 0.1.1. BLE, device runtime and control authorization are not
 provided. See the package's
 [verification record](../packages/rust/docs/verification.md) for exact host,
 corpus, Cortex-M0 compile-only and packed-consumer evidence.
@@ -353,7 +390,9 @@ corpus, Cortex-M0 compile-only and packed-consumer evidence.
 | Swift | GitHub/SwiftPM `swift-v0.1.0` | Public tag-pinned Linux/macOS consumers and Apple SDK builds | BLE integration and Apple-device runtime evidence |
 | Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 | Python | PyPI `deancochran-ftms==0.1.0a2` | Verified public wheel/sdist consumers including capability evaluation; no repository BLE example | Stable interface and live-device evidence |
-| Rust | crates.io `ftms==0.1.0` | Released package and docs.rs | Later range/control/status projections, expanded runner evidence, and BLE/device evidence |
+| Rust | crates.io `ftms==0.1.1` | Public-registry installed consumer and docs.rs | BLE/device runtime and qualification evidence |
+| Dart / Flutter | pub.dev `deancochran_ftms` 0.1.0 | Fresh hosted consumer; see Dart evidence above | Physical-device and Bluetooth qualification evidence |
+| Go | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 | Public proxy/checksum database and isolated consumers | Measurement normalization, record planning/assembly and device evidence |
 | C# | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1 | Both public target assemblies executed in isolated consumers | Stable API, Unity/MAUI/device runtime and BLE/qualification evidence |
 
 ## Start with the released TypeScript package

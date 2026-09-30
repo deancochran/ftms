@@ -1,8 +1,8 @@
 # FTMS Rust
 
-`ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.0 is
-published on crates.io; newer source capabilities described below are unreleased.
-This checkout prepares 0.1.1; the version bump is not publication evidence.
+`ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.1 is
+published on crates.io, including the normalized range/control/status projections.
+See the [verified release evidence](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md#published-rust-011).
 It is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
 runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, or
 control safety.
@@ -10,7 +10,7 @@ control safety.
 **Support profile:** [`FullWire`](https://github.com/deancochran/ftms/blob/main/docs/support-profiles.md)
 raw codecs with `RangeInspection`, `CapabilityEvidence`, `RecordPlanning`,
 `RecordAssembly`, and `NormalizedViews`.
-This is implemented source scope, not crates.io publication evidence.
+The release matrix records archive identity and public-consumer evidence separately.
 
 ## Implemented surface
 
@@ -159,7 +159,7 @@ shared corpus and is not coverage-guided fuzzing or device evidence.
 Fixture hashes and source identity remain run evidence, not package or
 specification versions.
 
-The immutable codec-v1 corpus has 97 cases. The unreleased host-only adapter validates the
+The immutable codec-v1 corpus has 97 cases. The host-only adapter for 0.1.1 validates the
 canonical schema and executes all categories with 97 passes, zero failures,
 unsupported cases or skips. `normalized` exposes typed Features, `normalize_range`,
 `normalize_control_request`, `normalize_control_response`, and
