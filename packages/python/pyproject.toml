@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deancochran-ftms"
+version = "0.1.0a1"
+description = "Pure Python FTMS feature, range, control, measurement, and status codecs (alpha)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Dean Cochran" }]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Source = "https://github.com/deancochran/ftms"
+Issues = "https://github.com/deancochran/ftms/issues"
+Documentation = "https://github.com/deancochran/ftms/blob/python-v0.1.0a1/packages/python/README.md"
+
+[dependency-groups]
+dev = ["jsonschema>=4.23", "mypy>=1.13", "pytest>=8.3", "ruff>=0.8", "types-jsonschema>=4.23"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deancochran_ftms"]
+
+[tool.hatch.build.targets.sdist]
+only-include = [
+  ".gitignore",
+  "CHANGELOG.md",
+  "LICENSE",
+  "README.md",
+  "RELEASING.md",
+  "pyproject.toml",
+  "uv.lock",
+  "src/deancochran_ftms/__init__.py",
+  "src/deancochran_ftms/_binary.py",
+  "src/deancochran_ftms/_errors.py",
+  "src/deancochran_ftms/control.py",
+  "src/deancochran_ftms/features.py",
+  "src/deancochran_ftms/measurements.py",
+  "src/deancochran_ftms/py.typed",
+  "src/deancochran_ftms/ranges.py",
+  "src/deancochran_ftms/statuses.py",
+  "scripts/run_features_conformance.py",
+  "scripts/run_measurement_matrix.py",
+  "scripts/run_measurement_status_conformance.py",
+  "scripts/verify.py",
+  "scripts/verify_package.py",
+  "tests/test_binary.py",
+  "tests/test_conformance.py",
+  "tests/test_features.py",
+  "tests/test_measurement_validation.py",
+  "tests/test_measurements_statuses.py",
+  "tests/test_ranges_control.py",
+  "tests/test_report_integrity.py",
+  "tests/test_status_validation.py",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501", "E702"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests", "scripts"]

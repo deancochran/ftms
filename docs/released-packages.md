@@ -1,22 +1,17 @@
 # Released packages and executable examples
 
 Last checked read-only against npm and GitHub: **2026-09-29**.
+Kotlin Maven Central publication and public consumers verified: **2026-09-30**.
 This is a point-in-time record, not a promise that branch source is published.
 
-This is the **canonical current release matrix** for this source tree. Other
-guides link here rather than treating historical candidates as current releases.
-Metadata was rechecked read-only during adoption work: npm `latest` and `gitHead`
-still match the record below, and the C tag exposes the named archive and sidecar.
-Work on other branches is not evidence of additional published implementations.
-
-| Implementation | Recommended start | Requirements | Support/evidence boundary |
-| --- | --- | --- | --- |
-| TypeScript / JavaScript | [Current-release quickstart](../examples/typescript-quickstart/README.md) | Node.js 20+ for the quickstart; ESM; [package requirements](../packages/typescript/README.md#install) | [Security policy](../SECURITY.md); host/package checks do not validate every bundler or BLE stack |
-| C / C++ | [Released-archive quickstart](../examples/c-client/README.md) | CMake 3.16+, C99 and compatible C++11 compiler for both example targets; [installation](../packages/c/INSTALL.md) | Source archive, not a universal binary; no registry registration or maintenance SLA implied |
-| Swift / Kotlin | Unimplemented in this checkout | None established | No package from this source tree |
-
-For source coverage see [coverage](coverage.md). For package, protocol and corpus
-version distinctions see [versioning](versioning.md).
+This is the **canonical current release matrix**. Begin with the
+[current TypeScript quickstart](../examples/typescript-quickstart/README.md),
+[C/C++ archive quickstart](../examples/c-client/README.md),
+[Swift guide](../packages/swift/README.md), or
+[Kotlin guide](../packages/kotlin/README.md).
+The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
+with an evolving API and no capability APIs; consult its separate release evidence.
+Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
 
@@ -46,14 +41,53 @@ Repository examples are not included in the C source archive. Artifact tests
 copy the repository examples into isolated consumer directories and link them
 against the extracted/installed archive; they do not claim the archive ships them.
 
+## Published: Kotlin/JVM 0.1.0
+
+Maven Central now serves **`io.github.deancochran:ftms:0.1.0`**:
+<https://repo.maven.apache.org/maven2/io/github/deancochran/ftms/0.1.0/>.
+The signed annotated tag `kotlin-v0.1.0` identifies clean source commit
+`1fdfefb62f5c1b6a6b3e757cf24deb9d5c09560a`, not the later PR merge commit.
+Central deployment `86dfed11-b0e1-4795-a233-60e12e6fc12a` reached `PUBLISHED`.
+The [GitHub release](https://github.com/deancochran/ftms/releases/tag/kotlin-v0.1.0)
+retains the exact Central bundle, signed manifest, public key, publication receipts
+and signed clean-source conformance reports.
+
+- Clean-source gates: 87 JUnit tests, all applicable canonical corpora and
+  181,760 measurement layouts encoded and decoded; all nine PR CI checks passed.
+- Binary, sources, Dokka documentation, POM and Gradle module metadata were signed
+  with OpenPGP fingerprint `A355E4B9EBD3FAEC850A84A6B7A6488FE4805547`. All ten staged
+  artifacts/signatures matched the prepared manifest before the publish request.
+- All **30 public files** (five artifacts, signatures and checksum sidecars) were
+  downloaded and matched the signed manifest. Signatures verified. Independent
+  Kotlin and Java consumers executed and the Android consumer built an APK with
+  FTMS resolution exclusive to the public Maven Central repository.
+- The Portal returned the exact Maven PURL at `VALIDATED` but empty PURL lists at
+  `PUBLISHING`/`PUBLISHED`. A follow-up client fix handles that observed behavior
+  without weakening the pre-publish coordinate/staged-byte checks. It has 18
+  passing offline publishing-safety tests. No artifact or tag was replaced.
+
+| Artifact | Verified SHA-256 |
+| --- | --- |
+| Binary JAR | `c32c3d4bf2533c0d5ff20cc30778973e0c1fd9568a7e75c505a6db0cbaf6a650` |
+| Sources JAR | `cbbc3b3363125c7501ff45eb0780f6bfe21747988ccd015452c7bf126afaa8b7` |
+| Documentation JAR | `b940124bbf6684b37b2333a8178ea4250a8c0243b1af688f8bae99a23ce4771a` |
+| Central upload bundle | `f56b8db378ab1efb7242126fbbed42fef7d1761c9a2316e735d8c2c3a126eb25` |
+
+The repeatable, explicit `prepare → upload → publish → verify` process and
+credential/key maintenance are documented in the
+[Kotlin release runbook](../packages/kotlin/docs/releasing.md). Kotlin package
+version, FTMS protocol revision and corpus identity remain independent. This is
+host/artifact and Android-build evidence, not a live Kotlin BLE or Android-runtime
+test, physical accuracy result, or Bluetooth qualification.
+
 ## Current public packages
 
 | Port | Public release verified | Runnable example | What is not released |
 | --- | --- | --- | --- |
-| TypeScript | npm `@deancochran/ftms@0.4.0` | [Current quickstart](../examples/typescript-quickstart/README.md); [historical client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline | Native Swift/Kotlin implementations |
+| TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native implementations are separate packages, not npm exports |
 | C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
-| Swift | None | None | Implementation and SwiftPM release |
-| Kotlin | None | None | Implementation and Maven Central release |
+| Swift | GitHub `swift-v0.1.0` | [Swift guide and public consumer evidence](../packages/swift/README.md) | BLE transport and universal equipment compatibility |
+| Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
 
 ## Start with the released TypeScript package
 
@@ -64,10 +98,9 @@ npm start
 npm test
 ```
 
-The quickstart asserts normalized indoor-bike metrics and truncation behavior.
-Its recipe checks exercise features, power range, UUID dispatch, control codecs
-and byte conversions without communicating with equipment. The separate 0.2.0
-example remains a historical compatibility fixture, not the default entry point.
+The current-release quickstart asserts normalized metrics, truncation behavior,
+capabilities, ranges and byte conversions without communicating with equipment.
+The separate `typescript-client` example preserves the historical npm 0.2.0 baseline.
 
 ## C installation evidence
 
@@ -97,3 +130,49 @@ It used the earlier local 0.1.0-based C installation, not the newly published
 0.2.0 artifact. Publication and host replay do not expand that device evidence.
 Do not advertise compatibility with specific equipment until reviewed evidence
 names the actual model, firmware, platform and installed package version.
+
+## Published: Swift 0.1.0
+
+Verified against public GitHub release assets and a fresh public-tag SwiftPM
+consumer on **2026-09-30**. Implementation [PR #7](https://github.com/deancochran/ftms/pull/7)
+and release-hardening [PR #8](https://github.com/deancochran/ftms/pull/8) are merged.
+The annotated tag **`swift-v0.1.0`** identifies
+**`a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8`**. No existing npm/C tag or artifact
+was changed and no separate repository was created.
+
+- [Release Swift run 36662538259](https://github.com/deancochran/ftms/actions/runs/36662538259)
+  succeeded, including tag identity, clean-source/main ancestry, complete corpus
+  identity checks, Linux/macOS native verification and public **tag-pinned** consumers.
+- Both hosts passed 16 native tests and all **282** canonical fixture IDs with
+  zero failures, skips, unsupported or unresolved cases. The shared measurement
+  matrix passed **181,760** layouts, 46 sentinels, 47 RFU cases and 315 incomplete
+  prefixes. A deterministic 2,080-payload malformed-input exercise did not trap.
+- Linux used Swift **6.0.3**; macOS used Apple Swift **6.1.2**, Xcode **16.4 (16F6)**.
+  Installed-consumer release builds passed for **macOS 13, iOS 16, tvOS 16,
+  watchOS 9 and visionOS 1** deployment targets. The reports retain resolved Git
+  identities, SDK inventory, toolchains and canonical schema/vector/contract hashes.
+- Downloaded all four public JSON reports and verified **SHA256SUMS** and every
+  reported canonical-file hash against the tagged source. A second fresh public
+  tag consumer on Linux compiled and ran after publication, resolving the exact
+  commit above.
+- Early gates exposed a local consumer's missing macOS minimum, hidden artifact
+  upload filtering, incomplete older Xcode platform components and Git line-ending
+  attributes that made clean checkouts appear dirty. All were fixed before the
+  tag. The generated Kotlin launcher bytes were preserved unchanged. CI now
+  requires clean evidence; no failed gate was bypassed. Pinned artifact actions
+  still emit non-fatal Node-runtime deprecation notices.
+
+| Public evidence asset | Verified SHA-256 |
+| --- | --- |
+| `swift-linux-verification.json` | `a96c426d6e98df20263bdcbdcd3ee9f8ff70f61b6a48f9b34f63c772d4c0b9f7` |
+| `swift-linux-consumer.json` | `0fb205e5ad9854e0849c95d6e7a126f2b8a6298e920253fa5123c86473d3f59c` |
+| `swift-apple-verification.json` | `0587679c91659c967378ecd4c341f6b5d4ec479904e4b7b6edb10c48c3a1640c` |
+| `swift-apple-consumer.json` | `f5b0705208f62c49d1e31399e9f4a1370b93b59de90adfba9be47931aeeecf0d` |
+
+Use `.package(url: "https://github.com/deancochran/ftms.git", revision: "swift-v0.1.0")`
+and product `FTMS`; use the full commit above for an immutable pin. Normal
+SwiftPM version requirements are intentionally unsupported because ordinary
+`v*` tags in this repository identify npm releases. This is native compiler,
+host-runtime and SDK-build evidence, **not** Swift BLE device interoperability,
+runtime coverage of every Apple OS version, physical accuracy or Bluetooth qualification.
+See the [Swift release runbook](../packages/swift/RELEASING.md).

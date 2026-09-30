@@ -5,7 +5,7 @@ have independent version histories. Do not synchronize them by implication.
 
 | Boundary | Meaning | Current evidence |
 | --- | --- | --- |
-| Package semantic version | A package's public API and distribution compatibility | TypeScript 0.4.0 and C 0.2.0 are the current source versions; verified public release identities are tracked in [released packages](released-packages.md). Swift and Kotlin remain scaffolds. |
+| Package semantic version | A package's public API and distribution compatibility | TypeScript 0.4.0, C 0.2.0 and Kotlin 0.1.0 are published independently; verified identities are tracked in [released packages](released-packages.md). Swift is implemented with separate release gates. Kotlin uses `kotlin-vVERSION` tags and Maven Central coordinates. |
 | FTMS specification and errata | Bluetooth SIG service semantics and corrections used to review behavior | FTMS 1.0 plus ESR11 and EC23224 provenance; [1.0.1 annotated-redline reconciliation](specification-audit.md), with all nine incorporated errata attributed and remaining source conflicts explicitly recorded. |
 | Corpus schema format | Shape and comparison rules for fixtures | `schemaVersion: 1`, under `shared/conformance/v1/`. |
 | Corpus content revision | The exact schema/vector/contract bytes and checkout consumed by a runner | Pin immutable source commit, dirty indicator, and SHA-256 of both JSON assets plus `shared/conformance/README.md`. |
@@ -73,8 +73,14 @@ TypeScript-only and are not changed by C releases. A C release archive is built
 only from a clean checkout at that exact tag. Building it is release evidence, not
 a claim that a registry has published it. Conan and vcpkg registry submissions are
 separate explicitly authorized pull requests after an immutable archive and digest
-exist. Swift remains independently versioned and tagged; no root `Package.swift`
-is added until it has a real implementation.
+exist. Swift has a real implementation and thin root `Package.swift`. Its package
+version is recorded in `packages/swift/VERSION`, with `swift-vVERSION` releases in
+this same repository. SwiftPM's ordinary version resolver recognizes plain and
+`v`-prefixed semantic versions, not an arbitrary `swift-v` namespace. Swift users
+must therefore pin a **revision/tag or full commit**, not use normal version
+ranges. The [Swift release gate](../packages/swift/RELEASING.md) verifies public
+tag-pinned consumers on Linux/macOS plus Apple SDK builds before publication.
+There is no separate distribution repository and no alteration of npm tags.
 
 An illustrative release-evidence record (not an automated format) is:
 

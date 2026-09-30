@@ -1,6 +1,6 @@
 # FTMS Protocol Libraries
 
-**Transport-independent Bluetooth Fitness Machine Service codecs for TypeScript and C.**
+**Transport-independent Bluetooth Fitness Machine Service protocol libraries.**
 
 Replace handwritten FTMS packet parsing with typed values, explicit diagnostics,
 and bidirectional codecs. Decode telemetry, inspect capability evidence, and
@@ -15,7 +15,9 @@ Created and maintained by Dean Cochran; contributions are welcome.
 | --- | --- | --- |
 | JavaScript / TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms` |
 | C / C++ | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation |
-| Swift / Kotlin | Not implemented in this checkout | No release from this source tree |
+| Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
+| Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
+| Python | [Partial alpha guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1; evolving API, no capability APIs |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.
@@ -68,6 +70,7 @@ This is not a complete trainer controller or a Bluetooth-qualified product.
 
 ## Integrate
 
+- [Documentation website](https://deancochran.github.io/ftms/)
 - [Documentation and recommended reading order](docs/README.md)
 - [Static documentation site: local preview and deployment](site/README.md)
 - [Integration cookbook](docs/integration.md)

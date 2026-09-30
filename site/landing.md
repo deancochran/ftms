@@ -10,6 +10,9 @@ embedded integration, or protocol tool without taking on another connection stac
 | --- | --- | --- |
 | TypeScript / JavaScript | ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |
 | C / C++ | Portable C99, fixed-point values, caller-owned memory | [Install the source archive](../examples/c-client/README.md) |
+| Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
+| Kotlin / Java | Independent JVM codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
+| Python | Partial alpha, evolving API; no capability APIs | [Python package guide](../packages/python/README.md) |
 
 ## A focused boundary
 

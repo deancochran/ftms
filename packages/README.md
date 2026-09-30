@@ -2,15 +2,17 @@
 
 Published versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
 codecs, static capability interpretation and additive range inspection. Swift
-and Kotlin remain README-only scaffolds. See [release identities](../docs/released-packages.md)
+and Kotlin have independent 0.1.0 releases; Python is a partial 0.1.0a1 alpha.
+See [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.
 
 | Port | Initial consumers | Distribution status |
 | --- | --- | --- |
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
 | [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive with CMake; Make tooling is source-checkout-only |
-| [Swift](swift/README.md) | iOS and other supported Apple applications | Planned Swift Package Manager; not implemented here |
-| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Planned Maven artifact; not implemented here |
+| [Swift](swift/README.md) | iOS and other supported Apple applications | SwiftPM `swift-v0.1.0` |
+| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
+| [Python](python/README.md) | Python tooling | Partial alpha `deancochran-ftms` 0.1.0a1; package-specific scope |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must

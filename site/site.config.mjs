@@ -9,6 +9,24 @@ export const sitePath = (route = "") => `${base}/${route ? `${route}/` : ""}`;
 export const pages = [
   { source: "site/landing.md", slug: "", title: "FTMS Protocol Libraries", group: null },
   {
+    source: "packages/swift/README.md",
+    slug: "start/swift",
+    title: "Swift",
+    group: "Getting started",
+  },
+  {
+    source: "packages/kotlin/README.md",
+    slug: "start/kotlin",
+    title: "Kotlin / Java",
+    group: "Getting started",
+  },
+  {
+    source: "packages/python/README.md",
+    slug: "start/python",
+    title: "Python (partial alpha)",
+    group: "Getting started",
+  },
+  {
     source: "examples/typescript-quickstart/README.md",
     slug: "start/typescript",
     title: "TypeScript / JavaScript",

@@ -6,8 +6,9 @@ Until `1.0.0`, only the latest published `0.x` version of `@deancochran/ftms`
 receives security fixes. C is also released; see the
 [current release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md).
 This policy does not establish a C maintenance window or response-time guarantee.
-Reports affecting either released implementation are welcome through the private
-channel below. Swift and Kotlin remain unimplemented scaffolds in this checkout.
+Reports affecting any implementation are welcome through the private channel
+below. Native and Python packages have independent versions; include the exact
+package version and tag/commit when reporting.
 
 ## Reporting a vulnerability
 

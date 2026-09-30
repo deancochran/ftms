@@ -2,7 +2,8 @@
 
 Status: TypeScript and C have released bidirectional codecs and static capability
 interpretation. See the [canonical release matrix](released-packages.md) for
-versions and distribution. Swift/Kotlin remain scaffolds in this checkout.
+versions and distribution. Swift and Kotlin have independent 0.1.0 releases;
+Python has a partial 0.1.0a1 alpha without capability APIs.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
@@ -26,8 +27,9 @@ establish publication; consult the release matrix above.
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released source archive |
-| `packages/swift/` | Native Apple package | Reserved |
-| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Reserved |
+| `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
+| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
+| `packages/python/` | Pure synchronous Python protocol package | Partial alpha 0.1.0a1 |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
@@ -38,13 +40,12 @@ The C port has package-owned build, installation, verification and source-releas
 tooling. Its release does not establish vcpkg or ConanCenter registration.
 Directory names for future ports are not promises of published artifacts.
 
-Swift Package Manager is the planned ecosystem exception: a conventional Git URL
+Swift Package Manager is an ecosystem exception: a conventional Git URL
 dependency needs a repository-root `Package.swift`, even though Swift sources,
 tests, documentation, and package-owned tooling remain under `packages/swift/`.
-When Swift is implemented, prefer a thin root manifest that points into those
-directories, or deliberately use a distribution repository instead. Do not add an
-empty root manifest now. A future Swift release must test an isolated Git-URL
-dependency, not only a local-directory build.
+The implemented thin root manifest points into those directories. Swift uses
+`swift-vVERSION` tag/revision pins rather than normal SwiftPM semantic-version
+requirements. Release gates test an isolated public Git/tag consumer.
 
 ## Layers
 

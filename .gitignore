@@ -17,3 +17,8 @@ coverage/
 /packages/typescript/conformance/
 /packages/typescript/LICENSE
 /packages/typescript/SECURITY.md
+
+# SwiftPM build products
+/.build/
+/packages/swift/.build/
+/packages/swift/Verification/__pycache__/

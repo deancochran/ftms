@@ -3,8 +3,10 @@
 Status: this is an audit of the current TypeScript exports, unit tests, and v1
 corpus. It is not a claim of complete FTMS conformance, device interoperability,
 or Bluetooth qualification. TypeScript and C have released bidirectional codecs
-and static capability interpretation; Swift and Kotlin have no implementation
-in this checkout. See [current releases](released-packages.md).
+and static capability interpretation. Swift and Kotlin now have independently
+released implementations; Python is a partial alpha. See [current releases](released-packages.md)
+and each package's own verification evidence; the historical tables below do not
+substitute for language-specific evidence.
 
 ## Current codec surface
 

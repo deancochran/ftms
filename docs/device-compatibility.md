@@ -31,7 +31,11 @@ recording that profile. No option grants permission to issue a control command.
 
 This is a bounded audit, not a claim to identify every firmware variant. Both
 implemented ports (TypeScript and C) share the raw format options and regression
-corpus. Swift and Kotlin remain scaffolds, not validated implementations.
+corpus. Swift's subsequent independent implementation and verification are
+documented in [its package](../packages/swift/README.md); this historical device
+audit does not establish Swift device interoperability. Kotlin has independent
+[host and public-artifact verification](../packages/kotlin/docs/verification.md),
+not live Kotlin BLE/device evidence.
 
 | Gap | Evidence and limits | Disposition across implemented ports |
 | --- | --- | --- |
