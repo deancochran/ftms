@@ -14,6 +14,7 @@ for verified publication status; source metadata alone is not publication eviden
 | [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive; Make and CMake integration |
 | [Swift](swift/README.md) | iOS and other supported Apple applications | Swift Package Manager |
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central: `io.github.deancochran:ftms` |
+| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must
@@ -29,8 +30,10 @@ it. Add build manifests and CI with real implementations, not empty packages.
 No registry names, minimum platform versions, or native release dates are
 committed by this scaffold.
 
-The initial roadmap is C/C++ consumption, then Swift and Kotlin/Java. Rust and
- other ports remain deferred. The TypeScript npm build/release remains independent;
+Rust now implements bidirectional raw codecs with independent `no_std` sources,
+conformance tests and gated publishing. It does not yet implement capability
+interpretation or fragment assembly; see its [coverage and evidence](rust/docs/verification.md).
+Other language ports remain deferred. The TypeScript npm build/release remains independent;
  the private root pnpm workspace orchestrates only that implemented package.
  Ports and package tooling consume the independent [shared layer](../shared/README.md),
  which has no dependency on any port. TypeScript owns its npm staging/verification

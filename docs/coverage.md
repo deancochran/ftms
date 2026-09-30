@@ -7,6 +7,9 @@ capability interpretation. Swift now implements the corresponding native codec,
 range-inspection and capability surfaces; see [Swift verification](../packages/swift/README.md)
 for its host corpus/matrix checks and separate Apple/distribution gates. Kotlin
 has separate [full raw conformance and public-artifact verification](../packages/kotlin/docs/verification.md).
+Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md);
+it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
+or registry publication.
 The historical TypeScript/C tables below do not substitute for language-specific evidence.
 
 ## Current codec surface

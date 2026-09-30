@@ -128,9 +128,10 @@ At this codec milestone only Rust 1.85.1 local host/package results and Cortex
 compilation had been verified. Additional pipeline work is recorded below;
 MCU linking/execution, Rust BLE/device testing, PTS and Bluetooth qualification
 remain unverified. No equipment commands were sent.
-Normalized feature/capability interpretation remains unimplemented. Nothing was
-committed, merged, pushed or published; the package name/version are local
-candidate metadata, not evidence of registry availability or publication.
+Normalized feature/capability interpretation remains unimplemented. At this
+milestone nothing had been committed, merged, pushed or published; the package
+name/version were candidate metadata, not evidence of registry availability or
+publication.
 
 ## Publishing-pipeline addition
 
@@ -162,8 +163,25 @@ verification tooling, fixtures or credentials. Actual invocations confirmed that
 dirty-source preparation/publication fail before registry/authentication work.
 These candidates remain dirty and are deliberately ineligible for release.
 
-The `crates-io` GitHub environment is configured for `rust-v*` tags and contains
-the encrypted publishing secret. The workflow files remain local/uncommitted;
-remote CI, macOS/Windows jobs, first registry authentication/publication, docs.rs
-and a real public-registry consumer have not run. No release tag or package was
-published during setup. Feature/capability interpretation remains out of scope.
+At pipeline setup, the `crates-io` GitHub environment was configured for `rust-v*`
+tags with the encrypted publishing secret, while workflow files were still
+local/uncommitted. No release tag or package was published during setup.
+Feature/capability interpretation remains out of scope.
+
+## Integration verification
+
+The Rust implementation and workflows were committed and pushed for
+[PR #14](https://github.com/deancochran/ftms/pull/14). The first remote Rust matrix
+passed the codec tests but correctly rejected an unintended tracked `.gitignore`
+in the crate. Commit `a7cde5d` explicitly excludes that repository-only file;
+the strict archive check remains in place.
+
+Two clean local MSRV preparations at that commit built and executed their
+extracted-package consumers and produced identical archives and release records.
+The archive SHA-256 was
+`68a6c1fcf23d6742fdc02b2fa30f9a8c1ab30ff1328356b519f00375d753327b`.
+This identifies that commit's archive, not a later merge/tag or registry version.
+All 24 offline release-policy tests and the 588-test TypeScript push gate passed.
+The pull request's checks provide the authoritative remote execution status.
+First registry authentication/publication, docs.rs and a real public-registry
+consumer remain unverified; no Rust release tag has been created.

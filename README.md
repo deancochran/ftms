@@ -29,6 +29,9 @@ installation uses the Swift-specific tag or commit, not npm version ranges.
 [Kotlin/JVM and Java](packages/kotlin/README.md) are supported by the independent
 Maven Central package **`io.github.deancochran:ftms:0.1.0`**, including an Android
 artifact-consumer build check.
+[Rust](packages/rust/README.md) has an independent, allocation-free `no_std`
+raw-codec implementation and gated crates.io publishing. Its **0.1.0** source is
+not yet published; capability interpretation and fragment assembly are not implemented.
 See [verified releases](docs/released-packages.md) for actual publication status
 and [compatibility verification](docs/compatibility-verification.md) for scope and
 test accounting. Neither regression tests nor one trainer pilot establish
@@ -43,6 +46,7 @@ universal interoperability, PTS results or Bluetooth qualification.
 | [packages/c/](packages/c/README.md) | Portable bidirectional C99 codecs and static capability evidence, consumable from C++ |
 | [packages/swift/](packages/swift/README.md) | Native Swift 6 protocol package for SwiftPM, independent of other ports |
 | [packages/kotlin/](packages/kotlin/README.md) | Independent Kotlin/JVM FTMS package on Maven Central, consumable from Java/Android |
+| [packages/rust/](packages/rust/README.md) | Independent allocation-free `no_std` raw codecs, host/embedded compilation checks and crates.io release tooling |
 | [docs/](docs/architecture.md) | Repository-wide [architecture](docs/architecture.md), [coverage](docs/coverage.md), and [versioning](docs/versioning.md) guidance |
 | [examples/](examples/README.md) | Installed consumers and passive capture/replay examples outside protocol cores |
 | Root configs and workflows | Repository orchestration, formatting, hooks, and release gates |
