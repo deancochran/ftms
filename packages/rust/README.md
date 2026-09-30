@@ -2,6 +2,7 @@
 
 `ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.0 is
 published on crates.io; newer source capabilities described below are unreleased.
+This checkout prepares 0.1.1; the version bump is not publication evidence.
 It is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
 runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, or
 control safety.

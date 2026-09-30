@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.1
+
+Prepared release; publication is not yet claimed.
 
 - Added public allocation-free normalized range, human-unit control-request,
   control-response and Machine Status projections, retaining status actions.
