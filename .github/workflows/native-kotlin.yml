@@ -28,6 +28,6 @@ jobs:
           echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
           echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
       - name: Install Android compilation components
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
       - name: Verify codecs and isolated Kotlin, Java and Android consumers
         run: bash packages/kotlin/verification/verify.sh
