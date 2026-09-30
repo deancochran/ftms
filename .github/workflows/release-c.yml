@@ -53,9 +53,11 @@ jobs:
           python3 packages/c/scripts/source-bundle.py --release
           archive="packages/c/build/source-candidate/ftms-c-$(cat packages/c/VERSION).tar.gz"
           python3 packages/c/scripts/verify-source-bundle.py --archive "$archive"
-          echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
-          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(sha256sum "$archive" | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+          {
+            echo "tag=$GITHUB_REF_NAME"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "sha256=$(sha256sum "$archive" | cut -d ' ' -f1)"
+          } >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: c-source-release
