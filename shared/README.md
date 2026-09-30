@@ -6,8 +6,8 @@ fixtures**, never the reverse. Nothing here requires npm, a language-specific
 package, a native toolchain, BLE, or an OS lifecycle API.
 
 - [protocol/capability-discovery.md](protocol/capability-discovery.md) describes
-  static protocol interpretation rules and acceptance scenarios. The unreleased
-  C interpreter implements them without BLE or control authorization.
+  static protocol interpretation rules and acceptance scenarios. The released
+  C and TypeScript interpreters implement them without BLE or control authorization.
 - [conformance/v1/schema.json](conformance/v1/schema.json) and
   [conformance/v1/vectors.json](conformance/v1/vectors.json) are the canonical
   versioned codec regression corpus. Fixtures are executable expectations and

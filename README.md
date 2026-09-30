@@ -1,98 +1,109 @@
-# FTMS protocol project
+# FTMS Protocol Libraries
 
-Transport-independent codecs and shared protocol design for the Bluetooth
-Fitness Machine Service (FTMS). Implementations interpret bytes; applications
-own Bluetooth discovery, connections, control permission, and physical safety.
+**Transport-independent Bluetooth Fitness Machine Service protocol libraries.**
 
-## Current support
+Replace handwritten FTMS packet parsing with typed values, explicit diagnostics,
+and bidirectional codecs. Decode telemetry, inspect capability evidence, and
+encode protocol messages—without replacing your Bluetooth stack.
 
-Start with the [released-package status and examples](docs/released-packages.md).
-The [TypeScript example](examples/typescript-client/README.md) works with the
-published npm 0.2.0 compatibility baseline; the [C example](examples/c-client/README.md)
-uses an installed source archive. A [limited passive KICKR CORE pilot](docs/equipment-results/2026-09-29-kickr-core-linux.md)
-records 55 telemetry packets across two connections. It does not establish
-universal device compatibility, physical accuracy or safe control execution.
+For application developers, firmware authors, and protocol tooling maintainers.
+Created and maintained by Dean Cochran; contributions are welcome.
 
-[TypeScript / JavaScript](packages/typescript/README.md) is distributed as
-`@deancochran/ftms`; the current source version is **0.4.0**. It provides codecs
-for all six FTMS machine-data families, features, supported ranges, statuses,
-and Control Point requests/responses. See its README for installation and API
-usage and its [changelog](packages/typescript/CHANGELOG.md) for releases.
+## Choose your implementation
 
-C/C++ has independently released bidirectional C99 codecs for Features, ranges,
-all six measurement families, Control Point and statuses, plus static capability
-interpretation. Its current source version is **0.2.0**. Both ports add explicit
-range-inspection diagnostics without changing existing defaults or automatically
-selecting device formats. [Swift](packages/swift/README.md) now has native codecs,
-range inspection and capabilities with independent SwiftPM version **0.1.0**;
-installation uses the Swift-specific tag or commit, not npm version ranges.
-[Kotlin/JVM and Java](packages/kotlin/README.md) are supported by the independent
-Maven Central package **`io.github.deancochran:ftms:0.1.0`**, including an Android
-artifact-consumer build check.
-[Rust](packages/rust/README.md) has an independent, allocation-free `no_std`
-raw-codec implementation and gated crates.io publishing. Its **0.1.0** source is
-not yet published; capability interpretation and fragment assembly are not implemented.
-See [verified releases](docs/released-packages.md) for actual publication status
-and [compatibility verification](docs/compatibility-verification.md) for scope and
-test accounting. Neither regression tests nor one trainer pilot establish
-universal interoperability, PTS results or Bluetooth qualification.
+| Environment | Start here | Distribution |
+| --- | --- | --- |
+| JavaScript / TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms` |
+| C / C++ | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation |
+| Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
+| Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
+| Python | [Partial alpha guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1; evolving API, no capability APIs |
+| Rust | [Rust raw-codec guide](packages/rust/README.md) | `no_std` source 0.1.0; crates.io publishing pipeline configured, not yet published |
 
-## Layout and dependencies
+The [canonical release matrix](docs/released-packages.md) records verified versions,
+publication identity, installation requirements and evidence limits.
 
-| Location | Ownership |
-| --- | --- |
-| [shared/](shared/README.md) | Language-neutral protocol definitions/design and versioned conformance fixtures |
-| [packages/typescript/](packages/typescript/README.md) | npm API docs, changelog, sources, tests, compiler configs, and npm-specific scripts |
-| [packages/c/](packages/c/README.md) | Portable bidirectional C99 codecs and static capability evidence, consumable from C++ |
-| [packages/swift/](packages/swift/README.md) | Native Swift 6 protocol package for SwiftPM, independent of other ports |
-| [packages/kotlin/](packages/kotlin/README.md) | Independent Kotlin/JVM FTMS package on Maven Central, consumable from Java/Android |
-| [packages/rust/](packages/rust/README.md) | Independent allocation-free `no_std` raw codecs, host/embedded compilation checks and crates.io release tooling |
-| [docs/](docs/architecture.md) | Repository-wide [architecture](docs/architecture.md), [coverage](docs/coverage.md), and [versioning](docs/versioning.md) guidance |
-| [examples/](examples/README.md) | Installed consumers and passive capture/replay examples outside protocol cores |
-| Root configs and workflows | Repository orchestration, formatting, hooks, and release gates |
+Rust is an independent, allocation-free raw-codec implementation. It does not yet
+implement capability interpretation or fragment assembly; see its
+[coverage and evidence](packages/rust/docs/verification.md).
 
-Ports and their build/test tools consume `shared/`; shared definitions and
-fixtures depend on no language-specific package or tool. Ports are siblings,
-not wrappers around TypeScript, and consumers need not install other ports.
-The npm build stages shared corpus snapshots at its existing public export
-paths; these generated files are not separately maintained fixtures.
+## Decode your first measurement
 
-Root conventional configs stay at the root. Package-specific tooling stays
-with its package. A future `tools/` directory is appropriate only when actual
-shared tooling is implemented, not as a home for speculative infrastructure.
-See the [architecture](docs/architecture.md) and
-[capability contract](shared/protocol/capability-discovery.md) for boundaries.
-The [conformance runner contract](shared/conformance/README.md) records the
-language-neutral v1 comparison and reporting rules.
-The [deterministic simulation contract](docs/simulation.md) is separate,
-host-only protocol/session evidence and is not Bluetooth qualification.
+With Node.js 20+ in a new directory:
 
-## Repository commands
+```sh
+npm init -y
+npm install @deancochran/ftms@0.4.0
+```
 
-Run from the repository root with Node.js 20+ and pnpm 10.33.0:
+Save as `reading.mjs`, then run `node reading.mjs`:
+
+```js
+import { parseFtmsIndoorBikeMeasurement } from "@deancochran/ftms";
+
+const bytes = Uint8Array.of(0x44, 0x00, 0x10, 0x0e, 0xb4, 0x00, 0xfa, 0x00);
+const reading = parseFtmsIndoorBikeMeasurement(bytes);
+console.log(reading.metrics.speedMps);   // 10
+console.log(reading.metrics.cadenceRpm); // 90
+console.log(reading.metrics.powerWatts); // 250
+console.log(reading.diagnostics.truncated); // false
+```
+
+These are illustrative bytes, not a device capture. The
+[runnable quickstart](examples/typescript-quickstart/main.mjs) asserts these values
+and checks a deliberately truncated input. No Bluetooth hardware is needed.
+
+## What you get
+
+- All six FTMS measurement families: treadmill, cross trainer, step climber,
+  stair climber, rower and indoor bike.
+- Features, supported ranges, training/machine statuses and Control Point codecs.
+- TypeScript normalized metrics and raw APIs; C fixed-point values and diagnostics.
+- Static capability interpretation that preserves missing and contradictory evidence.
+- Shared, versioned regression fixtures and verified package-consumer boundaries.
+
+See [coverage](docs/coverage.md) for exact scope. Protocol coverage is not universal
+equipment compatibility. A [limited passive KICKR CORE pilot](docs/equipment-results/2026-09-29-kickr-core-linux.md)
+is evidence for that recorded setup only, not control safety or qualification.
+
+## What stays in your application
+
+Bluetooth discovery, permissions, connections, subscriptions, timing, reconnection,
+control ownership, procedure serialization and physical safety. Encoding a valid
+command or observing a supported feature does **not** authorize sending it.
+This is not a complete trainer controller or a Bluetooth-qualified product.
+
+## Integrate
+
+- [Documentation website](https://deancochran.github.io/ftms/)
+- [Documentation and recommended reading order](docs/README.md)
+- [Static documentation site: local preview and deployment](site/README.md)
+- [Integration cookbook](docs/integration.md)
+- [Web Bluetooth, React Native and C byte-boundary recipes](docs/transport-recipes.md)
+- [Public API selection and reference](docs/api.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [TypeScript package details](packages/typescript/README.md) · [C installation](packages/c/INSTALL.md)
+
+## Contribute and verify
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [roadmap and non-goals](docs/roadmap.md),
+[MIT license](LICENSE), and [security reporting](SECURITY.md).
+
+From a source checkout with Node.js 20+ and pnpm 10.33.0:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm verify
+pnpm docs:build
+make -C packages/c test
 ```
 
-The private pnpm workspace includes only TypeScript. Root `pnpm test`,
-`pnpm check-types`, `pnpm build`, `pnpm clean`, and `pnpm verify:package` forward
-to it. `pnpm verify` runs root lint, TypeScript checks and tests, then fresh-build
-linked-consumer and packed-artifact verification. Root `pnpm lint` and
-`pnpm format` use Biome; Lefthook runs `pnpm test` before pushes.
+pnpm checks validate TypeScript and documentation, not native code or devices.
+Native tests need their own host compilers and dependencies; see the contributor guide.
+No command above operates equipment or publishes a release.
 
-From `packages/typescript`, the corresponding package commands run directly;
-its lint/format scripts use the root configuration. C host verification runs with
-`make -C packages/c test`; the optional `make -C packages/c check-embedded` target
-records Cortex-M0 compile-only evidence. These use actual compilers and isolated
-C/C++ consumers. pnpm success does not validate native code or devices.
-
-## Policy and releases
-
-[LICENSE](LICENSE) and [SECURITY.md](SECURITY.md) are canonical repository policy.
-The TypeScript build stages those policies into the npm package. npm release
-metadata and history belong to `packages/typescript/package.json` and
-`packages/typescript/CHANGELOG.md`; existing tag, verification, and trusted
-publishing gates apply only to that package. C uses the independently gated
-`c-vVERSION` source-release workflow; registry submissions are separate.
+Repository boundaries and package ownership are documented in
+[architecture](docs/architecture.md). Protocol contracts and fixtures live under
+[shared/](shared/README.md); language-owned sources and tools live under
+[packages/](packages/README.md). Detailed historical verification remains available
+through the documentation index, separate from the getting-started path.

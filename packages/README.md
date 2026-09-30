@@ -2,18 +2,17 @@
 
 Published versions are TypeScript **0.4.0** and C **0.2.0**, with bidirectional
 codecs, static capability interpretation and additive range inspection. Swift
-has an unreleased native implementation with Linux host verification; Kotlin/JVM
-**0.1.0** is published on Maven Central with public Java/Kotlin consumer execution
-and Android APK compilation evidence. See the
-[Swift package](swift/README.md) for exact limits and [release identities](../docs/released-packages.md)
+and Kotlin have independent 0.1.0 releases; Python is a partial 0.1.0a1 alpha.
+See [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.
 
-| Port | Initial consumers | Planned distribution |
+| Port | Initial consumers | Distribution status |
 | --- | --- | --- |
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
-| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive; Make and CMake integration |
-| [Swift](swift/README.md) | iOS and other supported Apple applications | Swift Package Manager |
-| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central: `io.github.deancochran:ftms` |
+| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive with CMake; Make tooling is source-checkout-only |
+| [Swift](swift/README.md) | iOS and other supported Apple applications | SwiftPM `swift-v0.1.0` |
+| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
+| [Python](python/README.md) | Python tooling | Partial alpha `deancochran-ftms` 0.1.0a1; package-specific scope |
 | [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
 
 Start from the [architecture](../docs/architecture.md) and the shared
@@ -39,9 +38,8 @@ Other language ports remain deferred. The TypeScript npm build/release remains i
  which has no dependency on any port. TypeScript owns its npm staging/verification
  scripts, API README, and changelog; root policy and orchestration remain at root.
 
-Swift has one ecosystem exception: Swift Package Manager Git dependencies look
-for a repository-root `Package.swift`. The implemented thin root entrypoint points
-into `packages/swift/`; sources, tests, and package documentation remain there.
-Swift releases stay in this repository using `swift-vVERSION` and revision/tag
-pins, not normal SwiftPM version ranges. See its package README and the verified
-release record for installation and publication evidence.
+Swift has one planned ecosystem exception: Swift Package Manager Git dependencies
+look for a repository-root `Package.swift`. When real Swift code exists, a thin
+root entrypoint may point into `packages/swift/`, or Swift may use a distribution
+repository. Do not add a placeholder manifest; sources, tests, and package docs
+remain in `packages/swift/`.

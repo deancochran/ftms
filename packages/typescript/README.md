@@ -3,6 +3,13 @@
 Runtime-neutral TypeScript codecs for the Bluetooth Fitness Machine Service
 (FTMS).
 
+Replace handwritten packet parsing while keeping your existing Bluetooth stack.
+Start with the [runnable quickstart](https://github.com/deancochran/ftms/blob/main/examples/typescript-quickstart/README.md),
+then the [integration cookbook](https://github.com/deancochran/ftms/blob/main/docs/integration.md),
+[API index](https://github.com/deancochran/ftms/blob/main/docs/api.md), and
+[troubleshooting](https://github.com/deancochran/ftms/blob/main/docs/troubleshooting.md).
+Repository links describe main; use a matching release tag for older packages.
+
 The package accepts `Uint8Array` or `ArrayBuffer` values and returns typed,
 normalized data. It does not create BLE connections, own GATT subscriptions,
 schedule command timeouts, log, or depend on React Native.
@@ -28,6 +35,7 @@ React Native/Metro projects.
 ```ts
 import { parseFtmsIndoorBikeMeasurement } from "@deancochran/ftms";
 
+const notificationBytes = Uint8Array.of(0x44, 0x00, 0x10, 0x0e, 0xb4, 0x00, 0xfa, 0x00);
 const reading = parseFtmsIndoorBikeMeasurement(notificationBytes);
 
 if (reading.diagnostics.truncated) {
@@ -186,7 +194,7 @@ published at:
 Use the JSON loading mechanism appropriate to your runtime or tooling. The
 corpus is regression evidence, not a Bluetooth qualification certificate.
 Its language-neutral comparison and reporting rules are in the repository's
-[conformance runner contract](../../shared/conformance/README.md).
+[conformance runner contract](https://github.com/deancochran/ftms/blob/main/shared/conformance/README.md).
 
 ## Specification basis
 
@@ -300,9 +308,9 @@ covers all six FTMS machine-data families, not only indoor bikes. Both interpret
 evaluates caller-supplied feature, characteristic, and range evidence without
 owning BLE discovery or inferring a machine's identity.
 
-The repository [coverage matrix](../../docs/coverage.md) distinguishes the current
+The repository [coverage matrix](https://github.com/deancochran/ftms/blob/main/docs/coverage.md) distinguishes the current
 protocol parity from platform-specific APIs and unverified device behavior; its
-[versioning boundaries](../../docs/versioning.md) keep package releases independent
+[versioning boundaries](https://github.com/deancochran/ftms/blob/main/docs/versioning.md) keep package releases independent
 from FTMS and corpus revisions.
 
 ## Development

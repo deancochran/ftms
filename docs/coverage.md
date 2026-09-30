@@ -2,25 +2,25 @@
 
 Status: this is an audit of the current TypeScript exports, unit tests, and v1
 corpus. It is not a claim of complete FTMS conformance, device interoperability,
-or Bluetooth qualification. C has unreleased bidirectional codecs and static
-capability interpretation. Swift now implements the corresponding native codec,
-range-inspection and capability surfaces; see [Swift verification](../packages/swift/README.md)
-for its host corpus/matrix checks and separate Apple/distribution gates. Kotlin
-has separate [full raw conformance and public-artifact verification](../packages/kotlin/docs/verification.md).
+or Bluetooth qualification. TypeScript and C have released bidirectional codecs
+and static capability interpretation. Swift and Kotlin now have independently
+released implementations; Python is a partial alpha. See [current releases](released-packages.md)
+and each package's own verification evidence; the historical tables below do not
+substitute for language-specific evidence.
+
 Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md);
 it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
 or registry publication.
-The historical TypeScript/C tables below do not substitute for language-specific evidence.
 
 ## Current codec surface
 
 | Family | TypeScript decode | TypeScript encode | Tests and v1 vectors | Equipment-side direction |
 | --- | --- | --- | --- | --- |
-| Measurements | All six families via normalized parsers and raw codecs | All six via raw codec | Original vectors plus 26 raw cases / 47 assertions | Implemented, unreleased addition |
-| Statuses | Training and Machine Status, normalized and raw | Both raw codecs | Original vectors plus 38 raw cases / 63 assertions | Implemented, unreleased addition |
-| Features | Normalized and raw words | Raw words | Original 35 vectors plus raw value corpus | Implemented, unreleased addition |
+| Measurements | All six families via normalized parsers and raw codecs | All six via raw codec | Original vectors plus 26 raw cases / 47 assertions | Implemented |
+| Statuses | Training and Machine Status, normalized and raw | Both raw codecs | Original vectors plus 38 raw cases / 63 assertions | Implemented |
+| Features | Normalized and raw words | Raw words | Original 35 vectors plus raw value corpus | Implemented |
 | C Features | Raw machine/target words | Raw machine/target words | Original 35 vectors plus bidirectional value corpus | Implemented |
-| Supported ranges | All five, normalized/raw and caller-profile inspection | All five, raw and caller-profile inspection | Original 7 vectors plus raw value and separate synthetic inspection corpus | Implemented, unreleased addition |
+| Supported ranges | All five, normalized/raw and caller-profile inspection | All five, raw and caller-profile inspection | Original 7 vectors plus raw value and separate synthetic inspection corpus | Implemented |
 | C Supported ranges | All five ranges, fixed-point | All five ranges, fixed-point | Original 7 vectors plus bidirectional value corpus | Implemented |
 | C Measurements | All six families, raw fixed-point and diagnostics | All six families | 26 raw cases / 47 directional assertions plus original corpus | Implemented |
 | C Statuses | Training and all 22 Machine Status opcodes | Training and all 22 Machine Status opcodes | 38 raw cases / 63 directional assertions plus original corpus | Implemented |
@@ -36,8 +36,8 @@ it must not be confused with the overall TypeScript test count or used to infer
 that all test cases are shared vectors. The 350-test TypeScript run was historical
 evidence from the earlier codec audit; current verification is recorded below.
 
-The published TypeScript release is client-oriented. Unreleased source additions
-now cover both directions through separate raw APIs without replacing existing
+The published TypeScript release covers both directions through separate raw
+APIs without replacing existing
 normalized/compatibility interfaces. The package keeps its existing public module
 paths and 42-file artifact layout. C deliberately keeps raw integers, fixed-size
 storage and compact diagnostics; it does not imitate TypeScript's allocating
@@ -46,7 +46,7 @@ not missing wire directions. See [parity evidence](parity.md).
 
 ## Capability interpretation
 
-The C slice includes an unreleased static capability-evidence interpreter and a
+The C implementation includes a released static capability-evidence interpreter and a
 separate executable capability corpus. TypeScript now exposes the same static
 interpretation as `evaluateFtmsCapabilities`; neither is an execution
 permission decision, or device evidence. The contract covers all six measurement
@@ -110,9 +110,9 @@ evidence document. The nine incorporated 1.0.1 errata are the nine entries in
 the audit reconciliation; ESR11 and EC23224 are additional governing sources,
 not additional entries in that nine-errata count.
 
-Current evidence includes TypeScript host unit tests, schema validation, canonical
+The historical audit evidence included TypeScript host unit tests, schema validation, canonical
 shared vectors, and the package's linked-consumer/packed-artifact checks. The
-unreleased C package additionally has strict GCC/Clang host builds,
+C candidate at that time additionally had strict GCC/Clang host builds,
 C++11 consumers linked to actual C archives, isolated-prefix C/C++ consumer
 checks, an ASan+UBSan bounded fuzz run, and a Cortex-M0 freestanding compile-only
 result. Its direct v1 runner passes all 97 cases with zero unsupported/skipped.

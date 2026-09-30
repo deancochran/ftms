@@ -1,23 +1,19 @@
 # FTMS integration examples
 
-These are runnable external-consumer codec examples. They use installed package
-boundaries rather than workspace imports and intentionally contain no BLE stack,
-device identifiers, or control writes.
+These examples consume public installed packages. They contain no connection
+attempts, device identifiers or control writes.
 
-| Example | Status | Run |
+| Example | Purpose | Run |
 | --- | --- | --- |
-| [TypeScript client](typescript-client/) | Uses released `@deancochran/ftms@0.2.0` | `cd examples/typescript-client && npm install && node main.mjs` |
-| [C client](c-client/) | Uses the unreleased local C `0.1.0` source candidate after an isolated install | See its README |
+| [TypeScript quickstart](typescript-quickstart/README.md) | Recommended current-release entry; expected outputs and byte-boundary recipes | `npm install && npm test` in its directory |
+| [C / C++ client](c-client/README.md) | Released archive, installed CMake target, assertions in both languages | Follow its download/install/build steps |
+| [Historical TypeScript client](typescript-client/README.md) | Explicit 0.2.0 compatibility baseline, not the default quickstart | `npm install && npm test` in its directory |
+| [C passive replay](c-passive-replay/README.md) | Offline capture replay; separate opt-in live-capture procedure | Follow its README; do not run capture implicitly |
 
-Both examples decode Indoor Bike and non-bike Treadmill values and construct
-bytes only. Feature declarations, ranges, and successful codec calls are not
-permission to control equipment. Real control procedures require caller-owned
-discovery, properties, security, ownership, supported-range validation,
-serialization, response handling, failure handling, and user authorization.
+Read the [release matrix](../docs/released-packages.md) before assuming a source
+API is published. Features, ranges and successful encoders are not permission to
+control equipment. See the [integration cookbook](../docs/integration.md).
 
-They are deterministic host simulations, not evidence of real equipment,
-Bluetooth lifecycle behavior, PTS results, or Bluetooth qualification.
-
-See [released package status](../docs/released-packages.md) before assuming a
-source API is available from a registry. Follow the [equipment-test procedure](../docs/equipment-testing.md)
-to record real observations; no equipment interoperability result is currently recorded.
+Examples are host evidence, not Bluetooth qualification. The
+[limited passive pilot](../docs/equipment-results/2026-09-29-kickr-core-linux.md)
+records a separate real-equipment observation, not universal interoperability.

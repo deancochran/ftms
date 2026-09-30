@@ -1,5 +1,9 @@
 # Device-readiness improvements — 2026-09-28
 
+> Historical local evidence for the checkout identified below, including its
+> then-unreleased 0.1.0 candidate. Not current release status; see the
+> [release matrix](../../../docs/released-packages.md).
+
 Source: `scaffold/native-capabilities`, HEAD
 `41023a60cff6efdeef5e36730c3d7356a91d26b6`, dirty/local/unreleased.
 This record distinguishes implemented host-verifiable improvements from the

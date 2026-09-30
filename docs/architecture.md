@@ -1,52 +1,52 @@
 # Cross-language FTMS architecture
 
-Status: TypeScript and C have published bidirectional codecs, static capability
-interpretation and range inspection. Swift 0.1.0 implements these surfaces natively,
-with separate Linux/macOS, Git-consumer and Apple SDK release gates. See the
-[release record](released-packages.md) for actual publication identities; source
-metadata is not publication evidence. Kotlin/JVM 0.1.0 is independently implemented
-and published on Maven Central with Java/Kotlin execution and Android APK checks.
+Status: TypeScript and C have released bidirectional codecs and static capability
+interpretation. See the [canonical release matrix](released-packages.md) for
+versions and distribution. Swift and Kotlin have independent 0.1.0 releases;
+Python has a partial 0.1.0a1 alpha without capability APIs.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
 
 Keep protocol decisions and cross-language regression evidence in one repository.
 Consumers must be able to use one implementation without installing the others.
-TypeScript, C, Swift, Kotlin, and Rust occupy sibling directories under `packages/`.
+TypeScript, C, Swift, Kotlin, Python, and Rust occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
-`pnpm-workspace.yaml` includes only the implemented TypeScript package. Its npm
-identity and public export paths remain stable. Published TypeScript is
-`@deancochran/ftms@0.4.0`.
+`pnpm-workspace.yaml` includes the TypeScript package and private documentation
+website under `site/`. The site's Node 22.12+ build requirement does not change
+the protocol package's runtime requirements. Its npm
+identity and public export paths remain stable. Source versions alone do not
+establish publication; consult the release matrix above.
 
 | Location | Responsibility | Current state |
 | --- | --- | --- |
 | `packages/typescript/` | TypeScript README, changelog, manifest, sources, tests, scripts, and compiler configs | Implemented |
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift and Kotlin |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by C and TypeScript |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
-| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented; C 0.2.0 released |
-| `packages/swift/` | Native SwiftPM protocol package | Implemented; version 0.1.0 with independent release gates |
-| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Implemented; 0.1.0 published on Maven Central |
+| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released source archive |
+| `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
+| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
+| `packages/python/` | Pure synchronous Python protocol package | Partial alpha 0.1.0a1 |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
-| `examples/` | Future integration examples outside the core packages | Reserved |
+| `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples |
+| `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
 Other language ports are deferred. The existing TypeScript package
 continues to serve JavaScript and React Native consumers.
 
-The C port has native source, host tooling and independent release automation.
-Add each package's build and installation files
- with its first real implementation and tests. Directory names are not promises
- of registry names or published artifacts.
+The C port has package-owned build, installation, verification and source-release
+tooling. Its release does not establish vcpkg or ConanCenter registration.
+Directory names for future ports are not promises of published artifacts.
 
 Swift Package Manager is an ecosystem exception: a conventional Git URL
 dependency needs a repository-root `Package.swift`, even though Swift sources,
 tests, documentation, and package-owned tooling remain under `packages/swift/`.
-The implemented thin root manifest points into those directories. Swift stays
-in this repository using `swift-vVERSION` tags, installed via revision/tag pins
-rather than normal SwiftPM semantic-version requirements. Its release gate tests
-an isolated public Git/tag dependency, not only a local-directory build.
+The implemented thin root manifest points into those directories. Swift uses
+`swift-vVERSION` tag/revision pins rather than normal SwiftPM semantic-version
+requirements. Release gates test an isolated public Git/tag consumer.
 
 ## Layers
 
@@ -109,7 +109,8 @@ encryption, permission ownership, and actuator safety remain caller-owned.
 
 ## Conformance and release boundaries
 
-Root pnpm commands forward to TypeScript; Biome and Lefthook stay at the root.
+Root build/test/package commands forward to TypeScript; root `pnpm verify` also
+checks documentation and builds API reference HTML. Biome and Lefthook stay at the root.
 TypeScript tests read the canonical shared corpus directly. Each TypeScript build
 cleans generated outputs, compiles, and stages distribution snapshots of the
 root `LICENSE` and `SECURITY.md` policies and the two canonical

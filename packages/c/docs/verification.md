@@ -1,5 +1,9 @@
 # Verification record
 
+> Historical chronological evidence from 2026-09-27/28. Each section records its
+> own source identity and intermediate limitations; it is not a current support
+> matrix. See [released packages](../../../docs/released-packages.md).
+
 ## Historical intermediate Control Point milestone (2026-09-28)
 
 The following intermediate limitations were subsequently resolved; see the

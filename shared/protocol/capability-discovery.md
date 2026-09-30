@@ -1,6 +1,6 @@
 # FTMS capability discovery contract
 
-Status: language-neutral contract. The unreleased C slice and TypeScript
+Status: language-neutral contract. The released C implementation and TypeScript
 `evaluateFtmsCapabilities` implement the static evidence interpretation
 described here. TypeScript accepts `Uint8Array`/`ArrayBuffer` read bytes and
 returns the corpus's normalized representation; neither API performs discovery
@@ -47,7 +47,8 @@ Service Changed, and refreshing evidence after relevant lifecycle changes.
 
 ## Evidence model
 
-The C API is unreleased. This contract preserves these distinctions:
+See the [release matrix](../../docs/released-packages.md) for publication status.
+This contract preserves these distinctions:
 
 | Evidence | Required distinctions |
 | --- | --- |
