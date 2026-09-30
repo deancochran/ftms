@@ -10,7 +10,7 @@ This document defines boundaries, not universal FTMS device compatibility.
 
 Keep protocol decisions and cross-language regression evidence in one repository.
 Consumers must be able to use one implementation without installing the others.
-TypeScript, C, Swift, and Kotlin occupy sibling directories under `packages/`.
+TypeScript, C, Swift, Kotlin, Python, and Rust occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
 `pnpm-workspace.yaml` includes the TypeScript package and private documentation
 website under `site/`. The site's Node 22.12+ build requirement does not change
@@ -30,10 +30,11 @@ establish publication; consult the release matrix above.
 | `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
 | `packages/python/` | Pure synchronous Python protocol package | Partial alpha 0.1.0a1 |
+| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-Rust and other language ports are deferred. The existing TypeScript package
+Other language ports are deferred. The existing TypeScript package
 continues to serve JavaScript and React Native consumers.
 
 The C port has package-owned build, installation, verification and source-release

@@ -18,9 +18,14 @@ Created and maintained by Dean Cochran; contributions are welcome.
 | Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
 | Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
 | Python | [Partial alpha guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1; evolving API, no capability APIs |
+| Rust | [Rust raw-codec guide](packages/rust/README.md) | `no_std` source 0.1.0; crates.io publishing pipeline configured, not yet published |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.
+
+Rust is an independent, allocation-free raw-codec implementation. It does not yet
+implement capability interpretation or fragment assembly; see its
+[coverage and evidence](packages/rust/docs/verification.md).
 
 ## Decode your first measurement
 

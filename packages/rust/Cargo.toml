@@ -1,0 +1,30 @@
+[package]
+name = "ftms"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85.1"
+description = "Allocation-free no_std codecs for Bluetooth Fitness Machine Service data"
+license = "MIT"
+repository = "https://github.com/deancochran/ftms"
+readme = "README.md"
+keywords = ["bluetooth", "ftms", "fitness", "embedded", "no-std"]
+categories = ["embedded", "no-std", "encoding"]
+publish = ["crates-io"]
+# Cargo includes tracked dotfiles; repository-only metadata is not crate content.
+exclude = [".gitignore", ".toolchain", "target", "*.crate", "rust-toolchain.toml", "tests", "scripts"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[dev-dependencies]
+jsonschema = { version = "0.18.3", features = ["draft202012"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+# Pin transitive resolver choices that remain compatible with the declared
+# Rust 1.85 MSRV; Cargo 1.85 does not automatically select by MSRV.
+time = "=0.3.36"
+url = "=2.5.2"

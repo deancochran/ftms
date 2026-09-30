@@ -8,6 +8,10 @@ released implementations; Python is a partial alpha. See [current releases](rele
 and each package's own verification evidence; the historical tables below do not
 substitute for language-specific evidence.
 
+Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md);
+it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
+or registry publication.
+
 ## Current codec surface
 
 | Family | TypeScript decode | TypeScript encode | Tests and v1 vectors | Equipment-side direction |
