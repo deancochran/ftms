@@ -6,10 +6,13 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 import ci_release as ci
 import publish as release
+
+WORKFLOW = release.ROOT / ".github/workflows/release-kotlin.yml"
 
 
 class CIReleaseTest(unittest.TestCase):
@@ -136,6 +139,7 @@ class CIReleaseTest(unittest.TestCase):
         calls = []
         with patch.object(ci, "github_release", return_value={"draft": True}), patch.object(ci, "restore"), \
                 patch.object(release, "load_release", return_value=self.manifest), \
+                patch.object(ci, "validate_evidence"), \
                 patch.object(release, "assemble") as assemble, patch.object(ci, "save_receipts", side_effect=lambda _: calls.append("receipt")), \
                 patch.object(release, "upload", side_effect=lambda *_: calls.append("upload")), \
                 patch.object(release, "publish", side_effect=lambda *_: calls.append("publish")), \
@@ -148,6 +152,7 @@ class CIReleaseTest(unittest.TestCase):
     def test_verification_failure_keeps_release_draft_and_saves_receipts(self):
         with patch.object(ci, "github_release", return_value={"draft": True}), patch.object(ci, "restore"), \
                 patch.object(release, "load_release", return_value=self.manifest), patch.object(release, "upload"), \
+                patch.object(ci, "validate_evidence"), \
                 patch.object(release, "publish"), patch.object(release, "verify_public", side_effect=release.ReleaseError("mismatch")), \
                 patch.object(ci, "save_receipts") as save, patch.object(ci, "gh") as gh, \
                 self.assertRaises(release.ReleaseError):
@@ -169,6 +174,63 @@ class CIReleaseTest(unittest.TestCase):
     def test_incomplete_saved_release_is_not_replaced(self):
         with self.assertRaises(release.ReleaseError):
             ci.restore({"assets": [{"name": "manifest.json"}]})
+        with self.assertRaises(release.ReleaseError):
+            ci.restore({"assets": [{"name": name} for name in ci.CORE_ASSETS]})
+
+    def test_draft_aware_discovery_paginates_and_refuses_duplicates(self):
+        draft = {"tag_name": "kotlin-v0.2.0", "draft": True, "assets": []}
+        other = [{"tag_name": f"v0.0.{i}", "draft": False} for i in range(100)]
+        results = [subprocess.CompletedProcess([], 0, json.dumps(page).encode(), b"") for page in (other, [draft])]
+        with patch.object(ci, "gh", side_effect=results) as gh:
+            self.assertEqual(draft, ci.github_release("kotlin-v0.2.0"))
+            self.assertTrue(gh.call_args.args[1].endswith("page=2"))
+        result = subprocess.CompletedProcess([], 0, json.dumps([draft, draft]).encode(), b"")
+        with patch.object(ci, "gh", return_value=result), self.assertRaises(release.ReleaseError):
+            ci.github_release("kotlin-v0.2.0")
+        with patch.object(ci, "gh", side_effect=subprocess.CalledProcessError(1, "gh")), \
+                self.assertRaises(subprocess.CalledProcessError):
+            ci.github_release("kotlin-v0.2.0")
+
+    def test_verify_mode_checks_central_published_draft_without_mutation(self):
+        self.output.mkdir()
+        (self.output / "deployment.json").write_text("{}")
+        draft = {"tag_name": "kotlin-v0.2.0", "draft": True}
+        for state in ("PUBLISHED", "VALIDATED"):
+            with self.subTest(state=state), patch.object(ci, "github_release", return_value=draft), \
+                    patch.object(ci, "restore") as restore, patch.object(ci, "validate_evidence"), \
+                    patch.object(release, "load_release", return_value=self.manifest), \
+                    patch.object(release, "deployment", return_value="id"), patch.object(release, "status", return_value=state), \
+                    patch.object(release, "verify_public") as verify, patch.object(release, "upload") as upload, \
+                    patch.object(ci, "gh") as gh:
+                result = ci.deliver(self.config, self.metadata, "verify")
+                restore.assert_called_once_with(draft)
+                self.assertEqual(1 if state == "PUBLISHED" else 0, verify.call_count)
+                self.assertNotIn("Unpublished version", result)
+                upload.assert_not_called()
+                gh.assert_not_called()
+
+    def test_restored_signed_evidence_must_prove_the_same_clean_commit(self):
+        self.output.mkdir()
+        for source, failures, valid in (("commit", 0, True), ("wrong", 0, False), ("commit", 1, False)):
+            with zipfile.ZipFile(self.output / "conformance-evidence.zip", "w") as archive:
+                result = {"sourceCommit": source, "dirty": False, "complete": True, "passed": 1, "failed": 0}
+                for name in ("original-v1.json", "compatibility-v1.json"):
+                    archive.writestr("reports/conformance/" + name, json.dumps(result))
+                archive.writestr("test-results/test/TEST-fixture.xml", f'<testsuite tests="1" failures="{failures}" errors="0" skipped="0"/>')
+            with self.subTest(source=source, failures=failures), patch.object(release, "verify_signature") as signature:
+                if valid:
+                    ci.validate_evidence(self.config, self.manifest)
+                else:
+                    with self.assertRaises(release.ReleaseError):
+                        ci.validate_evidence(self.config, self.manifest)
+                signature.assert_called_once()
+
+    def test_retry_download_uses_successful_gate_artifact_identity(self):
+        workflow = WORKFLOW.read_text()
+        self.assertIn("artifact_name: ${{ steps.gate.outputs.artifact_name }}", workflow)
+        self.assertIn("name: ${{ needs.gate.outputs.artifact_name }}", workflow)
+        self.assertNotIn("name: kotlin-verified-${{ github.run_id }}-${{ github.run_attempt }}", workflow)
+        self.assertIn("group: kotlin-publish-${{ needs.gate.outputs.version }}", workflow)
 
     def test_existing_remote_tag_is_never_signed_or_force_pushed(self):
         with patch.object(release, "git", return_value="existing-tag-object"), patch.object(release, "run") as run:

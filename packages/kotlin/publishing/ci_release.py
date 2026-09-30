@@ -76,6 +76,7 @@ def gate():
     with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
         output.write(f"commit={commit}\nversion={value}\n")
         output.write("gate_sha256=" + release.sha256((VERIFIED / "gate.json").read_bytes()) + "\n")
+        output.write(f"artifact_name=kotlin-verified-{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}\n")
     print(f"Verified Kotlin {value} at {commit}; no publishing secrets used.")
 
 
@@ -156,22 +157,28 @@ def gh(*args, check=True):
 
 
 def github_release(tag):
-    result = gh("api", f"repos/{REPOSITORY}/releases/tags/{tag}", check=False)
-    try:
+    # The tag endpoint omits drafts. The authenticated releases list includes
+    # them; inspect all pages and never mistake an API failure for absence.
+    matches = []
+    page = 1
+    while True:
+        result = gh("api", f"repos/{REPOSITORY}/releases?per_page=100&page={page}")
         data = json.loads(result.stdout)
-    except ValueError:
-        raise release.ReleaseError("GitHub release lookup failed; no upload attempted") from None
-    if result.returncode:
-        if str(data.get("status")) == "404":
-            return None
-        raise release.ReleaseError("GitHub release lookup failed; no upload attempted")
-    return data
+        if not isinstance(data, list):
+            raise release.ReleaseError("GitHub release lookup returned an unexpected response")
+        matches.extend(item for item in data if item["tag_name"] == tag)
+        if len(data) < 100:
+            break
+        page += 1
+    if len(matches) > 1:
+        raise release.ReleaseError("Multiple GitHub releases use this tag; refusing to choose one")
+    return matches[0] if matches else None
 
 
 def restore(existing):
     names = {item["name"] for item in existing["assets"]}
-    if not set(CORE_ASSETS).issubset(names):
-        raise release.ReleaseError("Existing release has incomplete bundle/manifest evidence; refusing to replace it")
+    if not set((*CORE_ASSETS, *EVIDENCE_ASSETS)).issubset(names):
+        raise release.ReleaseError("Existing release has incomplete bundle or signed conformance evidence; refusing to replace it")
     if release.RELEASE.exists():
         raise release.ReleaseError("Refusing to overwrite local release evidence")
     release.RELEASE.mkdir(parents=True)
@@ -220,6 +227,7 @@ def verify_existing(config, existing):
     restore(existing)
     manifest = release.load_release(config, require_prepared_checkout=False)
     require_release_identity(manifest, existing["tag_name"])
+    validate_evidence(config, manifest)
     if not (release.RELEASE / "deployment.json").exists():
         # The initial 0.1.0 public release predates the durable deployment receipt.
         saved = json.loads((release.RELEASE / "central-status.json").read_text())
@@ -228,6 +236,41 @@ def verify_existing(config, existing):
         release.record_deployment(manifest, saved["deploymentId"])
     release.verify_public(config, manifest)
     return manifest
+
+
+def validate_evidence(config, manifest):
+    archive = release.RELEASE / "conformance-evidence.zip"
+    release.verify_signature(config, archive)
+    with zipfile.ZipFile(archive) as evidence:
+        for name in ("original-v1.json", "compatibility-v1.json"):
+            result = json.loads(evidence.read("reports/conformance/" + name))
+            if (result["sourceCommit"] != manifest["sourceCommit"] or result["dirty"]
+                    or not result["complete"] or result["failed"] or result["passed"] <= 0):
+                raise release.ReleaseError("Saved conformance evidence does not verify the released source")
+        suites = [ET.fromstring(evidence.read(name)) for name in evidence.namelist()
+                  if name.startswith("test-results/test/TEST-") and name.endswith(".xml")]
+        if not suites or sum(int(s.get("tests", 0)) for s in suites) == 0 or any(
+                int(s.get(key, 0)) for s in suites for key in ("failures", "errors", "skipped")):
+            raise release.ReleaseError("Saved JUnit evidence is incomplete or contains failures/skips")
+
+
+def verify_draft(config, existing):
+    restore(existing)
+    manifest = release.load_release(config, require_prepared_checkout=False)
+    require_release_identity(manifest, existing["tag_name"])
+    validate_evidence(config, manifest)
+    if not (release.RELEASE / "deployment.json").exists():
+        recovered = release.find_deployment(config, manifest)
+        if not recovered:
+            return "Signed draft verified; no Central deployment found. No publication attempted."
+        release.record_deployment(manifest, recovered)
+    state = release.status(config, release.deployment(manifest), manifest)
+    if state == "PUBLISHED":
+        release.verify_public(config, manifest)
+        return "Central publication and public consumers verified; GitHub draft unchanged (verify mode)."
+    if state == "FAILED":
+        raise release.ReleaseError("Saved draft has a failed Central deployment")
+    return f"Signed draft verified; Central state {state}. No publish request or GitHub release mutation."
 
 
 def require_release_identity(manifest, tag):
@@ -255,11 +298,14 @@ def deliver(config, metadata, mode):
         verify_existing(config, existing)
         return "Already published; exact public artifacts and consumers verified. No release mutation."
     if mode == "verify":
+        if existing:
+            return verify_draft(config, existing)
         return "Credentials and full source/artifact gates passed. Unpublished version; no tag/upload/publication attempted."
     if existing:
         restore(existing)
         manifest = release.load_release(config)
         require_release_identity(manifest, tag)
+        validate_evidence(config, manifest)
     else:
         require_unpublished(metadata["version"])
         value, repo, files = release.publication(VERIFIED / "repository")
@@ -271,6 +317,7 @@ def deliver(config, metadata, mode):
         manifest = release.load_release(config)
         require_release_identity(manifest, tag)
         package_evidence(config)
+        validate_evidence(config, manifest)
         gh("release", "create", tag, "--repo", REPOSITORY, "--verify-tag", "--draft", "--latest=false",
            "--title", "FTMS Kotlin/JVM " + value, "--notes", "Release validation in progress; not yet announced.",
            *(str(release.RELEASE / name) for name in (*CORE_ASSETS, *EVIDENCE_ASSETS)))

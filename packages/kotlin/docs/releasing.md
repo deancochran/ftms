@@ -94,7 +94,10 @@ Use **Actions → Release Kotlin → Run workflow** on `main` for recovery or ch
   verified version. Existing public versions remain verify-only. Do not increment
   a version merely to test publishing credentials.
 
-All release runs are serialized with cancellation disabled. Workflow actions are
+Publication is serialized per version with cancellation disabled; different
+version bumps use independent groups so a newer version cannot discard an older
+pending release. A publish-only retry downloads the successful gate's recorded
+artifact name, not the retry's attempt number. Workflow actions are
 pinned by commit. The CI code and offline safety tests live in `publishing/`;
 ordinary PR CI runs those tests without account access.
 

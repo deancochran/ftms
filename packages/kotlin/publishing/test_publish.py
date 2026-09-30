@@ -149,6 +149,42 @@ class PublishingTest(unittest.TestCase):
         central.assert_not_called()
         wait.assert_called_once()
 
+    def test_central_discovery_paginates_exact_bundle_names(self):
+        manifest = {"tag": "kotlin-v0.2.0", "deploymentName": "kotlin-v0.2.0-hash"}
+        matched = {"deploymentName": manifest["deploymentName"], "deploymentId": "00000000-0000-0000-0000-000000000001", "deploymentState": "VALIDATED"}
+        pages = [{"pageCount": 2, "deployments": [{**matched, "deploymentName": "prefix-" + manifest["deploymentName"]}]},
+                 {"pageCount": 2, "deployments": [matched]}]
+        with patch.object(release, "central", side_effect=[json.dumps(p).encode() for p in pages]) as central:
+            self.assertEqual(matched["deploymentId"], release.find_deployment(self.config, manifest))
+            self.assertIn("page=1", central.call_args.args[1])
+        for matches in ([matched, matched], [{**matched, "deploymentState": "FAILED"}]):
+            with patch.object(release, "central", return_value=json.dumps({"pageCount": 1, "deployments": matches}).encode()), \
+                    self.assertRaises(release.ReleaseError):
+                release.find_deployment(self.config, manifest)
+
+    def test_accepted_upload_can_be_recovered_without_another_post(self):
+        manifest = {"tag": "kotlin-v0.2.0", "deploymentName": "kotlin-v0.2.0-hash", "bundleSha256": "hash", "sourceCommit": "commit", "tagObject": "tag"}
+        item = {"deploymentName": manifest["deploymentName"], "deploymentId": "00000000-0000-0000-0000-000000000001", "deploymentState": "VALIDATED"}
+        with patch.object(release, "central", return_value=json.dumps({"pageCount": 1, "deployments": [item]}).encode()) as central, \
+                patch.object(release, "wait_for"):
+            release.upload(self.config, manifest, 1)
+        self.assertEqual(1, central.call_count)
+        self.assertEqual("GET", central.call_args.kwargs["method"])
+        self.assertEqual(item["deploymentId"], release.deployment(manifest))
+
+    def test_public_propagation_retry_and_deadline(self):
+        manifest, _ = self.bundle()
+        manifest.update({"sourceCommit": "commit", "coordinates": "io.github.deancochran:ftms:0.1.0"})
+        with patch.object(release, "deployment", return_value="id"), patch.object(release, "status", return_value="PUBLISHED"), \
+                patch.object(release, "request", side_effect=[release.HttpFailure(404), b"artifact"]) as request, \
+                patch.object(release, "logged"), patch.object(release.time, "sleep"), patch.object(release.time, "monotonic", return_value=0):
+            release.verify_public(self.config, manifest, timeout=10)
+            self.assertEqual(2, request.call_count)
+        with patch.object(release, "deployment", return_value="id"), patch.object(release, "status", return_value="PUBLISHED"), \
+                patch.object(release, "request", side_effect=release.HttpFailure(404)), \
+                patch.object(release.time, "monotonic", side_effect=[0, 11]), self.assertRaises(release.HttpFailure):
+            release.verify_public(self.config, manifest, timeout=10)
+
     def test_status_identity_and_failure(self):
         with patch.object(release, "central", return_value=json.dumps({"deploymentId": "wrong"}).encode()), \
                 self.assertRaises(release.ReleaseError):
