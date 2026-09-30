@@ -13,6 +13,10 @@ The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
 with an evolving API and no capability APIs; consult its separate release evidence.
 The [Rust crate](../packages/rust/README.md) is an implemented 0.1.0 source
 candidate, but no `rust-v0.1.0` tag or crates.io package exists as of this check.
+The [Dart package](../packages/dart/README.md) is a new 0.1.0 source candidate,
+not a pub.dev release. Its local verification and future publication gates are
+recorded [separately](../packages/dart/doc/verification.md); no public Dart
+installation is claimed by this release matrix.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
 
 ## Published: TypeScript 0.4.0 / C 0.2.0

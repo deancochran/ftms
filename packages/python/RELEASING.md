@@ -2,7 +2,8 @@
 
 Publishing requires explicit authorization. The distribution is `deancochran-ftms`;
 `pyproject.toml` defines its independently versioned Python release. The current
-`0.1.0a1` is a partial alpha, not full cross-language API parity or device evidence.
+`0.1.0a2` adds static capability evidence while retaining an evolving alpha API;
+it is not full cross-language convenience-API parity or device evidence.
 
 ## One-time Trusted Publishing setup
 
@@ -25,21 +26,22 @@ publisher does not reserve the package name or publish anything.
 
 ## Authorized release procedure
 
-1. Verify the scope, changelog, version and documentation. Keep capability
-   interpretation and other unimplemented APIs explicitly outside this alpha.
+1. Verify the scope, changelog, version and documentation. Keep unimplemented
+   convenience APIs and device evidence explicitly outside this alpha's claims.
 2. Commit the reviewed source. From a clean checkout at that exact commit,
    run `uv run --locked --group dev python scripts/verify.py` in `packages/python/`.
    Inspect reports, source identity, clean state and archive contents. Then run:
    `uv tool run --from twine==7.0.0 twine check --strict build/isolated/*.whl build/isolated/*.tar.gz`.
-3. Push the source branch and require the Python workflow's verification job to
-   pass. A branch push or pull request cannot execute the publishing job.
+3. Push the source branch, open a pull request, and require the Python workflow's
+   verification job to pass. Merge only with explicit authorization. A branch
+   push or pull request cannot execute the publishing job.
 4. Confirm the PyPI publisher setup and explicit release authorization before
    creating and pushing the immutable `python-vVERSION` tag at that reviewed
    commit. Python tags are independent of `v*` (npm) and `c-v*` tags.
-   The initial alpha can be tagged on the reviewed Python branch; this does not
-   merge that branch to `main` or authorize merging other ports.
+   The tagged commit must already be reachable from `origin/main`; the workflow
+   enforces this ancestry gate. This does not authorize merging other ports.
 5. The tag workflow verifies the version/tag match, both test interpreters,
-   all scoped codec corpora, the structural matrix, and the isolated rebuilt-wheel
+   all scoped codec and capability corpora, the structural matrix, and the isolated rebuilt-wheel
    consumer. It checks metadata and saves distributions plus identity/hash reports.
 6. Approve the publishing deployment only after reviewing that exact tag/commit
    and its verification job. A separate job, restricted to the `pypi` environment, checks the distribution

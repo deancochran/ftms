@@ -17,8 +17,9 @@ Created and maintained by Dean Cochran; contributions are welcome.
 | C / C++ | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation |
 | Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
 | Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
-| Python | [Partial alpha guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1; evolving API, no capability APIs |
+| Python | [Python guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1 alpha; capability evaluator available in unreleased source only |
 | Rust | [Rust raw-codec guide](packages/rust/README.md) | `no_std` source 0.1.0; crates.io publishing pipeline configured, not yet published |
+| Dart / Flutter | [Dart guide](packages/dart/README.md) | Pure Dart 0.1.0 source candidate; not published on pub.dev |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.

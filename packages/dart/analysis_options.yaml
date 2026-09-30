@@ -1,0 +1,14 @@
+include: package:lints/recommended.yaml
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - build/**
+    - doc/api/**
+linter:
+  rules:
+    - avoid_dynamic_calls
+    - type_annotate_public_apis
+    - directives_ordering

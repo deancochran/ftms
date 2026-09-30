@@ -3,7 +3,8 @@
 TypeScript **0.4.0**, C **0.2.0**, Swift **0.1.0** and Kotlin/JVM **0.1.0** are
 published with bidirectional codecs, range inspection and static capability
 interpretation. Python **0.1.0a1** is a published partial alpha with bidirectional
-raw codecs and no capability evaluator. See the role-based
+raw codecs and no capability evaluator; unreleased Python source now includes
+static capability evaluation against the shared corpus. See the role-based
 [support profiles](../docs/support-profiles.md) and exact
 [release identities](../docs/released-packages.md); source metadata alone is not
 publication evidence.
@@ -16,7 +17,7 @@ publication evidence.
 | [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a1; evolving alpha |
 | [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` (not yet published) |
-| [C#](csharp/README.md) | .NET applications and protocol tooling | Local prerelease development; not published on NuGet |
+| [Dart](dart/README.md) | Flutter applications and standalone Dart tools | `deancochran_ftms` 0.1.0 source candidate; not published on pub.dev |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must
@@ -41,6 +42,10 @@ particular module. Other future ports remain deferred until a consumer justifies
 a specific support profile. The TypeScript npm build/release remains independent;
 the private root pnpm workspace orchestrates TypeScript and the documentation site,
 not native package builds.
+Dart's requested full-wire port additionally implements static capability evidence,
+range inspection and normalized measurement views. It has independent
+[verification](dart/doc/verification.md) and [release gates](dart/RELEASING.md);
+source/host evidence does not imply pub.dev publication or Flutter device testing.
 Ports and package tooling consume the independent [shared layer](../shared/README.md),
 which has no dependency on any port. TypeScript owns its npm staging/verification
 scripts, API README, and changelog; root policy and orchestration remain at root.

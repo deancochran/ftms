@@ -3,8 +3,8 @@
 Status: this is an audit of codec directions and evidence, not a claim of complete
 FTMS conformance, device interoperability or Bluetooth qualification. TypeScript,
 C, Swift and Kotlin have published `FullWire` codecs and static capability
-interpretation; Python has a published `FullWire` raw-codec alpha without capability
-evaluation. See the role-based [support profiles](support-profiles.md) and each
+interpretation; Python's published `FullWire` raw-codec alpha lacks capability
+evaluation, while local Python source has an unreleased evaluator. See the role-based [support profiles](support-profiles.md) and each
 package's verification record. Historical TypeScript/C tables below do not
 substitute for language-specific evidence.
 
@@ -12,11 +12,11 @@ Rust has separate [raw-codec conformance and package evidence](../packages/rust/
 it does not claim the normalized codec-v1 or capability-v1 corpora, fragment assembly,
 or registry publication.
 
-C# has an unpublished `FullWire` source candidate with range inspection,
-normalized views and static capability interpretation. Its separate
-[verification record](../packages/csharp/docs/verification.md) covers both target
-assemblies, canonical corpora, local NuGet consumers and Linux NativeAOT. This
-does not establish NuGet publication or Windows/macOS/mobile execution.
+Dart has an unpublished [full-wire source candidate](../packages/dart/README.md)
+with static capability evidence, range inspection and normalized measurement
+views. Its [package-owned evidence](../packages/dart/doc/verification.md) covers
+the canonical codec, raw, capability and structural corpora separately from
+Flutter builds, physical devices and publication.
 
 ## Current codec surface
 
@@ -71,6 +71,11 @@ adapter/schema/template tests check wrong outputs, malformed fixtures and failur
 accounting. Native tests separately isolate all 17 target bits, every range
 relationship, base procedures, all read reasons and argument/capacity atomicity.
 Those test-suite counts are not additional shared vectors or device evidence.
+
+The Python local-source capability runner consumes the same 63-case corpus with
+exact reports and hashes all four required corpus/contract inputs. This is local
+host evidence only; it neither changes the published Python alpha nor establishes
+BLE execution authority, device interoperability, PTS, or qualification.
 
 ## Evidence and future gates
 

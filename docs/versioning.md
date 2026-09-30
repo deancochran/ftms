@@ -66,15 +66,13 @@ compatibility: `0.x` minor versions are treated as potentially breaking. This is
 local source-package metadata only, not a git tag, published artifact, or release
 record.
 
-## C# version identity
+## Dart release policy
 
-C# has an independent `packages/csharp/VERSION` authority and reserved
-`csharp-vVERSION` tag namespace. Its initial source version is a NuGet prerelease,
-not a public release. C# versions must already be canonical three-component
-SemVer with lowercase prerelease labels and no build metadata, so NuGet
-normalization cannot silently change the release identity. Registry publishing
-requires separate authorization and verified ownership/trusted-publisher setup.
-Local package validation never establishes public availability.
+The Dart source candidate uses its own `packages/dart/pubspec.yaml` version and
+`dart-vVERSION` namespace. Its future pub.dev releases use tag-push OIDC after a
+separately approved first manual publication. The manifest and workflow do not
+establish publication; see [Dart release gates](../packages/dart/RELEASING.md).
+Existing package tags and corpus identities are unchanged.
 
 ## C release policy
 
