@@ -109,6 +109,15 @@ assert f.encode_control_request_raw(request) == bytes([5, 75, 0])
 assert f.decode_control_response_raw(bytes([128, 5, 1])).result_code == 1
 measurement = f.MeasurementRaw(5, 0, 1, 0, (1234,) + (0,) * 29)
 assert f.decode_measurement_raw(f.encode_measurement_raw(measurement), 5).values[0] == 1234
+evidence = f.CharacteristicEvidence('00002acc00001000800000805f9b34fb', 2, f.ReadState.SUCCESS, read_bytes=bytes(8))
+snapshot = f.CapabilitySnapshot(f.DiscoveryState.COMPLETE, f.ServiceScope.PRESENT, 1, (evidence,))
+report = f.evaluate_capabilities(snapshot)
+assert report.presence[1] is f.Presence.UNIQUE
+assert report.feature[1] == f.DecodeState.VALID
+assert len(report.operations) == 21 and 'canExecute' not in report.to_wire()
+r = f.CharacteristicEvidence('00002ad600001000800000805f9b34fb', 2, f.ReadState.SUCCESS, read_bytes=bytes.fromhex('f6ff64000a00'))
+selected = f.evaluate_capabilities(f.CapabilitySnapshot(f.DiscoveryState.COMPLETE, f.ServiceScope.PRESENT, 2, (r,)), f.RangeFormatOptions('signed16Tenths'))
+assert selected.ranges[2][3] == (2, -10, 100, 10, 10, 2)
 """.replace("VERSION", repr(report["packageVersion"]))
     subprocess.run([str(python), "-I", "-c", consumer], check=True)
     report.setdefault("consumers", {})[artifact_kind] = {

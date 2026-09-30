@@ -2,7 +2,8 @@
 
 Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
 range inspection and static capability interpretation. Python 0.1.0a1 is a
-published partial alpha with bidirectional raw codecs and no capability evaluator.
+published partial alpha with bidirectional raw codecs and no capability evaluator;
+the Python source now additionally implements an unreleased static evaluator.
 Rust 0.1.0 is an implemented `no_std` source candidate with static capability
 interpretation and no registry publication.
 Dart is an implemented, unpublished full-wire source candidate with static
@@ -30,13 +31,13 @@ establish publication; consult the release matrix above.
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
 | `docs/support-profiles.md` | Role-based wire-direction and optional-module claims | Current package taxonomy |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift and Kotlin |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift, Kotlin and unreleased Python source |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released 0.2.0 source archive |
 | `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
-| `packages/python/` | Pure synchronous Python protocol package | Published partial alpha 0.1.0a1 |
+| `packages/python/` | Pure synchronous Python protocol package | Published partial alpha 0.1.0a1; capability evaluator added in unreleased source |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
 | `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Implemented 0.1.0 source candidate; not published on pub.dev |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |

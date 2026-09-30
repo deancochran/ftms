@@ -1,11 +1,72 @@
 # deancochran-ftms
 
 `deancochran-ftms` is a pure, synchronous Python protocol package.  This
-**0.1.0a1 is a partial alpha release with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, and bidirectional Machine/Training Status. It has no BLE, lifecycle, logging, or capability APIs. It is not a complete port of every API in the TypeScript/C packages.
+**0.1.0a2 is an alpha with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, bidirectional Machine/Training Status, and static capability evaluation. The earlier 0.1.0a1 artifact has no capability API. It has no BLE, lifecycle, or logging APIs and is not a complete port of every API in the TypeScript/C packages.
 
 Its wire [support profile](../../docs/support-profiles.md) is `FullWire` raw codecs,
-with `RangeInspection` and selected `NormalizedViews`. `CapabilityEvidence` remains
-explicitly unsupported; `FullWire` does not mean cross-language convenience parity.
+with `RangeInspection`, selected `NormalizedViews`, and `CapabilityEvidence`.
+`FullWire` does not mean cross-language convenience parity.
+
+## Static capability evidence
+
+`evaluate_capabilities(snapshot, options=None)` is a pure interpretation of one immutable,
+caller-owned `CapabilitySnapshot`. It accepts ordered immutable
+`CharacteristicEvidence` observations and returns an immutable `CapabilityReport`.
+The report preserves discovery/scope uncertainty, duplicates, raw feature words,
+unknown bits, range evidence, all 21 operation prerequisites, and diagnostics.
+`report.to_wire()` produces fresh JSON-compatible containers in the exact shared
+capability-corpus representation. It deliberately has no `canExecute` field: BLE
+I/O, encryption, indication setup, control ownership, retries, and safety approval
+remain outside this package. The evaluator supports explicit C.7 `C7Evidence`;
+unknown is not false.
+
+As with standalone range decoding, pass
+`RangeFormatOptions(resistance_format="signed16Tenths")` to explicitly select the
+six-byte resistance range alternative. The default is three unsigned whole-level
+bytes; this selection affects only the resistance range and is never inferred
+from observed bytes or Feature bits.
+
+This API requires 0.1.0a2 or newer. Until that version is available on PyPI,
+install from the source checkout (`python -m pip install ./packages/python`
+from the repository root). Publication evidence is tracked separately in the
+[release matrix](../../docs/released-packages.md).
+
+```python
+from deancochran_ftms import (
+    CapabilitySnapshot,
+    CharacteristicEvidence,
+    DiscoveryState,
+    ReadState,
+    ServiceScope,
+    evaluate_capabilities,
+)
+
+# The application supplies discovery/read evidence; this does not use Bluetooth.
+feature = CharacteristicEvidence(
+    uuid="00002acc00001000800000805f9b34fb",
+    properties=0x02,  # Read
+    read_state=ReadState.SUCCESS,
+    read_bytes=bytes(8),  # Valid all-zero feature words, not a missing read.
+)
+report = evaluate_capabilities(
+    CapabilitySnapshot(
+        discovery=DiscoveryState.COMPLETE,
+        scope=ServiceScope.PRESENT,
+        generation=1,
+        characteristics=(feature,),
+    )
+)
+assert report.observation_count == 1
+assert len(report.operations) == 21
+assert "canExecute" not in report.to_wire()
+```
+
+UUIDs use 32 lowercase hexadecimal characters without hyphens. Read payloads
+must be immutable `bytes`, observations must be a tuple, and state fields use the
+exported enums. Positional report rows follow the
+[shared capability report layout](../../shared/conformance/capabilities/README.md).
+Missing Control Point/Machine Status evidence and unknown C.7 facts in this
+example are retained as diagnostics, not silently treated as satisfied.
 
 ## Install and compatibility
 
@@ -13,10 +74,10 @@ The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has
 no runtime dependencies and declares Python >=3.11. Python 3.11 and 3.14 are
 tested by the package verification commands in this milestone.
 
-Install this explicitly selected prerelease from PyPI:
+After publication, install this explicitly selected prerelease from PyPI:
 
 ```sh
-python -m pip install 'deancochran-ftms==0.1.0a1'
+python -m pip install 'deancochran-ftms==0.1.0a2'
 ```
 
 ```python
@@ -123,6 +184,7 @@ uv run --locked --group dev mypy src tests scripts
 uv run --locked --group dev python scripts/run_features_conformance.py
 uv run --locked --group dev python scripts/run_measurement_status_conformance.py
 uv run --locked --group dev python scripts/run_measurement_matrix.py
+uv run --locked --group dev python scripts/run_capability_conformance.py
 uv run --locked --group dev python scripts/verify_package.py
 ```
 
@@ -130,7 +192,8 @@ The conformance test reads `../../shared/conformance/v1` and
 `../../shared/conformance/values/v1` directly; it never copies fixtures.
 It executes all codec-v1 categories and the additive values, controls,
 inspection, compatibility, measurements and statuses contracts directly from
-shared fixtures. Capability interpretation is not implemented or claimed.
+shared fixtures. The capability runner validates the separate canonical schema and
+executes all 63 exact reports directly from `../../shared/conformance/capabilities/v1`.
 `scripts/verify_package.py` builds both artifacts, rebuilds from
 an extracted sdist outside this checkout, installs the wheel non-editably into
 a fresh environment, and writes its distinct machine-readable artifact hashes,
@@ -152,10 +215,11 @@ from these host verification results.
 
 ## Coverage and limits
 
-Version `0.1.0a1` is an **alpha with partial API coverage**. Features, ranges, controls,
+Version `0.1.0a2` is an **alpha with language-specific API coverage**. Features, ranges, controls,
 all six measurement families and both status characteristics have raw codecs.
 Normalized measurement/status projections and normalized range decoding are
-available. Capability evaluation remains outstanding. Range, control and
+available. Static capability evaluation is included starting with 0.1.0a2.
+Range, control and
 measurement format choices are independent and explicit; no API infers them
 from packet length, feature declarations or BLE state. Host fixtures establish
 codec regression evidence, not live-device compatibility or qualification.
