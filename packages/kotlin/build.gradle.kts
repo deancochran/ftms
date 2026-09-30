@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.deancochran"
-version = "0.1.0"
+version = file("VERSION").readText().trim()
 
 kotlin { jvmToolchain(17); explicitApi() }
 
