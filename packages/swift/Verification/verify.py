@@ -73,7 +73,7 @@ def verify_local_consumer():
         directory = Path(temporary)
         (directory / "Package.swift").write_text(f'''// swift-tools-version: 6.0
 import PackageDescription
-let package = Package(name: "Consumer", dependencies: [.package(path: "{ROOT}")], targets: [.executableTarget(name: "Consumer", dependencies: [.product(name: "FTMS", package: "{ROOT.name}")])])
+let package = Package(name: "Consumer", platforms: [.macOS(.v13)], dependencies: [.package(path: "{ROOT}")], targets: [.executableTarget(name: "Consumer", dependencies: [.product(name: "FTMS", package: "{ROOT.name}")])])
 ''')
         (directory / "Sources" / "Consumer").mkdir(parents=True)
         (directory / "Sources" / "Consumer" / "main.swift").write_text('''import FTMS

@@ -44,6 +44,7 @@ jobs:
         with:
           name: swift-linux-evidence
           path: .build/swift-*-report.json
+          include-hidden-files: true
           if-no-files-found: error
 
   apple:
@@ -74,4 +75,5 @@ jobs:
         with:
           name: swift-apple-evidence
           path: .build/swift-*-report.json
+          include-hidden-files: true
           if-no-files-found: error
