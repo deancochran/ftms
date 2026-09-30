@@ -1,0 +1,77 @@
+name: Release Rust
+
+on:
+  push:
+    tags: ['rust-v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-publish
+  cancel-in-progress: false
+
+jobs:
+  identity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require version, changelog, clean tag and main ancestry
+        run: python3 packages/rust/scripts/release.py validate-tag
+
+  verify:
+    needs: identity
+    uses: ./.github/workflows/native-rust.yml
+    # No inherited secrets: every host/package check is credential-free.
+
+  publish:
+    needs: [identity, verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: crates-io
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+        working-directory: packages/rust
+    env:
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Install the exact release toolchain
+        run: |
+          set -euo pipefail
+          channel=$(python scripts/release.py toolchain)
+          rustup toolchain install "$channel" --profile minimal
+          echo "RUSTUP_TOOLCHAIN=$channel" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rust-linux-msrv-evidence
+          path: packages/rust/target/release-input
+      - name: Publish matching reproducible bytes and verify public installation
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: python scripts/release.py publish --artifact-dir target/release-input/distribution --execute
+      - name: Create checksum-pinned GitHub release without overwriting assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/release.py github-release --artifact-dir target/release-input/distribution
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: rust-registry-release-evidence
+          path: packages/rust/target/release-input/distribution/*
+          if-no-files-found: warn
+          retention-days: 90

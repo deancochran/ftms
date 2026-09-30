@@ -1,0 +1,102 @@
+name: Native Rust
+
+on:
+  pull_request:
+    paths:
+      - 'packages/rust/**'
+      - 'shared/**'
+      - '.github/workflows/native-rust.yml'
+      - '.github/workflows/release-rust.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/rust/**'
+      - 'shared/**'
+      - '.github/workflows/native-rust.yml'
+      - '.github/workflows/release-rust.yml'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+jobs:
+  verify:
+    name: Rust / ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-msrv
+            os: ubuntu-24.04
+            toolchain: msrv
+          - name: linux-stable
+            os: ubuntu-24.04
+            toolchain: stable
+          - name: macos-stable
+            os: macos-14
+            toolchain: stable
+          - name: windows-stable
+            os: windows-2022
+            toolchain: stable
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: packages/rust
+    env:
+      CARGO_TERM_COLOR: never
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Install selected Rust toolchain
+        env:
+          REQUESTED_TOOLCHAIN: ${{ matrix.toolchain }}
+        run: |
+          set -euo pipefail
+          channel="$REQUESTED_TOOLCHAIN"
+          if [[ "$channel" == msrv ]]; then
+            channel=$(python scripts/release.py toolchain)
+          fi
+          rustup toolchain install "$channel" --profile minimal --component rustfmt --component clippy
+          echo "RUSTUP_TOOLCHAIN=$channel" >> "$GITHUB_ENV"
+      - name: Verify release guards (no credentials or network)
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Check formatting and lint
+        run: |
+          cargo fmt --check
+          rustfmt --check --edition 2021 tests/fixtures/consumer.rs
+          cargo clippy --locked --all-targets -- -D warnings
+      - name: Verify codecs, shared conformance and Rustdoc examples
+        run: |
+          set -euo pipefail
+          mkdir -p target/verification
+          cargo test --locked -- --nocapture --test-threads=1 2>&1 | tee target/verification/tests.log
+      - name: Compile Cortex-M0 (not board execution)
+        if: runner.os == 'Linux'
+        run: |
+          rustup target add thumbv6m-none-eabi
+          cargo build --locked --target thumbv6m-none-eabi
+      - name: Build documentation without warnings
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --locked --no-deps
+      - name: Package and execute an isolated consumer of the exact archive
+        run: python scripts/release.py prepare
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rust-${{ matrix.name }}-evidence
+          path: |
+            packages/rust/target/distribution/*
+            packages/rust/target/verification/tests.log
+          if-no-files-found: error
+          retention-days: 30
