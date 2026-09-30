@@ -1,6 +1,6 @@
 # Go coverage and remaining parity work
 
-Status: **unreleased raw codecs and capability interpretation**. The proposed final target is `FullWire`
+Version 0.1.0 scope: **raw codecs and capability interpretation**. The proposed full-parity target is `FullWire`
 with `CapabilityEvidence`, `RangeInspection`, `NormalizedViews`, `RecordPlanning`,
 and `RecordAssembly`. This milestone does not claim that final target is complete.
 
@@ -69,8 +69,9 @@ input/result ownership. These tests do not extend the canonical corpus claim.
 - `NormalizedViews`: ranges only; normalized measurements remain pending.
 - Real devices, BLE lifecycle, physical-control safety, PTS, Bluetooth qualification,
   TinyGo, and embedded targets: no evidence or support claim.
-- Public publication and pkg.go.dev indexing: not performed.
+- Public publication and pkg.go.dev indexing: see the canonical release matrix
+  for independently verified distribution evidence.
 
-Before the first full-parity release, complete the pending modules, validate all
+Before a full-parity release, complete the pending modules, validate all
 their contracts, finish exported interface documentation and ergonomic review,
 and execute the public consumer gate described in `releasing.md`.

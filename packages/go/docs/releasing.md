@@ -1,8 +1,10 @@
-# Go release gates — no release has been performed
+# Go release process
 
-The package is an unreleased source candidate. Complete the parity target and
-interface review before the proposed first `v0.1.0`; do not tag a placeholder or
-describe this local milestone as published.
+The authorized `v0.1.0` scope is raw bidirectional codecs, range inspection,
+normalized ranges and complete static capability interpretation. Measurement
+normalization and record planning/assembly remain future work; this release does
+not claim those modules. Publication evidence belongs in the canonical release
+matrix after the public consumer gate succeeds.
 
 ## Identity
 
@@ -19,8 +21,8 @@ specification, corpus schema and corpus content versions remain independent.
 
 ## Before explicit release authorization
 
-1. Complete and review the intended support profile, exported interface docs,
-   pending corpus accounting, safety exclusions, and changelog.
+1. Review the version's explicit support profile, exported interface docs,
+   completed and pending corpus accounting, evidence limits, and changelog.
 2. Run `bash scripts/verify.sh` on a clean proposed release commit under the
    minimum supported Go toolchain and current supported toolchains.
 3. Run bounded fuzzing, inspect coverage gaps, review the module zip and license,
@@ -28,7 +30,8 @@ specification, corpus schema and corpus content versions remain independent.
 4. Confirm public repository ownership and the exact module path. Do not change
    existing npm exports, other package tags, or shared fixtures to release Go.
 5. Obtain authorization to commit/push/tag/publish. Implementation permission is
-   not release permission. No release workflow is enabled in this milestone.
+   not release permission. Releases currently use an explicitly authorized tag;
+   there is no automatic publication workflow.
 
 ## Authorized publication and public verification
 
@@ -54,6 +57,17 @@ and the normal public checksum database enabled:
 4. Confirm the module zip contains the intended files, license, and no private
    context or independent fixture copies.
 5. Confirm pkg.go.dev displays documentation for that exact version separately.
+
+The repeatable public consumer gate is:
+
+```sh
+python3 scripts/verify-consumer.py --public-version v0.1.0 --report /path/to/public-consumer.json
+```
+
+It enables the public proxy and checksum database with a fresh module cache,
+checks the installed license, runs telemetry/control/capability code, and tests
+the downloaded module without the repository's shared fixtures. Run it only
+after authorized tag publication.
 
 Only after those checks update the canonical `docs/released-packages.md` and
 project overview with the exact version/tag, commit, installation instructions,

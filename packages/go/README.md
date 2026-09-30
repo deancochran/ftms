@@ -1,14 +1,21 @@
-# FTMS for Go — unreleased codecs and capability interpretation
+# FTMS for Go
 
 Pure Go codecs for Bluetooth Fitness Machine Service bytes. Module:
 `github.com/deancochran/ftms/packages/go`, package name: `ftms`, minimum Go: 1.24.
 No runtime dependencies beyond the standard library. No BLE, cgo, timers,
 logging, background goroutines, or control authority.
 
-**Local source candidate, not a published package or a completed parity port.**
-The interface is experimental and may change before the first release. See
+**Version 0.1.0: raw codecs and static capability interpretation.**
+The pre-1.0 interface may change in minor releases. See
 [coverage](docs/coverage.md), [verification](docs/verification.md), and
-[release gates](docs/releasing.md). No public `go get` version is claimed.
+[release gates](docs/releasing.md). Publication evidence is recorded in the
+[canonical release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md).
+
+Install the tagged module:
+
+```sh
+go get github.com/deancochran/ftms/packages/go@v0.1.0
+```
 
 ## Implemented
 
