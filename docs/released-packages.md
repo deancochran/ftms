@@ -1,7 +1,7 @@
 # Released packages and executable examples
 
-Last checked read-only against npm and GitHub: **2026-09-29**.
-Kotlin Maven Central publication and public consumers verified: **2026-09-30**.
+Last checked read-only against npm, GitHub, Maven Central, PyPI and crates.io:
+**2026-09-30 UTC**.
 This is a point-in-time record, not a promise that branch source is published.
 
 This is the **canonical current release matrix**. Begin with the
@@ -11,6 +11,8 @@ This is the **canonical current release matrix**. Begin with the
 [Kotlin guide](../packages/kotlin/README.md).
 The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
 with an evolving API and no capability APIs; consult its separate release evidence.
+The [Rust crate](../packages/rust/README.md) is an implemented 0.1.0 source
+candidate, but no `rust-v0.1.0` tag or crates.io package exists as of this check.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
@@ -88,57 +90,6 @@ environment holds the existing credentials/signing material; it does not require
 repeating local integration setup for each version. Existing published versions
 are verified without another upload. See the runbook for recovery and rotation.
 
-## Current public packages
-
-| Port | Public release verified | Runnable example | What is not released |
-| --- | --- | --- | --- |
-| TypeScript | npm `@deancochran/ftms@0.4.0` | [TypeScript client](../examples/typescript-client/README.md) retains its 0.2.0 compatibility baseline; isolated 0.4.0 inspection consumer also passed | Native implementations are separate packages, not npm exports |
-| C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
-| Swift | GitHub `swift-v0.1.0` | [Swift guide and public consumer evidence](../packages/swift/README.md) | BLE transport and universal equipment compatibility |
-| Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
-
-## Start with the released TypeScript package
-
-```sh
-cd examples/typescript-quickstart
-npm install --ignore-scripts --no-audit --no-fund
-npm start
-npm test
-```
-
-The current-release quickstart asserts normalized metrics, truncation behavior,
-capabilities, ranges and byte conversions without communicating with equipment.
-The separate `typescript-client` example preserves the historical npm 0.2.0 baseline.
-
-## C installation evidence
-
-The C example uses `find_package(ftms CONFIG REQUIRED)` against an installed
-artifact, not private source paths. The source-package verifier builds/installs
-the archive, moves its prefix and runs the example from an isolated copy.
-The public archive is at <https://github.com/deancochran/ftms/releases/tag/c-v0.2.0>.
-Source availability does not establish package-manager registry publication.
-
-## Historical baseline identity and next actions
-
-- Previous npm 0.3.0 and C 0.1.0 releases identify `74f1552959d96755f38eac42f6999a5b04088b2f`.
-- npm 0.3.0 integrity and all seven included source files matched that checkout.
-- Previous C 0.1.0 archive SHA-256 is
-  `3dc61329a2883f88a7828cff77b282961c9e91680ecae0ca5100622e9d8e6924`;
-  its checksum asset and ten source/header files matched the reviewed checkout.
-- CI, Native C, Publish and Release C runs for that commit succeeded. This does
-  not establish environment protection settings or device compatibility.
-- Further changes require separate review, verification and explicit release
-  approval. Updating this record does not publish a new version.
-- vcpkg/Conan registry submissions are separate external actions after a real
-  immutable artifact exists. Local recipe tests are not registry publication.
-
-See [C release runbook](releasing-c.md) and [real-equipment test procedure](equipment-testing.md).
-The repository includes a [limited passive KICKR CORE pilot](equipment-results/2026-09-29-kickr-core-linux.md).
-It used the earlier local 0.1.0-based C installation, not the newly published
-0.2.0 artifact. Publication and host replay do not expand that device evidence.
-Do not advertise compatibility with specific equipment until reviewed evidence
-names the actual model, firmware, platform and installed package version.
-
 ## Published: Swift 0.1.0
 
 Verified against public GitHub release assets and a fresh public-tag SwiftPM
@@ -184,3 +135,96 @@ SwiftPM version requirements are intentionally unsupported because ordinary
 host-runtime and SDK-build evidence, **not** Swift BLE device interoperability,
 runtime coverage of every Apple OS version, physical accuracy or Bluetooth qualification.
 See the [Swift release runbook](../packages/swift/RELEASING.md).
+
+## Published alpha: Python 0.1.0a1
+
+PyPI serves **`deancochran-ftms==0.1.0a1`** at
+<https://pypi.org/project/deancochran-ftms/0.1.0a1/>. The annotated tag
+`python-v0.1.0a1` identifies clean source commit
+`f556d9f9d6e5fc253c1ac9bd4564ea30ad97c26d`. The tag's
+[Python verification and release run](https://github.com/deancochran/ftms/actions/runs/36662102567)
+completed successfully and published the verified wheel and source distribution
+through PyPI Trusted Publishing.
+
+| Public artifact | Verified PyPI SHA-256 |
+| --- | --- |
+| `deancochran_ftms-0.1.0a1-py3-none-any.whl` | `3cd84fee28c3e8b2968d4fcbf9451c343b1b72e949e22797fc52d2deae8bf4b0` |
+| `deancochran_ftms-0.1.0a1.tar.gz` | `0f434f7e3b14f499815367f028cb7af1744d9bc5156c80f364cc21b7a1190de4` |
+
+The release is an explicitly selected pre-release with an evolving interface.
+It provides bidirectional raw Feature, range, control, measurement and status
+codecs plus selected normalized views and range inspection. It does not provide
+static capability evaluation, BLE integration, lifecycle policy or execution
+permission. Host and package verification are not real-device evidence. The
+release workflow now includes a post-publication public-artifact hash and isolated
+consumer job for future Python tags. A read-only rerun downloaded both artifacts,
+matched the hashes above and executed independent isolated wheel and sdist
+consumers on Python 3.11.15; both completed successfully.
+
+## Implemented source candidate: Rust 0.1.0 (not published)
+
+PR [#14](https://github.com/deancochran/ftms/pull/14) merged the independent,
+allocation-free `no_std` Rust implementation at
+`384f7304b6e5add0cee495c983928cc65c17a31b`. Its `Cargo.toml` declares 0.1.0,
+but source metadata is not a release: there is no `rust-v0.1.0` tag, crates.io
+package or Rust GitHub release. The crates.io API returned not found during this
+read-only check.
+
+The candidate implements `FullWire` raw codecs and `RangeInspection`; it does not
+implement capability interpretation, normalized views, fragment planning/assembly,
+BLE, device runtime or control authorization. See the package's
+[verification record](../packages/rust/docs/verification.md) for exact host,
+corpus, Cortex-M0 compile-only and packed-consumer evidence. Do not use a registry
+installation instruction until this matrix records a verified public artifact.
+
+## Current public packages
+
+| Port | Public release verified | Runnable example | What is not released |
+| --- | --- | --- | --- |
+| TypeScript | npm `@deancochran/ftms@0.4.0` | [Current quickstart](../examples/typescript-quickstart/README.md); the separate client preserves a 0.2.0 compatibility baseline | Native implementations are separate packages, not npm exports |
+| C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
+| Swift | GitHub/SwiftPM `swift-v0.1.0` | Public tag-pinned Linux/macOS consumers and Apple SDK builds | BLE integration and Apple-device runtime evidence |
+| Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
+| Python | PyPI `deancochran-ftms==0.1.0a1` | Isolated wheel/sdist package consumers; no repository BLE example | Capability evaluation, stable interface and live-device evidence |
+
+## Start with the released TypeScript package
+
+```sh
+cd examples/typescript-quickstart
+npm install --ignore-scripts --no-audit --no-fund
+npm start
+npm test
+```
+
+The current-release quickstart asserts normalized metrics, truncation behavior,
+capabilities, ranges and byte conversions without communicating with equipment.
+The separate `typescript-client` example preserves the historical npm 0.2.0 baseline.
+
+## C installation evidence
+
+The C example uses `find_package(ftms CONFIG REQUIRED)` against an installed
+artifact, not private source paths. The source-package verifier builds/installs
+the archive, moves its prefix and runs the example from an isolated copy.
+The public archive is at <https://github.com/deancochran/ftms/releases/tag/c-v0.2.0>.
+Source availability does not establish package-manager registry publication.
+
+## Historical baseline identity and next actions
+
+- Previous npm 0.3.0 and C 0.1.0 releases identify `74f1552959d96755f38eac42f6999a5b04088b2f`.
+- npm 0.3.0 integrity and all seven included source files matched that checkout.
+- Previous C 0.1.0 archive SHA-256 is
+  `3dc61329a2883f88a7828cff77b282961c9e91680ecae0ca5100622e9d8e6924`;
+  its checksum asset and ten source/header files matched the reviewed checkout.
+- CI, Native C, Publish and Release C runs for that commit succeeded. This does
+  not establish environment protection settings or device compatibility.
+- Further changes require separate review, verification and explicit release
+  approval. Updating this record does not publish a new version.
+- vcpkg/Conan registry submissions are separate external actions after a real
+  immutable artifact exists. Local recipe tests are not registry publication.
+
+See [C release runbook](releasing-c.md) and [real-equipment test procedure](equipment-testing.md).
+The repository includes a [limited passive KICKR CORE pilot](equipment-results/2026-09-29-kickr-core-linux.md).
+It used the earlier local 0.1.0-based C installation, not the newly published
+0.2.0 artifact. Publication and host replay do not expand that device evidence.
+Do not advertise compatibility with specific equipment until reviewed evidence
+names the actual model, firmware, platform and installed package version.

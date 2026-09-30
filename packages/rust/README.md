@@ -5,6 +5,11 @@ is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
 runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, or
 control safety.
 
+**Support profile:** [`FullWire`](https://github.com/deancochran/ftms/blob/main/docs/support-profiles.md)
+raw codecs with `RangeInspection`. The crate does not implement
+`CapabilityEvidence`, `RecordPlanning`, `RecordAssembly` or `NormalizedViews`.
+This is implemented source scope, not crates.io publication evidence.
+
 ## Implemented surface
 
 Raw, bidirectional codecs are supported for:

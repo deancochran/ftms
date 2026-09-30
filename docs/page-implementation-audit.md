@@ -1,5 +1,13 @@
 # Page-by-page FTMS implementation audit
 
+**Historical pinned-snapshot audit.** This ledger reviewed TypeScript and C on
+the branch/commit recorded below. Swift and Kotlin were scaffolds in that snapshot
+but are now published implementations; Python is now a published partial alpha.
+See [support profiles](support-profiles.md) and
+[released packages](released-packages.md) for current package status. The protocol
+findings and unimplemented transport obligations remain useful unless superseded
+explicitly.
+
 ## Audited text and checkout
 
 This is an implementation audit of the **81 physical pages** of the recovered
@@ -46,8 +54,8 @@ Raw evidence preservation is not server conformance validation: retaining RFU
 bits on decode does not mean a compliant server may transmit them. Likewise,
 encodable bytes do not prove command permission, valid equipment state, range
 enforcement, physical behavior, or data freshness. A test-only TypeScript
-session reducer is not a production record assembler. Swift/Kotlin are scaffolds
-and are not included as implemented ports.
+session reducer is not a production record assembler. Swift/Kotlin were scaffolds
+in the audited snapshot and were not included as implemented ports.
 
 ## Evidence references
 

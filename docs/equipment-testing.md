@@ -1,21 +1,22 @@
 # Real-equipment verification
 
-## Current evidence — 2026-09-28
+## Current evidence
 
-**A limited passive KICKR CORE result is now recorded in local work:**
+**A limited passive KICKR CORE result is recorded:**
 [2026-09-29 Linux pilot](equipment-results/2026-09-29-kickr-core-linux.md).
-It covers one authorized telemetry session and offline cross-port replay, not
-live controls, physical accuracy, reconnect behavior or MCU execution. The table
-below is historical evidence from before that session.
+It covers one authorized telemetry session, one successful reconnect path and
+offline cross-port replay, not live controls, physical accuracy, exhaustive
+reconnect/lifecycle behavior or MCU execution. The table separates package/host
+verification from that limited device observation.
 Do not interpret codec fixtures, literal example packets, simulated equipment,
 compiler checks or successful package installation as Bluetooth device testing.
 
 | Evidence | Status | Scope |
 | --- | --- | --- |
-| Published npm 0.2.0 example | Passed locally | Registry installation and simulated packet decoding; no radio |
-| Current TypeScript packed candidate | Passed locally | Package consumer and conformance tests; no radio |
-| C 0.1.0 source candidate | Passed locally | Installed C/C++ consumers and simulated packet codecs; no radio |
-| Real equipment, telemetry | Not tested | Model/firmware, platform and capture needed |
+| Published npm 0.4.0 package | Verified | Registry artifact and isolated consumers; no radio in package verification |
+| Published C 0.2.0 source archive | Verified | Installed C/C++ consumers and simulated packet codecs; no radio in release verification |
+| Published Swift/Kotlin/Python packages | Verified within each release's documented host/consumer scope | No live BLE runtime evidence |
+| Real equipment, telemetry | Partial | One KICKR CORE/Linux passive pilot; 55 packets and one reconnect, using earlier artifact versions |
 | Real equipment, control procedures | Not tested | Explicit operator authorization and physical safety arrangements needed |
 | Bluetooth PTS / qualification | Not tested | Separate process; not implied by interoperability |
 

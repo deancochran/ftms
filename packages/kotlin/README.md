@@ -9,6 +9,10 @@ Published on [Maven Central](https://central.sonatype.com/artifact/io.github.dea
 Exact source, signed artifact hashes and public-consumer evidence are recorded in
 [released packages](../../docs/released-packages.md).
 
+Support profile: [`FullWire`](../../docs/support-profiles.md), with
+`CapabilityEvidence` and `RangeInspection`. Public values are intentionally
+raw/idiomatic rather than a clone of TypeScript's normalized convenience interface.
+
 ```kotlin
 repositories { mavenCentral() }
 dependencies { implementation("io.github.deancochran:ftms:0.1.0") }

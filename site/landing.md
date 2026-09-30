@@ -13,6 +13,7 @@ embedded integration, or protocol tool without taking on another connection stac
 | Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
 | Kotlin / Java | Independent JVM codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
 | Python | Partial alpha, evolving API; no capability APIs | [Python package guide](../packages/python/README.md) |
+| Rust | Unpublished allocation-free `no_std` raw-codec source | [Rust package guide](../packages/rust/README.md) |
 
 ## A focused boundary
 
@@ -29,6 +30,7 @@ Bluetooth qualification.
 - [Cookbook](../docs/integration.md): choose the right public API for the task.
 - [Transport recipes](../docs/transport-recipes.md): preserve the exact received byte span.
 - [Releases and support](../docs/released-packages.md): distinguish source from published packages.
+- [Support profiles](../docs/support-profiles.md): select client and equipment wire directions.
 - [Protocol coverage](../docs/coverage.md): inspect tested scope and evidence limits.
 - [Contributing](../CONTRIBUTING.md): report problems and improve the project.
 

@@ -3,6 +3,10 @@
 `deancochran-ftms` is a pure, synchronous Python protocol package.  This
 **0.1.0a1 is a partial alpha release with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, and bidirectional Machine/Training Status. It has no BLE, lifecycle, logging, or capability APIs. It is not a complete port of every API in the TypeScript/C packages.
 
+Its wire [support profile](../../docs/support-profiles.md) is `FullWire` raw codecs,
+with `RangeInspection` and selected `NormalizedViews`. `CapabilityEvidence` remains
+explicitly unsupported; `FullWire` does not mean cross-language convenience parity.
+
 ## Install and compatibility
 
 The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has

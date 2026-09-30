@@ -27,6 +27,12 @@ export const pages = [
     group: "Getting started",
   },
   {
+    source: "packages/rust/README.md",
+    slug: "start/rust",
+    title: "Rust (source candidate)",
+    group: "Getting started",
+  },
+  {
     source: "examples/typescript-quickstart/README.md",
     slug: "start/typescript",
     title: "TypeScript / JavaScript",
@@ -74,6 +80,12 @@ export const pages = [
     source: "docs/coverage.md",
     slug: "reference/coverage",
     title: "Protocol coverage",
+    group: "Reference",
+  },
+  {
+    source: "docs/support-profiles.md",
+    slug: "reference/support-profiles",
+    title: "Support profiles",
     group: "Reference",
   },
   {

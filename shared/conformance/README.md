@@ -11,6 +11,13 @@ Static capability fixtures live under `capabilities/v1/` with their own schema
 and contract. They do not alter this codec-v1 comparison contract or historical
 identity.
 
+Repository package claims use the role-based
+[support profiles](../../docs/support-profiles.md). Profiles do not change corpus
+bytes or comparison rules: a runner still reports every discovered case, and a
+direction outside a package's claim is unsupported rather than silently absent.
+Directional raw corpora provide the separate encode/decode accounting needed for
+`ControllerClient`, `EquipmentServer` and `FullWire` claims.
+
 ## Identity and versioning
 
 The corpus currently has `schemaVersion: 1`. That names the JSON format and
