@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Host verification for the Swift package; no fixture copies or test stubs."""
 import hashlib
+import argparse
 import importlib.metadata
 import json
 import platform
@@ -138,6 +139,9 @@ def write_report(report):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--require-clean", action="store_true", help="reject dirty CI/release checkouts")
+    options = parser.parse_args()
     cases = discovered_cases()
     report = {"nativeCaseReport": {"cases": cases}}
     try:
@@ -152,6 +156,8 @@ def main():
                        "validatedSchemaInstances": [{"schema": str(s), "instance": str(i)} for s, i in pairs],
                        "sha256": {str(path.relative_to(ROOT)): digest(path) for path in consumed},
                        "measurementMatrix": matrix})
+        if options.require_clean and dirty:
+            raise RuntimeError("CI/release verification requires a clean checkout")
 
         print("+ swift test", flush=True)
         test = subprocess.run(["swift", "test"], cwd=ROOT, text=True, capture_output=True)

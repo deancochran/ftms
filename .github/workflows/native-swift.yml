@@ -32,7 +32,7 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swift --version
-          /tmp/swift-verification/bin/python packages/swift/Verification/verify.py
+          /tmp/swift-verification/bin/python packages/swift/Verification/verify.py --require-clean
       - name: Verify isolated Git revision consumer
         shell: bash
         run: |
@@ -66,7 +66,7 @@ jobs:
         run: |
           swift --version
           xcodebuild -version
-          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/verify.py
+          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/verify.py --require-clean
       - name: Verify Git consumer on macOS and Apple SDKs
         run: |
           revision=$(git rev-parse HEAD)
