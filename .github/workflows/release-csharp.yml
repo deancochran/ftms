@@ -45,10 +45,10 @@ jobs:
         env:
           CSHARP_RELEASE_SIGNER: ${{ vars.CSHARP_RELEASE_SIGNER }}
           RELEASE_TAG: ${{ github.ref_name }}
-          TAG_OBJECT: ${{ github.event.after }}
+          PUSHED_COMMIT: ${{ github.event.after }}
         run: |
           set -euo pipefail
-          python publishing/release.py gate --tag "$RELEASE_TAG" --tag-object "$TAG_OBJECT"
+          python publishing/release.py gate --tag "$RELEASE_TAG" --pushed-commit "$PUSHED_COMMIT"
           manifest=artifacts/release-manifest.json
           echo "commit=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["sourceCommit"])')" >> "$GITHUB_OUTPUT"
           echo "version=$(python -c 'import json; print(json.load(open("'"$manifest"'"))["version"])')" >> "$GITHUB_OUTPUT"
@@ -127,9 +127,9 @@ jobs:
           VERSION: ${{ needs.gate.outputs.version }}
         run: |
           set -euo pipefail
-          push() { dotnet nuget push "$1" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --timeout 300 --no-symbols; }
+          push() { dotnet nuget push "$@" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --timeout 300; }
           # Do not use --skip-duplicate: an existing immutable version is a release failure.
-          if ! push "artifacts/packages/DeanCochran.Ftms.$VERSION.nupkg"; then
+          if ! push "artifacts/packages/DeanCochran.Ftms.$VERSION.nupkg" --no-symbols; then
             python publishing/release.py public-verify --existing --manifest artifacts/release-manifest.json || true
             exit 1
           fi

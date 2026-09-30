@@ -118,19 +118,25 @@ class PackageGuardTests(unittest.TestCase):
             signer = " ".join(key.with_suffix(".pub").read_text().split()[:2])
             tag = "csharp-v0.1.0-alpha.1"
             git("-c", "gpg.format=ssh", "-c", f"user.signingkey={key}", "tag", "-s", tag, "-m", "test release")
-            tag_object = git("rev-parse", tag)
+            pushed_commit = git("rev-parse", f"{tag}^{{commit}}")
             # Existing run() default captures the product root; replace only the cwd wrapper.
             def run_in_fixture(*args, **kwargs):
                 return subprocess.check_output(args, cwd=root, env=kwargs.get("env"), text=True, stderr=subprocess.PIPE)
             with mock.patch.object(release, "run", side_effect=run_in_fixture), mock.patch.dict(os.environ, {"CSHARP_RELEASE_SIGNER": signer}):
-                release.validate_tag(tag, "0.1.0-alpha.1", tag_object)
+                release.validate_tag(tag, "0.1.0-alpha.1", pushed_commit)
                 with self.assertRaises(ValueError):
-                    release.validate_tag(tag, "0.1.0-alpha.2", tag_object)
+                    release.validate_tag(tag, "0.1.0-alpha.2", pushed_commit)
                 with self.assertRaises(ValueError):
                     release.validate_tag(tag, "0.1.0-alpha.1", "0" * 40)
                 git("commit", "--allow-empty", "-m", "different checkout")
                 with self.assertRaises(ValueError):
-                    release.validate_tag(tag, "0.1.0-alpha.1", tag_object)
+                    release.validate_tag(tag, "0.1.0-alpha.1", pushed_commit)
+
+    def test_workflow_pushes_symbols_without_no_symbols_flag(self):
+        workflow = (Path(__file__).resolve().parents[3] / ".github/workflows/release-csharp.yml").read_text()
+        self.assertIn('push "artifacts/packages/DeanCochran.Ftms.$VERSION.nupkg" --no-symbols', workflow)
+        self.assertIn('push "artifacts/packages/DeanCochran.Ftms.$VERSION.snupkg"\n', workflow)
+        self.assertNotIn('--timeout 300 --no-symbols', workflow)
 
 
 if __name__ == "__main__":

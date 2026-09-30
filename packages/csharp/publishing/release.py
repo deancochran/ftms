@@ -42,13 +42,13 @@ def require_clean():
     if run("git", "status", "--porcelain", "--untracked-files=all").strip():
         raise ValueError("Release source must be clean before verification artifacts are created")
 
-def validate_tag(value, release_version, pushed_tag_object):
+def validate_tag(value, release_version, pushed_commit):
     if value != f"csharp-v{release_version}":
         raise ValueError("Release tag must exactly match csharp-vVERSION")
     if run("git", "cat-file", "-t", f"refs/tags/{value}").strip() != "tag":
         raise ValueError("Release tag must be an annotated tag")
-    if run("git", "rev-parse", f"{value}^{{tag}}").strip() != pushed_tag_object:
-        raise ValueError("Push event tag object does not match the checked-out annotated tag")
+    if run("git", "rev-parse", f"{value}^{{commit}}").strip() != pushed_commit:
+        raise ValueError("Push event commit does not match the signed tag target")
     signer = os.environ.get("CSHARP_RELEASE_SIGNER", "").strip()
     if not signer.startswith("ssh-") or len(signer.split()) != 2:
         raise ValueError("CSHARP_RELEASE_SIGNER must be the pinned SSH public key (type and base64 only)")
@@ -81,10 +81,10 @@ def identity_manifest(release_version):
     output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     return manifest
 
-def gate(tag, pushed_tag_object):
+def gate(tag, pushed_commit):
     release_version = version()
     require_clean()
-    validate_tag(tag, release_version, pushed_tag_object)
+    validate_tag(tag, release_version, pushed_commit)
     if not re.search(r"^## " + re.escape(release_version) + r"\s*$", (HERE / "CHANGELOG.md").read_text(), re.MULTILINE):
         raise ValueError("CHANGELOG must contain the release version heading")
     env = dict(os.environ, FTMS_VERIFY_AOT="1", FTMS_AOT_RID="linux-x64")
@@ -157,10 +157,10 @@ def public_verify(manifest_path, existing=False):
 def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
-    p = sub.add_parser("gate"); p.add_argument("--tag", required=True); p.add_argument("--tag-object", required=True)
+    p = sub.add_parser("gate"); p.add_argument("--tag", required=True); p.add_argument("--pushed-commit", required=True)
     p = sub.add_parser("public-verify"); p.add_argument("--manifest", required=True); p.add_argument("--existing", action="store_true")
     args = parser.parse_args()
-    if args.command == "gate": gate(args.tag, args.tag_object)
+    if args.command == "gate": gate(args.tag, args.pushed_commit)
     else: public_verify(args.manifest, args.existing)
 
 if __name__ == "__main__":
