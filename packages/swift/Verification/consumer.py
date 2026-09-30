@@ -23,6 +23,7 @@ def main():
     parser.add_argument("--expected-commit", required=True)
     parser.add_argument("--apple", action="store_true")
     args = parser.parse_args()
+    identity = args.repository.rstrip("/").rsplit("/", 1)[-1].removesuffix(".git").lower()
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     report = {"repository": args.repository, "revision": args.revision,
               "expectedCommit": args.expected_commit, "platform": platform.platform(),
@@ -41,10 +42,10 @@ let package = Package(
   platforms: [.macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9), .visionOS(.v1)],
   products: [.library(name: "FTMSConsumer", targets: ["Usage"]),
              .executable(name: "Consumer", targets: ["Consumer"])],
-  dependencies: [.package(name: "FTMSDependency", url: REPOSITORY, revision: REVISION)],
-  targets: [.target(name: "Usage", dependencies: [.product(name: "FTMS", package: "FTMSDependency")]),
+  dependencies: [.package(url: REPOSITORY, revision: REVISION)],
+  targets: [.target(name: "Usage", dependencies: [.product(name: "FTMS", package: IDENTITY)]),
             .executableTarget(name: "Consumer", dependencies: ["Usage"])])
-'''.replace("REPOSITORY", json.dumps(args.repository)).replace("REVISION", json.dumps(args.revision)))
+'''.replace("REPOSITORY", json.dumps(args.repository)).replace("REVISION", json.dumps(args.revision)).replace("IDENTITY", json.dumps(identity)))
             (directory / "Sources/Usage/Usage.swift").write_text('''import FTMS
 
 public func verifyFTMS() throws {
@@ -77,6 +78,7 @@ public func verifyFTMS() throws {
             report["hostConsumer"] = "passed"
             if args.apple:
                 report["xcode"] = subprocess.check_output(["xcodebuild", "-version"], text=True).strip()
+                report["sdks"] = subprocess.check_output(["xcodebuild", "-showsdks"], text=True).strip()
                 for name, destination, deployment in [
                     ("macos", "macOS", "MACOSX_DEPLOYMENT_TARGET=13.0"),
                     ("ios", "iOS", "IPHONEOS_DEPLOYMENT_TARGET=16.0"),
