@@ -3,8 +3,8 @@
 Status: this is an audit of codec directions and evidence, not a claim of complete
 FTMS conformance, device interoperability or Bluetooth qualification. TypeScript,
 C, Swift and Kotlin have published `FullWire` codecs and static capability
-interpretation; Python's published `FullWire` raw-codec alpha lacks capability
-evaluation, while local Python source has an unreleased evaluator. See the role-based [support profiles](support-profiles.md) and each
+interpretation; Python's published 0.1.0a2 `FullWire` raw-codec alpha also includes
+static capability evaluation. See the role-based [support profiles](support-profiles.md) and each
 package's verification record. Historical TypeScript/C tables below do not
 substitute for language-specific evidence.
 
@@ -75,10 +75,11 @@ accounting. Native tests separately isolate all 17 target bits, every range
 relationship, base procedures, all read reasons and argument/capacity atomicity.
 Those test-suite counts are not additional shared vectors or device evidence.
 
-The Python local-source capability runner consumes the same 63-case corpus with
-exact reports and hashes all four required corpus/contract inputs. This is local
-host evidence only; it neither changes the published Python alpha nor establishes
-BLE execution authority, device interoperability, PTS, or qualification.
+The Python 0.1.0a2 release capability runner passed the same 63-case corpus with
+exact reports and hashes of all four required corpus/contract inputs. Public
+wheel/sdist installation evidence is recorded in the [release matrix](released-packages.md#published-alpha-python-010a2).
+This is host and artifact evidence only, not BLE execution authority, device
+interoperability, PTS, or qualification.
 
 ## Evidence and future gates
 

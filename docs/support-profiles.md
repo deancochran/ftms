@@ -96,7 +96,7 @@ artifact identities and publication boundaries are in
 | Swift `FTMS` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection`, `NormalizedViews` | Published Git/SwiftPM release; revision pin required |
 | Kotlin/JVM `io.github.deancochran:ftms` 0.1.0 | `FullWire` | `CapabilityEvidence`, `RangeInspection` | Published on Maven Central |
 | Go `github.com/deancochran/ftms/packages/go` v0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, range-only normalized views | Published nested Go module; public consumers verified on Go 1.24.0 and 1.27.1, Linux/amd64 |
-| Python `deancochran-ftms` 0.1.0a1 | `FullWire` raw codecs | Published alpha: `RangeInspection` and selected `NormalizedViews`; local unreleased source additionally implements `CapabilityEvidence` | Published PyPI alpha; local source additions are not publication evidence |
+| Python `deancochran-ftms` 0.1.0a2 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection` and selected `NormalizedViews` | Published PyPI alpha; public wheel/sdist consumers verified |
 | Rust `ftms` 0.1.0 | `FullWire` raw codecs | `CapabilityEvidence`, `RangeInspection`, `RecordPlanning`, `RecordAssembly`, `NormalizedViews` | crates.io 0.1.0 / `rust-v0.1.0` released; newer range/control/status projections and 97-case evidence are unreleased |
 | Dart `deancochran_ftms` 0.1.0 source candidate | `FullWire` | `CapabilityEvidence`, `RangeInspection`, measurement `NormalizedViews` | Implemented in source; not tagged or published on pub.dev; see [Dart evidence](../packages/dart/doc/verification.md) |
 

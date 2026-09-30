@@ -9,8 +9,8 @@ This is the **canonical current release matrix**. Begin with the
 [C/C++ archive quickstart](../examples/c-client/README.md),
 [Swift guide](../packages/swift/README.md), or
 [Kotlin guide](../packages/kotlin/README.md).
-The [Python package](../packages/python/README.md) is a partial 0.1.0a1 alpha
-with an evolving API and no capability APIs; consult its separate release evidence.
+The [Python package](../packages/python/README.md) is a published 0.1.0a2 alpha
+with an evolving API and static capability evidence; see its release evidence below.
 The [Rust crate](../packages/rust/README.md) **0.1.0** is published on crates.io;
 unreleased branch source must not be represented as part of that artifact.
 The [Dart package](../packages/dart/README.md) is published on pub.dev as
@@ -214,7 +214,49 @@ host-runtime and SDK-build evidence, **not** Swift BLE device interoperability,
 runtime coverage of every Apple OS version, physical accuracy or Bluetooth qualification.
 See the [Swift release runbook](../packages/swift/RELEASING.md).
 
-## Published alpha: Python 0.1.0a1
+## Published alpha: Python 0.1.0a2
+
+PyPI serves **`deancochran-ftms==0.1.0a2`** at
+<https://pypi.org/project/deancochran-ftms/0.1.0a2/>. Published and verified on
+**2026-09-30** from annotated tag `python-v0.1.0a2`, identifying clean source commit
+`82d978fa980fc4c5629fbdd855af42126f49bcef`. Implementation
+[PR #25](https://github.com/deancochran/ftms/pull/25) is merged. The
+[release workflow](https://github.com/deancochran/ftms/actions/runs/36761554741)
+passed verification, published through the approved `pypi` environment using
+Trusted Publishing and attestations, and completed public-artifact verification.
+
+| Public artifact | Verified PyPI SHA-256 |
+| --- | --- |
+| `deancochran_ftms-0.1.0a2-py3-none-any.whl` | `b9a1feb44140f52c32ecfcb1841d41cfa05ea0627b4361706f6934179cdc60a8` |
+| `deancochran_ftms-0.1.0a2.tar.gz` | `5261fa144e0f58ebe95d819ad276a269492abb22cb12c9248e42a774e04972bd` |
+
+Both public files were downloaded and matched the exact verified build hashes.
+Independent non-editable wheel and sdist consumers passed on Python **3.11.16**,
+including feature/control/measurement codecs, capability enum exports and
+explicit signed-tenths resistance evaluation. The workflow retains
+`python-public-evidence-82d978fa980fc4c5629fbdd855af42126f49bcef`, whose
+`public-package-verification-report.json` reports `complete: true` and no errors.
+
+The release passed **169 tests on each of Python 3.11 and 3.14**, all scoped codec
+corpora, the 181,760-layout measurement matrix, and **63/63** exact capability
+cases with zero failed, unsupported or skipped cases. Capability schema version 1
+and comparison inputs consumed by this release have these SHA-256 identities:
+
+| Capability corpus / comparison input | SHA-256 |
+| --- | --- |
+| `shared/conformance/capabilities/v1/schema.json` | `1a23dd523896d41b6aa115eea906e6f899a9cfcc8008a87d133ba8c51409ef26` |
+| `shared/conformance/capabilities/v1/vectors.json` | `90a9b85e735455515c36fc089fa786bd928e217e81cf95f5ccef67c0d479d3dd` |
+| `shared/conformance/capabilities/README.md` | `e844292d9a916aa63db9d1f6d22de5525c1923e3584afbcc5013d93d374e6a6a` |
+| `shared/protocol/capability-discovery.md` | `541ddd5950999bcd048808fd6eff578dc0a7031eaaa0dc988f8711003ecd488f` |
+
+The alpha adds `CapabilityEvidence` to existing `FullWire` raw codecs,
+`RangeInspection` and selected `NormalizedViews`. It does not add a normalized
+control encoder, record planning/assembly, BLE transport or execution authority.
+These are host/artifact results, not device interoperability or qualification.
+
+### Published alpha: Python 0.1.0a1
+
+Historical release evidence; superseded by 0.1.0a2 above.
 
 PyPI serves **`deancochran-ftms==0.1.0a1`** at
 <https://pypi.org/project/deancochran-ftms/0.1.0a1/>. The annotated tag
@@ -265,7 +307,7 @@ corpus, Cortex-M0 compile-only and packed-consumer evidence.
 | C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
 | Swift | GitHub/SwiftPM `swift-v0.1.0` | Public tag-pinned Linux/macOS consumers and Apple SDK builds | BLE integration and Apple-device runtime evidence |
 | Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
-| Python | PyPI `deancochran-ftms==0.1.0a1` | Isolated wheel/sdist package consumers; no repository BLE example | Capability evaluation, stable interface and live-device evidence |
+| Python | PyPI `deancochran-ftms==0.1.0a2` | Verified public wheel/sdist consumers including capability evaluation; no repository BLE example | Stable interface and live-device evidence |
 | Rust | crates.io `ftms==0.1.0` | Released package and docs.rs | Later range/control/status projections, expanded runner evidence, and BLE/device evidence |
 
 ## Start with the released TypeScript package

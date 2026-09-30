@@ -18,7 +18,7 @@ Created and maintained by Dean Cochran; contributions are welcome.
 | Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
 | Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
 | Go | [Go guide](packages/go/README.md) | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
-| Python | [Python guide](packages/python/README.md) | `deancochran-ftms` 0.1.0a1 alpha; capability evaluator available in unreleased source only |
+| Python | [Python guide](packages/python/README.md) | PyPI: `deancochran-ftms` 0.1.0a2 alpha; includes static capability evidence |
 | Rust | [Rust guide](packages/rust/README.md) | crates.io `ftms` 0.1.0; later range/control/status projections and 97-case evidence are unreleased |
 | Dart / Flutter | [Dart guide](packages/dart/README.md) | Pure Dart 0.1.0 source candidate; not published on pub.dev |
 

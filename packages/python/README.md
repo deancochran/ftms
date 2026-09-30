@@ -26,9 +26,9 @@ six-byte resistance range alternative. The default is three unsigned whole-level
 bytes; this selection affects only the resistance range and is never inferred
 from observed bytes or Feature bits.
 
-This API requires 0.1.0a2 or newer. Until that version is available on PyPI,
-install from the source checkout (`python -m pip install ./packages/python`
-from the repository root). Publication evidence is tracked separately in the
+This API requires 0.1.0a2 or newer, available on PyPI. You can also install from
+the source checkout (`python -m pip install ./packages/python` from the repository
+root). Publication evidence is tracked separately in the
 [release matrix](../../docs/released-packages.md).
 
 ```python
@@ -74,7 +74,7 @@ The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has
 no runtime dependencies and declares Python >=3.11. Python 3.11 and 3.14 are
 tested by the package verification commands in this milestone.
 
-After publication, install this explicitly selected prerelease from PyPI:
+Install this explicitly selected prerelease from PyPI:
 
 ```sh
 python -m pip install 'deancochran-ftms==0.1.0a2'
