@@ -32,6 +32,39 @@ dev = ["jsonschema>=4.23", "mypy>=1.13", "pytest>=8.3", "ruff>=0.8", "types-json
 [tool.hatch.build.targets.wheel]
 packages = ["src/deancochran_ftms"]
 
+[tool.hatch.build.targets.sdist]
+only-include = [
+  ".gitignore",
+  "CHANGELOG.md",
+  "LICENSE",
+  "README.md",
+  "RELEASING.md",
+  "pyproject.toml",
+  "uv.lock",
+  "src/deancochran_ftms/__init__.py",
+  "src/deancochran_ftms/_binary.py",
+  "src/deancochran_ftms/_errors.py",
+  "src/deancochran_ftms/control.py",
+  "src/deancochran_ftms/features.py",
+  "src/deancochran_ftms/measurements.py",
+  "src/deancochran_ftms/py.typed",
+  "src/deancochran_ftms/ranges.py",
+  "src/deancochran_ftms/statuses.py",
+  "scripts/run_features_conformance.py",
+  "scripts/run_measurement_matrix.py",
+  "scripts/run_measurement_status_conformance.py",
+  "scripts/verify.py",
+  "scripts/verify_package.py",
+  "tests/test_binary.py",
+  "tests/test_conformance.py",
+  "tests/test_features.py",
+  "tests/test_measurement_validation.py",
+  "tests/test_measurements_statuses.py",
+  "tests/test_ranges_control.py",
+  "tests/test_report_integrity.py",
+  "tests/test_status_validation.py",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib"]

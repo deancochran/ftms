@@ -10,6 +10,8 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +20,30 @@ PACKAGE = Path(__file__).resolve().parents[1]
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _check_archive_manifests(sdist: Path, wheel: Path) -> None:
+    config = tomllib.loads((PACKAGE / "pyproject.toml").read_text())
+    included = config["tool"]["hatch"]["build"]["targets"]["sdist"]["only-include"]
+    identity = config["project"]["name"].replace("-", "_") + "-" + config["project"]["version"]
+    expected_source = {f"{identity}/{name}" for name in included} | {f"{identity}/PKG-INFO"}
+    with tarfile.open(sdist) as archive:
+        members = archive.getmembers()
+        if (
+            {item.name for item in members} != expected_source
+            or len(members) != len(expected_source)
+            or any(not item.isfile() for item in members)
+        ):
+            raise ValueError("sdist does not match its explicit release manifest")
+    expected_wheel = {name.removeprefix("src/") for name in included if name.startswith("src/")}
+    expected_wheel.update(
+        f"{identity}.dist-info/{name}"
+        for name in ("METADATA", "WHEEL", "RECORD", "licenses/LICENSE")
+    )
+    with zipfile.ZipFile(wheel) as wheel_archive:
+        names = wheel_archive.namelist()
+        if set(names) != expected_wheel or len(names) != len(expected_wheel):
+            raise ValueError("wheel does not match its explicit release manifest")
 
 
 def _step(report: dict[str, Any], name: str, *args: str, cwd: Path | None = None) -> None:
@@ -53,6 +79,7 @@ def main() -> int:
         _step(report, "build-source-artifacts", "uv", "build", "--out-dir", str(build), cwd=PACKAGE)
         sdist = next(build.glob("*.tar.gz"))
         wheel = next(build.glob("*.whl"))
+        _check_archive_manifests(sdist, wheel)
         report["artifacts"]["sourceBuild"] = {
             sdist.name: _sha256(sdist),
             wheel.name: _sha256(wheel),
@@ -86,6 +113,8 @@ def main() -> int:
             )
             rebuilt_wheel = next(rebuilt.glob("*.whl"))
             rebuilt_sdist = next(rebuilt.glob("*.tar.gz"))
+            _check_archive_manifests(rebuilt_sdist, rebuilt_wheel)
+            report["archiveManifestsVerified"] = True
             report["artifacts"]["rebuiltFromSdist"] = {
                 rebuilt_sdist.name: _sha256(rebuilt_sdist),
                 rebuilt_wheel.name: _sha256(rebuilt_wheel),
