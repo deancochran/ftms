@@ -115,7 +115,7 @@ evidence streams.
 
 The following records the pre-C.7 audit run and its then-current corpus bytes.
 It is superseded for the current checkout by the authoritative local verification
-and input hashes in [coverage.md](coverage.md#authoritative-current-local-evidence).
+and input hashes in [coverage.md](coverage.md#historical-pre-merge-local-evidence).
 
 Verified locally against base `2b5ff79b81639e8beeea8bc9b219cbf78c2c7194`:
 

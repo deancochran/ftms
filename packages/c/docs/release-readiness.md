@@ -1,5 +1,8 @@
 # Local C release-readiness evidence — 2026-09-28
 
+> Historical 0.1.0 candidate evidence for the checkout identified below, not
+> current publication status. See the [release matrix](../../../docs/released-packages.md).
+
 Branch `scaffold/native-capabilities`, HEAD/base
 `41023a60cff6efdeef5e36730c3d7356a91d26b6`, intentionally dirty checkout.
 No commit, merge, push, tag, GitHub release, registry submission or remote CI run

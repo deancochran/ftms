@@ -1,15 +1,16 @@
 # C release and installation runbook
 
 These are maintainer instructions, not authorization to execute remote actions.
-Local packaging is implemented; no C tag, GitHub release or registry submission
-has been created by this work. The initial candidate is `0.1.0`, owned by
-`packages/c/VERSION`. npm keeps its existing `v*` tags and independent version.
+The C source archive is released; see the [canonical release matrix](released-packages.md)
+for verified identity and platform evidence. Public registry registration remains
+separate. `packages/c/VERSION` owns the source version. npm keeps its existing
+`v*` tags and independent version. These instructions apply to a future approved
+release; do not recreate or overwrite an existing tag or release.
 
 ## Before integration
 
-1. Review **all** tracked and untracked source files. This workspace contains a
-   substantial monorepo migration and later protocol work; tracked-only diffs
-   omit most new packages. Keep machine-local `.context` and workspace guidance
+1. Review **all** tracked and untracked source files; tracked-only diffs can
+   omit new files. Keep machine-local `.context` and workspace guidance
    out of the product. Never stage build outputs, Conan caches or local tools.
 2. Reconcile coverage: the later C packet planner and bounded record assembler
    are currently C-only. Raw codec
@@ -42,7 +43,7 @@ It does not report merely rebuilding a library as a passing protocol test.
 To verify an existing artifact **without replacing it**:
 
 ```sh
-python3 packages/c/scripts/verify-source-bundle.py --archive /path/to/ftms-c-0.1.0.tar.gz
+python3 packages/c/scripts/verify-source-bundle.py --archive /path/to/ftms-c-0.2.0.tar.gz
 ```
 
 The SHA-256 sidecar must accompany it. `SOURCE.json` checks byte integrity and
@@ -58,7 +59,7 @@ build helpers; neither workflow submits a package to a registry.
 ```sh
 python3 packages/c/scripts/source-bundle.py
 python3 packages/c/scripts/verify-package-managers.py \
-  packages/c/build/source-candidate/ftms-c-0.1.0.tar.gz \
+  packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz \
   --conan /path/to/conan --vcpkg /path/to/vcpkg
 ```
 
@@ -71,10 +72,10 @@ not become skipped-success checks. The checked-in overlay reads
 by the helper. It is not itself a public-registry submission.
 
 CI adds Linux package-manager checks and standalone source consumers on Linux,
-macOS and Windows. Local evidence currently covers Linux; remote matrix results
-must pass before claiming the corresponding release-platform evidence.
+macOS and Windows. Historical release results are recorded in the release matrix;
+every new release must pass its own platform gates before making those claims.
 
-## Merge and first publication
+## Merge and publication
 
 1. Merge the reviewed, green PR to `main` only with explicit authorization.
 2. Configure the GitHub **`c-release` environment with required reviewers and
@@ -100,7 +101,7 @@ After publishing the immutable GitHub artifact and confirming its URL resolves:
 
 ```sh
 python3 packages/c/scripts/prepare-registry-recipes.py \
-  /path/to/ftms-c-0.1.0.tar.gz --tag c-v0.1.0 \
+   /path/to/ftms-c-0.2.0.tar.gz --tag c-v0.2.0 \
   --output packages/c/build/public-vcpkg-ftms
 ```
 

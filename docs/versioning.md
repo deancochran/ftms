@@ -31,9 +31,9 @@ semantic-version policy and release evidence. A corpus-only correction does not
 automatically require a synchronized package release, though an affected package
 may need one. Conversely, a package release need not alter the corpus.
 
-For the unreleased controls-v1 and capabilities-v1 corpora, this milestone
-explicitly extends the schema in place; it is an exception to the no-shape-change
-rule above, not a forward-compatibility guarantee for earlier v1 runners. These
+During the pre-release controls-v1 and capabilities-v1 milestone, the schema was
+explicitly extended in place; that historical exception to the no-shape-change
+rule above is not a forward-compatibility guarantee for earlier v1 runners. These
 contracts must be consumed by exact schema/vector/contract hashes, not by
 `schemaVersion` alone. Older strict schemas reject the new properties, and older
 interpreters do not implement the C.7 comparison semantics. Consumers must upgrade
@@ -59,7 +59,7 @@ requirements using the same C.7 evidence and capacity assumptions as evaluation.
 Explicit false/true C.7 evidence has the corresponding conditional Feature
 property behavior; it does not grant connection or control permission.
 
-The C candidate's `VERSION` file is its single package-version authority. CMake
+The C package's `VERSION` file is its single source-version authority. CMake
 reads it for the project, package config, and
 pkg-config metadata. Its `ftmsConfigVersion.cmake` uses same-major-and-minor
 compatibility: `0.x` minor versions are treated as potentially breaking. This is

@@ -5,6 +5,13 @@ coverage/
 .DS_Store
 .turbo/
 .context/
+.verification/
+/packages/typescript/docs/api/
+/site/.astro/
+/site/src/content/docs/
+/site/public/api/
+/site/test-results/
+/site/playwright-report/
 
 # Generated TypeScript snapshots; edit shared corpus or root policy assets.
 /packages/typescript/conformance/

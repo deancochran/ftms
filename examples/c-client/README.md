@@ -1,38 +1,67 @@
-# C FTMS client example
+# C / C++ installed-library quickstart
 
-This is a C99 consumer of the installed `ftms::ftms` CMake target. It decodes
-literal Indoor Bike and Treadmill characteristic values, checks a deliberately
-truncated value, and encodes—but never sends—a Request Control operation. Its
-output preserves the library's raw integer units; `measurement.h` defines each
-field's scale and unavailable sentinel.
+Decode Indoor Bike and Treadmill data, detect truncation, and encode—but never
+send—Request Control bytes. [main.c](main.c) checks expected values and exits
+nonzero on failure. The same example also compiles as C++11 against the C library.
 
-## Build from the local source candidate
+Prerequisites: CMake 3.16+, compatible C99/C++11 compilers, and a build tool.
+The commands below use a POSIX shell, curl, tar and sha256sum. Windows users can
+download the same assets and verify the hash with PowerShell `Get-FileHash`.
+Node and Python are not required for ordinary consumption.
 
-For local candidate verification, first obtain an archive supplied by
-your maintainer (or build the local candidate), verify its SHA-256 sidecar, then
-install it to an isolated prefix:
+## Download and install the released library
+
+Run in a new directory, not a system prefix:
 
 ```sh
-python3 packages/c/scripts/source-bundle.py
-tar -xzf packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz
-cmake -S ftms-c-0.2.0 -B ftms-build -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
-cmake --build ftms-build
-cmake --install ftms-build
-cmake -S examples/c-client -B example-build -DCMAKE_PREFIX_PATH="$PWD/ftms-prefix"
-cmake --build example-build
-ctest --test-dir example-build --output-on-failure
+curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.2.0/ftms-c-0.2.0.tar.gz
+curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.2.0/ftms-c-0.2.0.tar.gz.sha256
+sha256sum -c ftms-c-0.2.0.tar.gz.sha256
+tar -xzf ftms-c-0.2.0.tar.gz
+cmake -S ftms-c-0.2.0 -B ftms-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
+cmake --build ftms-build --config Release
+cmake --install ftms-build --config Release
 ```
 
-The library target is implemented as C99. A C++ consumer can link the same
-`ftms::ftms` target; set that consumer's own C++ language level (the package
-verification consumers use `cxx_std_11`) and compile its C++ sources normally.
+Expected archive SHA-256 (also recorded in the [release matrix](../../docs/released-packages.md)):
+`3aa60d809f3dcd02634417018d39f325c46a552734f0fe311ba748261914e61f`.
+Compare the sidecar to this reviewed value; a matching checksum is integrity
+evidence, not device or protocol qualification.
 
-Once a C release archive exists, obtain that archive and its published SHA-256
-from its release record before following the same install-and-consume flow. Do
-not substitute an unverified URL or treat this candidate as a publication.
+Copy this example's `main.c` and `CMakeLists.txt` into a directory named `client`
+alongside `ftms-prefix`, then run:
 
-The example has no BLE transport and does not write a Control Point. A caller
-must separately establish discovery state, characteristic properties, security,
-control ownership, range validation, procedure serialization, responses, and
-user authorization. It is a host codec example, not real-hardware, PTS, or
-Bluetooth qualification evidence.
+```sh
+cmake -S client -B example-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$PWD/ftms-prefix"
+cmake --build example-build --config Release
+ctest --test-dir example-build -C Release --output-on-failure
+ctest --test-dir example-build -C Release -V
+```
+
+Both tests must pass. Verbose output includes raw bike power `250 W`, raw cadence
+`180 0.5 rpm` (90 rpm), treadmill inclination `-15 0.1 percent` (-1.5%), and
+`Request Control bytes: 0x00 (encoded only; not sent)`. The example asserts these
+key values and a deliberately truncated packet. Other printed fields remain
+raw integers; [measurement.h](../../packages/c/include/ftms/measurement.h) defines scales.
+
+Keep `CMAKE_BUILD_TYPE=Release` for single-configuration generators such as Unix
+Makefiles or Ninja; `--config Release` alone does not select their build type.
+Multi-configuration generators use `--config Release` at build/install time.
+
+`find_package(ftms CONFIG REQUIRED)` discovers the installed library; it does
+not download it. For other acquisition methods see [C installation](../../packages/c/INSTALL.md).
+The example itself is repository-owned and is not shipped inside the C archive.
+
+## Contributor-only candidate verification
+
+From a repository checkout, `python3 packages/c/scripts/source-bundle.py` creates
+a local candidate. Substitute that archive in the same flow to test a candidate,
+but do not describe it as the released artifact. The native test suite checks
+the example against an isolated installation of its source candidate.
+
+## Boundaries
+
+The example contains no BLE transport. Applications own discovery, properties,
+security, control ownership, supported-range validation, serialized procedures,
+matching indications, timeouts, disconnection and user authorization. Host codec
+success is not physical equipment compatibility, PTS or Bluetooth qualification.

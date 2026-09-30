@@ -1,0 +1,16 @@
+{
+  "name": "ftms-typescript-quickstart",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node main.mjs",
+    "test": "node main.mjs && node recipes.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@deancochran/ftms": "0.4.0",
+    "base64-js": "1.5.1"
+  }
+}

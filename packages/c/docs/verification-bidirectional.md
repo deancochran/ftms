@@ -1,5 +1,9 @@
 # Bidirectional C verification — 2026-09-28
 
+> Historical pre-release evidence for the exact base and dirty source recorded
+> below. It is not current publication status; see the
+> [release matrix](../../../docs/released-packages.md).
+
 Local, unreleased work on `scaffold/native-capabilities`, base/HEAD
 `41023a60cff6efdeef5e36730c3d7356a91d26b6`, **dirty checkout**. No commit, push,
 publication, deployment, remote CI dispatch or device-control action occurred.

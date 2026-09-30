@@ -5,12 +5,12 @@ codecs, static capability interpretation and additive range inspection. Swift
 and Kotlin remain README-only scaffolds. See [release identities](../docs/released-packages.md)
 for verified publication status; source metadata alone is not publication evidence.
 
-| Port | Initial consumers | Planned distribution |
+| Port | Initial consumers | Distribution status |
 | --- | --- | --- |
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
-| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive; Make and CMake integration |
-| [Swift](swift/README.md) | iOS and other supported Apple applications | Swift Package Manager |
-| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven artifact |
+| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive with CMake; Make tooling is source-checkout-only |
+| [Swift](swift/README.md) | iOS and other supported Apple applications | Planned Swift Package Manager; not implemented here |
+| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Planned Maven artifact; not implemented here |
 
 Start from the [architecture](../docs/architecture.md) and the shared
 [capability contract](../shared/protocol/capability-discovery.md). Capability coverage must

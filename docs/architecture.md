@@ -1,9 +1,8 @@
 # Cross-language FTMS architecture
 
-Status: TypeScript has a published client release plus unreleased bidirectional
-raw codecs and static capability interpretation. C has unreleased Feature/range
-encoding/decoding, measurement/control/status codecs and static capability
-interpretation. Swift/Kotlin remain scaffolds.
+Status: TypeScript and C have released bidirectional codecs and static capability
+interpretation. See the [canonical release matrix](released-packages.md) for
+versions and distribution. Swift/Kotlin remain scaffolds in this checkout.
 This document defines boundaries, not universal FTMS device compatibility.
 
 ## One protocol project, independent packages
@@ -12,9 +11,11 @@ Keep protocol decisions and cross-language regression evidence in one repository
 Consumers must be able to use one implementation without installing the others.
 TypeScript, C, Swift, and Kotlin occupy sibling directories under `packages/`.
 The root manifest is private pnpm orchestration, not a publishable package;
-`pnpm-workspace.yaml` includes only the implemented TypeScript package. Its npm
-identity and public export paths remain stable. Published TypeScript is
-`@deancochran/ftms@0.2.0`; the next source candidate is `0.3.0`.
+`pnpm-workspace.yaml` includes the TypeScript package and private documentation
+website under `site/`. The site's Node 22.12+ build requirement does not change
+the protocol package's runtime requirements. Its npm
+identity and public export paths remain stable. Source versions alone do not
+establish publication; consult the release matrix above.
 
 | Location | Responsibility | Current state |
 | --- | --- | --- |
@@ -24,19 +25,18 @@ identity and public export paths remain stable. Published TypeScript is
 | `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by C and TypeScript |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
-| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Implemented protocol surface, unreleased |
+| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released source archive |
 | `packages/swift/` | Native Apple package | Reserved |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Reserved |
-| `examples/` | Future integration examples outside the core packages | Reserved |
+| `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples |
+| `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
 Rust and other language ports are deferred. The existing TypeScript package
 continues to serve JavaScript and React Native consumers.
 
-The C port now has a narrow source implementation and port-local host tooling; it
-remains unreleased and does not add a native package manifest, toolchain download,
-or publishing job. Add each package's build and installation files
- with its first real implementation and tests. Directory names are not promises
- of registry names or published artifacts.
+The C port has package-owned build, installation, verification and source-release
+tooling. Its release does not establish vcpkg or ConanCenter registration.
+Directory names for future ports are not promises of published artifacts.
 
 Swift Package Manager is the planned ecosystem exception: a conventional Git URL
 dependency needs a repository-root `Package.swift`, even though Swift sources,
@@ -107,7 +107,8 @@ encryption, permission ownership, and actuator safety remain caller-owned.
 
 ## Conformance and release boundaries
 
-Root pnpm commands forward to TypeScript; Biome and Lefthook stay at the root.
+Root build/test/package commands forward to TypeScript; root `pnpm verify` also
+checks documentation and builds API reference HTML. Biome and Lefthook stay at the root.
 TypeScript tests read the canonical shared corpus directly. Each TypeScript build
 cleans generated outputs, compiles, and stages distribution snapshots of the
 root `LICENSE` and `SECURITY.md` policies and the two canonical

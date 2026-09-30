@@ -1,5 +1,9 @@
 # Device wire-layout compatibility
 
+Current API guidance is followed by historical local verification. Claims about
+what was unpublished in that recorded run do not describe current availability;
+see the [release matrix](released-packages.md).
+
 FTMS codecs default to the adopted historical layout. For known exceptional
 wire layouts, pass an explicit range or measurement format option on every
 raw decode and encode call that needs it. TypeScript also accepts measurement
