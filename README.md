@@ -23,7 +23,10 @@ C/C++ has independently released bidirectional C99 codecs for Features, ranges,
 all six measurement families, Control Point and statuses, plus static capability
 interpretation. Its current source version is **0.2.0**. Both ports add explicit
 range-inspection diagnostics without changing existing defaults or automatically
-selecting device formats. Swift and Kotlin/Java remain README-only scaffolds.
+selecting device formats. [Swift](packages/swift/README.md) now has native codecs,
+range inspection and capabilities with independent SwiftPM version **0.1.0**;
+installation uses the Swift-specific tag or commit, not npm version ranges.
+Kotlin/Java remains scaffold-only in this checkout.
 See [verified releases](docs/released-packages.md) for actual publication status
 and [compatibility verification](docs/compatibility-verification.md) for scope and
 test accounting. Neither regression tests nor one trainer pilot establish
@@ -36,7 +39,7 @@ universal interoperability, PTS results or Bluetooth qualification.
 | [shared/](shared/README.md) | Language-neutral protocol definitions/design and versioned conformance fixtures |
 | [packages/typescript/](packages/typescript/README.md) | npm API docs, changelog, sources, tests, compiler configs, and npm-specific scripts |
 | [packages/c/](packages/c/README.md) | Portable bidirectional C99 codecs and static capability evidence, consumable from C++ |
-| [packages/swift/](packages/swift/README.md) | Future independent native Apple package |
+| [packages/swift/](packages/swift/README.md) | Native Swift 6 protocol package for SwiftPM, independent of other ports |
 | [packages/kotlin/](packages/kotlin/README.md) | Future independent Kotlin/JVM package, consumable from Java/Android |
 | [docs/](docs/architecture.md) | Repository-wide [architecture](docs/architecture.md), [coverage](docs/coverage.md), and [versioning](docs/versioning.md) guidance |
 | [examples/](examples/README.md) | Installed consumers and passive capture/replay examples outside protocol cores |

@@ -17,7 +17,9 @@ capability parity below does not imply a corresponding TypeScript packet-plannin
 or assembly API. They form a transport-independent convenience layer above codecs, not a missing
 TypeScript wire codec. This release-packaging milestone records that difference
 rather than claiming renewed complete API parity or silently expanding protocol
-scope. Swift/Kotlin remain scaffold-only and are not package releases.
+scope. Swift now has a separate unreleased native implementation; its evidence is
+documented in [the Swift package](../packages/swift/README.md), not inferred from
+this TypeScript/C audit. Kotlin remains scaffold-only in this checkout.
 
 Explicit format propagation is intentionally asymmetric: TypeScript propagates
 caller-selected layouts through normalized measurement parsing, registry dispatch,
@@ -114,5 +116,6 @@ These are local source capabilities, not additions already available in publishe
 0.2.0. Package version/publication is unchanged. Neither port provides BLE
 transport, permissions, connection/control ownership or actuator safety. Embedded
 runtime/board, real-device interoperability and Bluetooth qualification remain
-unverified; Swift/Kotlin remain scaffolds. No assertion of universal FTMS or
+unverified; Swift's subsequent host implementation has separate evidence in its
+package README, while Kotlin remains a scaffold in this checkout. No assertion of universal FTMS or
 physical-equipment compatibility follows from these finite regression corpora.

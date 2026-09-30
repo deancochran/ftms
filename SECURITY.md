@@ -3,7 +3,10 @@
 ## Supported versions
 
 Until `1.0.0`, only the latest published `0.x` version of `@deancochran/ftms`
-receives security fixes. The C port is an unreleased partial source slice; Swift and Kotlin ports are scaffolds. No native versions are released.
+receives security fixes. C and Swift have independent package versions; consult
+the [verified release record](docs/released-packages.md) and include the exact
+native tag/commit when reporting. Native host tests and publication do not imply
+Bluetooth qualification or safe equipment-control execution.
 
 ## Reporting a vulnerability
 

@@ -1,0 +1,79 @@
+name: Native Swift
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_REPOSITORY: ${{ github.event.pull_request.head.repo.clone_url || 'https://github.com/deancochran/ftms.git' }}
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    container: swift:6.0.3-jammy
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install test-only schema validator
+        run: |
+          apt-get update
+          apt-get install -y python3-venv
+          python3 -m venv /tmp/swift-verification
+          /tmp/swift-verification/bin/pip install -r packages/swift/requirements-test.txt
+      - name: Compile, compare canonical corpora, and consume package
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          swift --version
+          /tmp/swift-verification/bin/python packages/swift/Verification/verify.py
+      - name: Verify isolated Git revision consumer
+        shell: bash
+        run: |
+          revision=$(git rev-parse HEAD)
+          if [ "$GITHUB_REF_TYPE" = tag ]; then revision="$GITHUB_REF_NAME"; fi
+          /tmp/swift-verification/bin/python packages/swift/Verification/consumer.py \
+            --repository "$SOURCE_REPOSITORY" --revision "$revision" --expected-commit "$(git rev-parse HEAD)"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-linux-evidence
+          path: .build/swift-*-report.json
+          include-hidden-files: true
+          if-no-files-found: error
+
+  apple:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Prepare test-only schema validator
+        run: |
+          python3 -m venv "$RUNNER_TEMP/swift-verification"
+          "$RUNNER_TEMP/swift-verification/bin/pip" install -r packages/swift/requirements-test.txt
+      - name: Verify macOS codecs and release build
+        run: |
+          swift --version
+          xcodebuild -version
+          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/verify.py
+      - name: Verify Git consumer on macOS and Apple SDKs
+        run: |
+          revision=$(git rev-parse HEAD)
+          if [ "$GITHUB_REF_TYPE" = tag ]; then revision="$GITHUB_REF_NAME"; fi
+          "$RUNNER_TEMP/swift-verification/bin/python" packages/swift/Verification/consumer.py \
+            --repository "$SOURCE_REPOSITORY" --revision "$revision" --expected-commit "$(git rev-parse HEAD)" --apple
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-apple-evidence
+          path: .build/swift-*-report.json
+          include-hidden-files: true
+          if-no-files-found: error
