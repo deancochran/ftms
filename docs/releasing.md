@@ -127,7 +127,7 @@ the Dart `pub-dev` environment/trusted publisher after its first manual publicat
 Confirm environment restrictions separately. No settings changes are performed by these
 scripts. Pages retains `PAGES_ENABLED=true` and the `github-pages` environment;
 merging to `main` automatically builds and deploys the site when Pages is enabled.
-manual `Documentation site` dispatch on main can rebuild/redeploy it independently.
+Manual `Documentation site` dispatch on main can rebuild/redeploy it independently.
 
 The readiness command validates metadata only, not compiler/conformance evidence,
 registry configuration, branch ancestry or authorization to publish. Follow each

@@ -20,7 +20,8 @@ Created and maintained by Dean Cochran; contributions are welcome.
 | Go | [Go guide](packages/go/README.md) | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
 | Python | [Python guide](packages/python/README.md) | PyPI: `deancochran-ftms` 0.1.0a2 alpha; includes static capability evidence |
 | Rust | [Rust guide](packages/rust/README.md) | crates.io `ftms` 0.1.0; later range/control/status projections and 97-case evidence are unreleased |
-| Dart / Flutter | [Dart guide](packages/dart/README.md) | Pure Dart 0.1.0 source candidate; not published on pub.dev |
+| Dart / Flutter | [Dart guide](packages/dart/README.md) | pub.dev: `deancochran_ftms` 0.1.0 |
+| C# / .NET | [C# guide](packages/csharp/README.md) | NuGet: `DeanCochran.Ftms` 0.1.0-alpha.1 |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.
