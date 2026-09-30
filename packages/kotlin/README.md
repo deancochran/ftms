@@ -14,6 +14,11 @@ repositories { mavenCentral() }
 dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
 ```
 
+Releases use the package-owned `VERSION` file and the
+[automated GitHub Actions release process](docs/releasing.md). A reviewed version
+bump merged into `main` runs verification, signing, Central publication and public
+consumer checks without re-entering credentials or setting up a local signing key.
+
 ## Scope
 
 - Bidirectional Features and all five Supported Ranges, including range inspection.

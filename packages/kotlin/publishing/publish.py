@@ -34,6 +34,12 @@ class ReleaseError(Exception):
     pass
 
 
+class HttpFailure(ReleaseError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(f"HTTP {code}; inspect the Portal for details")
+
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise ReleaseError("HTTP redirects are not permitted by the release client")
@@ -108,7 +114,7 @@ def request(url, *, data=None, headers=None, method=None):
     except urllib.error.HTTPError as error:
         # Never print server bodies or request headers: they may echo credentials.
         error.close()
-        raise ReleaseError(f"HTTP {error.code}; inspect the Portal for details") from None
+        raise HttpFailure(error.code) from None
     except urllib.error.URLError:
         raise ReleaseError("Network request failed; inspect Portal before retrying an upload") from None
 
@@ -125,8 +131,8 @@ def central(config, path, *, data=None, headers=None, method="POST"):
                    headers={**(headers or {}), "Authorization": "Bearer " + token})
 
 
-def publication():
-    repo = PACKAGE / "build/local-maven"
+def publication(repo=None):
+    repo = repo or PACKAGE / "build/local-maven"
     poms = list(repo.glob("io/github/deancochran/ftms/*/*.pom"))
     if len(poms) != 1:
         raise ReleaseError("Expected exactly one clean local Maven publication")
@@ -170,10 +176,19 @@ def prepare(config):
     if clean_commit() != commit:
         raise ReleaseError("Source changed during verification")
     version, repo, files = publication()
+    assemble(config, commit, version, repo, files, log, PACKAGE / "build")
+
+
+def assemble(config, commit, version, repo, files, log, evidence):
+    """Sign a verified publication; CI checks its gate digest before calling this."""
+    if RELEASE.exists():
+        raise ReleaseError("Release evidence already exists; refusing to replace it")
+    if clean_commit() != commit:
+        raise ReleaseError("Source changed after verification")
     RELEASE.mkdir(parents=True)
     shutil.copyfile(log, RELEASE / "verification.log")
     for relative in ("conformance", "reports/conformance", "test-results/test"):
-        shutil.copytree(PACKAGE / "build" / relative, RELEASE / "evidence" / relative)
+        shutil.copytree(evidence / relative, RELEASE / "evidence" / relative)
     with (RELEASE / "signing-public.asc").open("wb") as output:
         run(signing_command(config) + ["--armor", "--export", fingerprint(config)],
             stdout=output, stderr=subprocess.DEVNULL)
@@ -201,6 +216,7 @@ def prepare(config):
                 "coordinates": f"{NAMESPACE}:{ARTIFACT}:{version}", "tag": f"kotlin-v{version}",
                 "signingFingerprint": fingerprint(config), "files": bundle_files,
                 "bundleSha256": sha256(bundle.read_bytes())}
+    manifest["deploymentName"] = manifest["tag"] + "-" + manifest["bundleSha256"][:16]
     write_json(RELEASE / "manifest.json", manifest)
     sign(config, RELEASE / "manifest.json")
     print(f"Prepared {manifest['coordinates']} from {commit}; no remote upload performed.")
@@ -297,19 +313,46 @@ def wait_for(config, deployment_id, manifest, targets, timeout):
 
 def upload(config, manifest, timeout):
     if not (RELEASE / "deployment.json").exists():
-        # This read both authenticates and checks authority for this exact namespace.
-        central(config, "/deployments?namespace=" + NAMESPACE + "&size=1", method="GET")
+        recovered = find_deployment(config, manifest)
+        if recovered:
+            record_deployment(manifest, recovered)
+    if not (RELEASE / "deployment.json").exists():
         boundary = "ftms-" + uuid.uuid4().hex
         body = (f'--{boundary}\r\nContent-Disposition: form-data; name="bundle"; '
                 'filename="central-bundle.zip"\r\nContent-Type: application/octet-stream\r\n\r\n').encode()
         body += (RELEASE / "central-bundle.zip").read_bytes() + f"\r\n--{boundary}--\r\n".encode()
-        query = urllib.parse.urlencode({"name": manifest["tag"], "publishingType": "USER_MANAGED"})
+        query = urllib.parse.urlencode({"name": manifest.get("deploymentName", manifest["tag"]),
+                                       "publishingType": "USER_MANAGED"})
         deployment_id = str(uuid.UUID(central(config, "/upload?" + query, data=body,
             headers={"Content-Type": "multipart/form-data; boundary=" + boundary}).decode().strip()))
-        write_json(RELEASE / "deployment.json", {"deploymentId": deployment_id,
-            "bundleSha256": manifest["bundleSha256"], "sourceCommit": manifest["sourceCommit"],
-            "tagObject": manifest["tagObject"]})
+        record_deployment(manifest, deployment_id)
     wait_for(config, deployment(manifest), manifest, {"VALIDATED", "PUBLISHED"}, timeout)
+
+
+def record_deployment(manifest, deployment_id):
+    write_json(RELEASE / "deployment.json", {"deploymentId": str(uuid.UUID(deployment_id)),
+        "bundleSha256": manifest["bundleSha256"], "sourceCommit": manifest["sourceCommit"],
+        "tagObject": manifest["tagObject"]})
+
+
+def find_deployment(config, manifest):
+    """Recover a possibly accepted upload by exact bundle-derived name, never guess."""
+    name = manifest.get("deploymentName", manifest["tag"])
+    matches = []
+    page = 0
+    while True:
+        query = urllib.parse.urlencode({"namespace": NAMESPACE, "deploymentName": name,
+                                       "page": page, "size": 100})
+        result = json.loads(central(config, "/deployments?" + query, method="GET"))
+        matches.extend(item for item in result["deployments"] if item["deploymentName"] == name)
+        page += 1
+        if page >= result["pageCount"]:
+            break
+    if len(matches) > 1:
+        raise ReleaseError("Multiple Central deployments match this bundle; refusing to choose one")
+    if matches and matches[0]["deploymentState"] == "FAILED":
+        raise ReleaseError("The existing Central deployment failed; inspect it instead of reuploading")
+    return str(uuid.UUID(matches[0]["deploymentId"])) if matches else None
 
 
 def verify_staged(config, manifest, deployment_id):
@@ -338,12 +381,20 @@ def publish(config, manifest, timeout):
     wait_for(config, deployment_id, manifest, {"PUBLISHED"}, timeout)
 
 
-def verify_public(config, manifest):
+def verify_public(config, manifest, timeout=600):
     if status(config, deployment(manifest), manifest) != "PUBLISHED":
         raise ReleaseError("Central has not reported PUBLISHED")
     destination = RELEASE / "public"
+    deadline = time.monotonic() + timeout
     for name, expected in manifest["files"].items():
-        data = request(MAVEN + "/" + name)
+        while True:
+            try:
+                data = request(MAVEN + "/" + name)
+                break
+            except HttpFailure as error:
+                if error.code not in {404, 429, 502, 503, 504} or time.monotonic() >= deadline:
+                    raise
+                time.sleep(10)
         if sha256(data) != expected:
             raise ReleaseError("Public artifact differs from the signed/tested bundle: " + name)
         path = destination / name
@@ -380,7 +431,7 @@ def main():
             elif args.action == "publish":
                 publish(args.config, manifest, args.timeout)
             else:
-                verify_public(args.config, manifest)
+                verify_public(args.config, manifest, timeout=args.timeout)
     except (ReleaseError, OSError, ValueError, KeyError, subprocess.CalledProcessError) as error:
         # CalledProcessError/OSError details may include local private paths; no traceback.
         message = str(error) if isinstance(error, ReleaseError) else type(error).__name__

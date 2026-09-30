@@ -38,12 +38,92 @@ A GitHub release may distribute verified artifacts, but it must not be described
 as Maven Central availability. Never substitute an empty JAR, unsigned placeholder
 or incomplete protocol implementation to bypass a publication blocker.
 
-## Standard publishing method
+## Normal release: GitHub Actions (no recurring local setup)
+
+The **Release Kotlin** workflow at `.github/workflows/release-kotlin.yml` owns
+routine publishing. The persistent GitHub environment **`maven-central`** is
+provisioned with the existing Central account token and encrypted signing key.
+It permits `main` and `kotlin-v*` tags only; pull requests never receive its secrets.
+
+For each new release:
+
+1. Update **`packages/kotlin/VERSION`** and add the matching `## VERSION` heading
+   to `packages/kotlin/CHANGELOG.md`. Gradle reads VERSION directly; do not maintain
+   a second version literal in `build.gradle.kts`. Review intentional API changes.
+2. Merge the reviewed version update into **`main`** through the normal PR process.
+3. GitHub Actions automatically verifies, creates the signed `kotlin-vVERSION`
+   tag, publishes to Central, verifies public artifacts/consumers, and completes
+   the GitHub release. **No local GPG setup, token entry or manual tag signing is
+   needed for each release.**
+
+A push of an already-signed, matching `kotlin-v*` tag also triggers the workflow,
+as with the other ports. Tagged commits must be on `main`, the tag/version and
+changelog must match, and the signing identity must match the configured key.
+An Actions-created tag uses `GITHUB_TOKEN`; GitHub does not start another workflow
+for that push, so the same running workflow continues the publication itself.
+
+The workflow has two separate jobs:
+
+- **Gate (no publishing secrets):** clean checkout, exact version/changelog and
+  main ancestry, all canonical conformance/matrix/API checks, and local-artifact
+  Java/Kotlin execution plus Android APK compilation. The exact tested artifacts
+  and evidence are transferred using an immutable Actions artifact, with every
+  file and the gate metadata bound by SHA-256 to the verification-job output.
+- **Publish (restricted environment):** import the persisted key into an
+  owner-only directory under `RUNNER_TEMP`, verify actual signing-key possession
+  and Central namespace authority, sign the already-tested bytes without a
+  rebuild, create/verify the signed tag, validate/publish the exact bundle, then
+  download/hash/signature-check public files and rerun public consumers. The
+  credential directory and GPG agent are cleaned in an `always()` step.
+
+An existing public version is **verified, not republished**. Before an initial
+Central upload, the workflow creates a GitHub **draft** containing the signed
+bundle and manifest. Retries restore those exact bytes rather than re-signing a
+new bundle. Deployment/status receipts are retained on that draft; an ambiguous
+upload is recovered by its exact version-plus-bundle-hash deployment name. A
+failed or ambiguous duplicate deployment stops rather than silently choosing one.
+Only after public checks pass is the draft made public. Actions additionally
+retains public evidence for 90 days; completed GitHub release assets are durable.
+
+Use **Actions → Release Kotlin → Run workflow** on `main` for recovery or checks:
+
+- `mode=verify` (default): full gate, stored credentials/key validation, and—if
+  already released—public artifact and consumer verification. No tag, Central
+  upload, publish request or GitHub release mutation is performed.
+- `mode=publish`: resume the current version's draft/deployment or publish a new
+  verified version. Existing public versions remain verify-only. Do not increment
+  a version merely to test publishing credentials.
+
+All release runs are serialized with cancellation disabled. Workflow actions are
+pinned by commit. The CI code and offline safety tests live in `publishing/`;
+ordinary PR CI runs those tests without account access.
+
+### Persistent GitHub environment configuration
+
+These values are already provisioned in `maven-central`, not repository files:
+
+| Kind | Name | Purpose |
+| --- | --- | --- |
+| Secret | `MAVEN_CENTRAL_TOKEN` | Portal username/password token in base64 bearer format |
+| Secret | `MAVEN_SIGNING_PRIVATE_KEY` | Encrypted armored private signing key |
+| Secret | `MAVEN_SIGNING_PASSPHRASE` | Key passphrase |
+| Variable | `MAVEN_SIGNING_FINGERPRINT` | Full public signing-key fingerprint |
+
+No environment approval click is required per release; admission is restricted
+to `main`/Kotlin tags, after the secret-free gate. Future credential revocation,
+token rotation or key expiration still requires replacing/renewing the affected
+environment value, **not repeating integration setup**. The key has a two-year
+validity period; renew it before expiry and update its public distribution.
+GitHub secrets are encrypted storage, not a downloadable private-key recovery
+backup. Keep the separate encrypted backup described below.
+
+## Publisher and local recovery method
 
 `publishing/publish.py` is the package-owned Central Publisher API client. It uses
 Python's standard library and GnuPG, not an unpinned publishing plugin. Ordinary
-Gradle builds and CI have no publishing credentials and cannot publish. Each
-remote step is explicit; no release occurs automatically on a push or tag.
+Gradle builds and PR verification have no publishing credentials. The dedicated
+release workflow orchestrates its explicit stages; the local commands below are
+a recovery alternative, not required recurring release setup.
 
 Requirements: Python 3.10+, GnuPG 2.2+, Git, the JDK/Android SDK used by the
 verification script, a clean checkout, and explicit release authorization.
@@ -98,14 +178,16 @@ PY
 
 Credential checks reject group/world-readable configuration and symlinked secret
 files. API errors omit response bodies/headers; authenticated requests reject
-redirects. Credentials are never passed to Gradle, consumer builds, GitHub, or
-the public Maven download endpoint. Do not run the publisher with shell tracing.
+redirects. Credential values are not passed in Gradle/consumer arguments or sent
+to the public Maven download endpoint. In CI they are stored as encrypted GitHub
+environment secrets and materialized only in the temporary publishing directory,
+never the checkout or artifact paths. Do not run the publisher with shell tracing.
 
-### Release sequence
+### Local recovery release sequence
 
 Run from the repository root. Replace `0.1.0` with the reviewed package version.
-The POM generated by Gradle is authoritative for the coordinates and consumer
-version; no release step silently selects `latest`.
+VERSION is authoritative for the package version; Gradle propagates it into the
+POM, which selects the exact consumer coordinates. No step selects `latest`.
 
 1. Update the package version/changelog and review the API baseline. Commit and
    push changes, and require the PR's Kotlin, TypeScript and native checks to pass.
@@ -178,11 +260,14 @@ verifying the original signed manifest/tag. It never changes the released source
 identity. Upload and publish continue to require the exact prepared commit.
 An existing deployment record prevents a second upload; an already-published
 deployment is not republished. If an upload's connection fails **before** the
-deployment ID is saved, inspect Central's deployment history before retrying—
-the server might have accepted it. Never blindly retry an ambiguous upload or
-delete failed evidence while investigating. `--timeout SECONDS` controls waiting;
+deployment ID is saved, the publisher first looks for the exact bundle-derived
+deployment name in Central's history. It will not guess among multiple matches
+or retry a failed deployment. Legacy bundles without the deterministic name may
+require manual inspection. Never delete failed evidence while investigating.
+`--timeout SECONDS` controls waiting;
 a timeout is not a deployment failure. Public CDN propagation can lag Portal
-publication; retry `verify`, not `upload`, when public files are not yet visible.
+publication; public verification retries transient 404/rate-limit/server errors
+within a bounded wait. If it still times out, resume verification—not a new upload.
 
 The first live Portal deployment returned its exact PURL at `VALIDATED`, but an
 empty `purls` list at `PUBLISHING` and `PUBLISHED`. The client therefore requires
@@ -190,10 +275,9 @@ the exact PURL **before** publication and rejects any conflicting nonempty list
 afterwards. It does not infer public coordinates from an empty list: public-path
 downloads, signed-manifest hashes and executable consumers supply that evidence.
 
-The client intentionally has no delete/redeploy, automatic version bump, automatic
-merge, or credential-upload feature. Published Maven versions are immutable.
-CI secrets or a protected publishing workflow can be provisioned separately;
-the standard local method does not require changing an external account's secrets.
+The client intentionally has no delete/redeploy, automatic version increment or
+automatic PR merge. Published Maven versions are immutable. The workflow signs
+tags for reviewed VERSION changes; it does not choose release versions itself.
 
 Tag names must never be moved or reused as a release policy. The client verifies
 the signed tag object and remote target at each step; that is not proof of a

@@ -1,0 +1,123 @@
+name: Release Kotlin
+
+on:
+  push:
+    branches: [main]
+    tags: ['kotlin-v*']
+    paths:
+      - 'packages/kotlin/VERSION'
+      - 'packages/kotlin/publishing/**'
+      - '.github/workflows/release-kotlin.yml'
+  pull_request:
+    paths:
+      - 'packages/kotlin/VERSION'
+      - 'packages/kotlin/publishing/**'
+      - '.github/workflows/release-kotlin.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Verify setup/current release without mutations, or publish the current version
+        type: choice
+        options: [verify, publish]
+        default: verify
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kotlin-release-${{ github.event_name == 'pull_request' && github.ref || 'central' }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: Verify exact Kotlin release artifacts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      commit: ${{ steps.gate.outputs.commit }}
+      version: ${{ steps.gate.outputs.version }}
+      gate_sha256: ${{ steps.gate.outputs.gate_sha256 }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select Java 17 and Android compilation components
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Verify version, source, conformance, API and all artifact consumers
+        id: gate
+        run: python3 packages/kotlin/publishing/ci_release.py gate
+      - name: Preserve exact tested publication and evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kotlin-verified-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/kotlin/.releases/verified/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+      - name: Retain failure diagnostics without credentials
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kotlin-gate-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            packages/kotlin/.gradle/ci-verification.log
+            packages/kotlin/build/test-results/test/*.xml
+            packages/kotlin/build/reports/conformance/*.json
+            packages/kotlin/build/conformance/*.json
+          include-hidden-files: true
+
+  publish:
+    name: Sign, publish and verify Maven Central
+    needs: gate
+    if: github.event_name != 'pull_request' && github.repository == 'deancochran/ftms'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment:
+      name: maven-central
+      url: https://central.sonatype.com/artifact/io.github.deancochran/ftms/${{ needs.gate.outputs.version }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: kotlin-verified-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/kotlin/.releases/verified/
+      - name: Select Java 17 and Android compilation components
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Import persistent environment credentials into temporary owner-only storage
+        env:
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_SIGNING_PRIVATE_KEY: ${{ secrets.MAVEN_SIGNING_PRIVATE_KEY }}
+          MAVEN_SIGNING_PASSPHRASE: ${{ secrets.MAVEN_SIGNING_PASSPHRASE }}
+          MAVEN_SIGNING_FINGERPRINT: ${{ vars.MAVEN_SIGNING_FINGERPRINT }}
+        run: python3 packages/kotlin/publishing/ci_release.py bootstrap
+      - name: Resume or publish the verified version, then verify public consumers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
+          EXPECTED_GATE_SHA256: ${{ needs.gate.outputs.gate_sha256 }}
+        run: python3 packages/kotlin/publishing/ci_release.py release --mode "$RELEASE_MODE" --gate-sha256 "$EXPECTED_GATE_SHA256"
+      - name: Remove ephemeral signing and publishing credentials
+        if: always()
+        run: python3 packages/kotlin/publishing/ci_release.py cleanup
+      - name: Retain public release evidence, never the credential directory
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kotlin-release-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/kotlin/.releases/current/
+          include-hidden-files: true
+          retention-days: 90
