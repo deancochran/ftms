@@ -10,6 +10,10 @@ then the [integration cookbook](https://github.com/deancochran/ftms/blob/main/do
 [troubleshooting](https://github.com/deancochran/ftms/blob/main/docs/troubleshooting.md).
 Repository links describe main; use a matching release tag for older packages.
 
+**Support profile:** [`FullWire`](https://github.com/deancochran/ftms/blob/main/docs/support-profiles.md), with
+`CapabilityEvidence`, `RangeInspection` and `NormalizedViews`. This names codec
+directions, not BLE transport or permission to control equipment.
+
 The package accepts `Uint8Array` or `ArrayBuffer` values and returns typed,
 normalized data. It does not create BLE connections, own GATT subscriptions,
 schedule command timeouts, log, or depend on React Native.
@@ -245,8 +249,9 @@ seconds-per-500m fields stay null because the legacy units are unresolved.
 Omit options or pass `{}` for defaults; malformed option values are rejected.
 See the repository's `docs/device-compatibility.md` for field applicability.
 
-These additions are local source work, **not a claim that the published 0.2.0
-package already contains them**. No version bump or publication was performed.
+The bidirectional codecs and capability evaluator were published in 0.3.0;
+`inspectFtmsRangeRaw` followed in 0.4.0. Exact release identities and artifact
+evidence are recorded in the repository's `docs/released-packages.md`.
 
 Raw codecs use integer wire units and explicit diagnostics, matching the shared
 bidirectional contracts. They accept `Uint8Array`/`ArrayBuffer` inputs, including
@@ -292,20 +297,23 @@ It does not perform discovery or return execution authorization. Full state-code
 definitions and examples are in `shared/conformance/capabilities/v1/schema.json`
 and `shared/protocol/capability-discovery.md` in the repository.
 
-## Embedded and native mobile roadmap
+## Cross-language packages
 
 TypeScript is distributed through npm; C is independently distributed as a
 versioned source archive through GitHub releases. The repository places them in
 [language-owned packages](https://github.com/deancochran/ftms/tree/main/packages).
-Swift and Kotlin remain design scaffolds. Limited passive KICKR CORE telemetry
+Swift 0.1.0 is distributed through a revision-pinned SwiftPM Git dependency,
+Kotlin/JVM 0.1.0 through Maven Central, and Python 0.1.0a1 as a partial PyPI alpha.
+The role-based [support profiles](https://github.com/deancochran/ftms/blob/main/docs/support-profiles.md) distinguish wire
+directions from optional convenience modules. Limited passive KICKR CORE telemetry
 evidence is documented in the repository; it does not establish compatibility
 with every device, physical accuracy or safe control execution.
 
 The [cross-language architecture](https://github.com/deancochran/ftms/blob/main/docs/architecture.md)
 preserves the npm package identity and the canonical `shared/conformance/v1` corpus. The
 [capability-discovery design](https://github.com/deancochran/ftms/blob/main/shared/protocol/capability-discovery.md)
-covers all six FTMS machine-data families, not only indoor bikes. Both interpreters
-evaluates caller-supplied feature, characteristic, and range evidence without
+covers all six FTMS machine-data families, not only indoor bikes. Implementations
+evaluate caller-supplied feature, characteristic, and range evidence without
 owning BLE discovery or inferring a machine's identity.
 
 The repository [coverage matrix](https://github.com/deancochran/ftms/blob/main/docs/coverage.md) distinguishes the current
@@ -325,7 +333,8 @@ pnpm verify
 The root is a private pnpm orchestration workspace; its build, test, type-check,
 and verification commands forward to `packages/typescript`. Biome and Lefthook
 remain root tooling. C uses its own native compiler/test commands; Swift and
-Kotlin remain README-only scaffolds. None is a pnpm workspace package.
+Kotlin use their native toolchains, and Python uses its package-owned `uv` checks.
+None is a pnpm workspace package.
 
 Lefthook is installed by `pnpm install` and runs `pnpm test` before every push.
 Run one file with `pnpm --filter @deancochran/ftms exec vitest run test/control.test.ts`.
@@ -339,7 +348,7 @@ copies of repository documentation.
 ## Release
 
 Update the source-controlled version and changelog together, merge the verified
-change, then push the matching tag (for example, `v0.2.0`). Publishing rejects a
+change, then push the matching tag (for example, `v0.4.0`). Publishing rejects a
 tag that does not exactly match `packages/typescript/package.json` or lacks a
 `packages/typescript/CHANGELOG.md` entry.
 

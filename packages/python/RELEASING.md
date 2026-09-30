@@ -45,9 +45,13 @@ publisher does not reserve the package name or publish anything.
    and its verification job. A separate job, restricted to the `pypi` environment, checks the distribution
    hashes and publishes those exact artifacts using OIDC and attestations. Only
    this job receives `id-token: write`; it does not check out or build source.
-7. Confirm successful workflow completion, query the exact PyPI version, compare
-   both public SHA-256 digests to the workflow artifacts, and perform a fresh
-   non-editable registry installation. Only then describe the version as published.
+7. After publication, the `verify-public` job queries the exact PyPI version,
+   requires exactly the expected wheel and source distribution, compares both
+   public SHA-256 digests and downloaded bytes to the verified build outputs, and
+   executes fresh isolated consumers of both public artifacts. Inspect its retained
+   `public-package-verification-report.json` before describing the version as
+   published. The same check can be rerun manually with
+   `scripts/verify_public.py` and the two digests from the tag workflow.
 
 The workflow deliberately fails on duplicate uploads; do not overwrite or move a
 release tag. On a partial upload or network failure, inspect PyPI and compare

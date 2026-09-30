@@ -5,22 +5,30 @@ is authoritative for what is available from this source tree.
 
 ## Available
 
-- TypeScript and C bidirectional protocol codecs and static capability evidence.
+- TypeScript, C, Swift and Kotlin `FullWire` protocol codecs with static capability
+  evidence; Python provides a partial-alpha `FullWire` raw-codec surface without
+  capability evaluation; Rust provides an unpublished `no_std` `FullWire` raw-codec
+  source candidate with range inspection and no capability evaluator.
 - Installed-consumer examples, versioned fixtures and host verification.
 - Explicit malformed-input diagnostics and caller-selected format options.
+- Role-based [support profiles](support-profiles.md) that separate wire directions
+  from optional package modules and Bluetooth/application responsibilities.
 
 ## Adoption focus
 
 - Consistent installation and release guidance.
 - Runnable current-release examples and a task-oriented API reference.
 - Tested byte-boundary recipes and actionable contributor reports.
+- Executable profile-aware directional accounting in package conformance reports,
+  without changing immutable codec-v1 assets.
 
 ## Separate future proposals
 
 - Offline packet playground.
 - Reviewed external application integrations and additional equipment evidence.
 - Public native package-manager registration.
-- Additional native ports after implementation, compiler and consumer evidence.
+- Additional native ports only after a named adopter selects a justified profile
+  and supplies implementation, compiler and consumer evidence.
 - Any package namespace migration, with an explicit compatibility plan.
 
 These proposals do not establish availability, release dates or commitments.

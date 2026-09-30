@@ -12,8 +12,15 @@ attempts, device identifiers or control writes.
 
 Read the [release matrix](../docs/released-packages.md) before assuming a source
 API is published. Features, ranges and successful encoders are not permission to
-control equipment. See the [integration cookbook](../docs/integration.md).
+control equipment. Real control procedures require caller-owned discovery,
+properties, security, ownership, supported-range validation, serialization,
+response handling, failure handling and user authorization. See the
+[integration cookbook](../docs/integration.md).
 
-Examples are host evidence, not Bluetooth qualification. The
-[limited passive pilot](../docs/equipment-results/2026-09-29-kickr-core-linux.md)
-records a separate real-equipment observation, not universal interoperability.
+The codec examples are deterministic host executions, not evidence of Bluetooth
+lifecycle behavior, PTS results or qualification. A separately reviewed
+[limited KICKR CORE passive pilot](../docs/equipment-results/2026-09-29-kickr-core-linux.md)
+used the replay path with private captures; it is narrow device evidence, not a
+general claim for these examples or packages.
+Follow the [equipment-test procedure](../docs/equipment-testing.md)
+to record additional real observations.

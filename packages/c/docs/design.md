@@ -4,7 +4,8 @@ The released C99 library provides bidirectional Feature, range, measurement,
 control and status codecs, plus static capability interpretation. It has no
 BLE/OS API, allocator, I/O or global mutable state. CMake installation is provided
 in the source archive. See [release status](../../../docs/released-packages.md),
-[installation](../INSTALL.md), and the [public API index](../../../docs/api.md).
+[support profiles](../../../docs/support-profiles.md), [installation](../INSTALL.md),
+and the [public API index](../../../docs/api.md).
 The design notes below focus on representation and ownership; each public header
 is authoritative for its operation-specific argument and output contracts.
 

@@ -1,10 +1,14 @@
 # Cross-language FTMS architecture
 
-Status: TypeScript and C have released bidirectional codecs and static capability
-interpretation. See the [canonical release matrix](released-packages.md) for
-versions and distribution. Swift and Kotlin have independent 0.1.0 releases;
-Python has a partial 0.1.0a1 alpha without capability APIs.
-This document defines boundaries, not universal FTMS device compatibility.
+Status: TypeScript, C, Swift and Kotlin have published bidirectional codecs,
+range inspection and static capability interpretation. Python 0.1.0a1 is a
+published partial alpha with bidirectional raw codecs and no capability evaluator.
+Rust 0.1.0 is an implemented `no_std` raw-codec source candidate with no registry
+publication or capability evaluator.
+See the [canonical release matrix](released-packages.md) for versions and distribution
+and [support profiles](support-profiles.md) for role-based direction claims; source
+metadata is not publication evidence. This document defines boundaries, not
+universal FTMS device compatibility.
 
 ## One protocol project, independent packages
 
@@ -23,19 +27,21 @@ establish publication; consult the release matrix above.
 | `packages/typescript/` | TypeScript README, changelog, manifest, sources, tests, scripts, and compiler configs | Implemented |
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by C and TypeScript |
+| `docs/support-profiles.md` | Role-based wire-direction and optional-module claims | Current package taxonomy |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift and Kotlin |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
-| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released source archive |
+| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released 0.2.0 source archive |
 | `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
 | `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
-| `packages/python/` | Pure synchronous Python protocol package | Partial alpha 0.1.0a1 |
+| `packages/python/` | Pure synchronous Python protocol package | Published partial alpha 0.1.0a1 |
 | `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | Raw codecs implemented; 0.1.0 not yet published; capability interpretation and fragment assembly pending |
-| `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples |
+| `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-Other language ports are deferred. The existing TypeScript package
-continues to serve JavaScript and React Native consumers.
+.NET and other language ports are deferred until a named consumer justifies a
+specific support profile. The existing TypeScript package continues to serve
+JavaScript and React Native consumers.
 
 The C port has package-owned build, installation, verification and source-release
 tooling. Its release does not establish vcpkg or ConanCenter registration.
@@ -60,9 +66,10 @@ only for real reusable tooling, not speculative infrastructure or npm-only scrip
 
 1. **Protocol codecs:** bytes to values and values to bytes; deterministic,
    transport-independent, with explicit units and malformed-input behavior.
-2. **Capability interpretation (C and TypeScript implemented):** a pure evaluation of caller-supplied
-   discovery/read evidence. Report declared capabilities, missing evidence, and
-   contradictions. Do not scan, connect, read characteristics, or authorize motion.
+2. **Capability interpretation (TypeScript, C, Swift and Kotlin implemented):**
+   a pure evaluation of caller-supplied discovery/read evidence. Report declared
+   capabilities, missing evidence, and contradictions. Do not scan, connect, read
+   characteristics, or authorize motion.
 3. **Integration examples:** show how callers feed BLE evidence into the above
    layers. Bluetooth dependencies and platform lifecycle belong here or in the
    consumer, never in the protocol packages.
@@ -87,10 +94,12 @@ Port coverage must distinguish directions instead of labeling a package simply
 | Control requests | Encode | Decode |
 | Control responses | Decode | Encode |
 
-The current package emphasizes the client column. Native implementation work
-must audit and explicitly list coverage; copying current client APIs is not a
-complete equipment-side implementation. GATT service registration, subscriptions,
-encryption, permission ownership, and actuator safety remain caller-owned.
+Each package must audit and explicitly list its claimed directions; copying
+client APIs is not a complete equipment-side implementation. GATT service
+registration, subscriptions, encryption, permission ownership, and actuator
+safety remain caller-owned.
+The named [support profiles](support-profiles.md) turn these directions into
+explicit package claims without requiring identical language interfaces.
 
 ## Shared behavior, idiomatic APIs
 
@@ -146,15 +155,13 @@ identity are validated by TypeScript tests and the package verifier. Shared
 template edits compress literal expectations; they do not depend on a port to
 compute expected behavior.
 
-Each implemented port must gain its own local build/test commands, isolated
-consumer installation test, CI checks, supported-toolchain matrix, and documented
-package version before release. Registry publishing requires separate approval;
-do not couple it to existing npm tags without a deliberate release design.
-
-Until then, `pnpm verify` validates only the existing TypeScript package. Its
-exact packed-file allowlist should continue to exclude repository-only native
-scaffolds, documentation, and examples. Do not create green placeholder native
-CI jobs that imply a compiler or device has been tested.
+Each implemented port owns local build/test commands, isolated consumer installation
+checks, CI evidence, a supported-toolchain matrix and an independent package version.
+Registry publishing requires separate approval; do not couple it to existing npm
+tags without a deliberate release design. Root `pnpm verify` validates TypeScript
+and documentation, not native package compilers or runtime evidence. The npm
+packed-file allowlist continues to exclude repository-only native packages,
+documentation and examples.
 
 ## Implementation sequence and acceptance
 
@@ -164,8 +171,8 @@ CI jobs that imply a compiler or device has been tested.
     The separate `shared/conformance/capabilities/v1` corpus now covers this
    static evidence boundary and does not modify codec corpus v1.
    Define coverage for both client and equipment codec directions.
-3. Implement C with C++ consumption tests and a representative embedded
-   cross-build; then Swift and Kotlin with native consumer tests.
+3. For each new port, choose a role-based support profile, implement only claimed
+   directions, and verify a real installed consumer without depending on another port.
 4. Validate representative real equipment and mobile devices. Record model,
    firmware, platform, and results separately from host tests and simulations.
 

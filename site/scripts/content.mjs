@@ -80,7 +80,8 @@ export function convertMarkdown(markdown, page, titleAnchors) {
     editUrl: `${repository}/edit/${sourceBranch}/${page.source}`,
   };
   if (page.slug === "") {
-    metadata.description = "FTMS protocol codecs for TypeScript and C. Keep your Bluetooth stack.";
+    metadata.description =
+      "FTMS protocol codecs for TypeScript, C, Swift, Kotlin, Python and Rust. Keep your Bluetooth stack.";
     metadata.template = "splash";
     metadata.hero = {
       tagline: "Decode telemetry. Understand capabilities. Keep your Bluetooth stack.",

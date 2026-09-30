@@ -1,10 +1,10 @@
 # FTMS capability discovery contract
 
-Status: language-neutral contract. The released C implementation and TypeScript
-`evaluateFtmsCapabilities` implement the static evidence interpretation
-described here. TypeScript accepts `Uint8Array`/`ArrayBuffer` read bytes and
-returns the corpus's normalized representation; neither API performs discovery
-or authorizes control.
+Status: language-neutral contract. TypeScript, C, Swift and Kotlin independently
+implement the static evidence interpretation described here; Python 0.1.0a1 and
+the Rust 0.1.0 source candidate do not. Interfaces use each language's native byte
+representation and corpus mapping. No implementation performs discovery or
+authorizes control.
 
 An optional caller-owned resistance-range format selection is applied consistently
 to requirements and evaluation. It changes only resistance wire decoding; it does

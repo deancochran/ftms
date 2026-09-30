@@ -9,6 +9,17 @@ See the [release matrix](https://github.com/deancochran/ftms/blob/main/docs/rele
 for publication identity and evidence limits. This library does not manage BLE
 connections or authorize physical controls.
 
+**Release status:** C **0.2.0** is published as the independently versioned
+[`c-v0.2.0` source release](https://github.com/deancochran/ftms/releases/tag/c-v0.2.0).
+The generated archive described below is a local candidate even when it has the
+same version; building it is not publication evidence. See the exact
+[release record](../../docs/released-packages.md) and role-based
+[support profiles](../../docs/support-profiles.md).
+
+**Support profile:** `FullWire`, with `CapabilityEvidence`, `RangeInspection`,
+`RecordPlanning` and `RecordAssembly`. This names transport-independent protocol
+interfaces, not a complete equipment/server implementation.
+
 ## Additive range inspection in 0.2.0
 
 `ftms_inspect_range` and `ftms_inspect_range_with_format` report the caller's
@@ -64,7 +75,8 @@ BLE firmware image works.
   operation declarations/prerequisites.
 
 It does **not** implement BLE discovery, subscriptions, security,
-or control authorization. Swift/Kotlin implementations are separate future work.
+or control authorization. Swift, Kotlin, TypeScript and Python are separate
+language packages; their convenience modules and public interfaces need not match C.
 
 ## Build and consume
 
@@ -81,8 +93,8 @@ required; no universal vendor-toolchain compatibility is implied.
 
 The package has a CMake 3.16+ manifest for ordinary C99 builds and installs. Its
 source package version is recorded in `VERSION` (the sole source-version
-authority); publication is recorded separately in the release matrix. The CMake package
-config and `ftms.pc` metadata read that file; no public version header is added.
+authority); publication is recorded separately in the release matrix. The CMake
+package config and `ftms.pc` metadata read that file; no public version header is added.
 `find_package(ftms CONFIG REQUIRED)`
 exports `ftms::ftms`; package-version compatibility is same-major-and-minor, so
 pre-1.0 minor versions are deliberately not considered compatible. The installed

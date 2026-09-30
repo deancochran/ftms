@@ -22,6 +22,8 @@ Created and maintained by Dean Cochran; contributions are welcome.
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.
+The role-based [support profiles](docs/support-profiles.md) distinguish client and
+equipment wire directions from optional package modules.
 
 Rust is an independent, allocation-free raw-codec implementation. It does not yet
 implement capability interpretation or fragment assembly; see its

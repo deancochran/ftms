@@ -3,11 +3,13 @@
 ## Start here: humans and coding assistants
 
 1. Check the [release matrix](released-packages.md). Do not infer publication from a source version.
-2. Run the [TypeScript quickstart](../examples/typescript-quickstart/README.md) or
+2. Select the required client or equipment directions from the
+   [support profiles](support-profiles.md).
+3. Run the [TypeScript quickstart](../examples/typescript-quickstart/README.md) or
    [C/C++ quickstart](../examples/c-client/README.md) against an installed artifact.
-3. Select APIs using the [cookbook](integration.md) and [API index](api.md).
-4. Connect your application's byte boundary using [transport recipes](transport-recipes.md).
-5. Check expected outputs and diagnostics; use [troubleshooting](troubleshooting.md).
+4. Select APIs using the [cookbook](integration.md) and [API index](api.md).
+5. Connect your application's byte boundary using [transport recipes](transport-recipes.md).
+6. Check expected outputs and diagnostics; use [troubleshooting](troubleshooting.md).
 
 Prefer normalized TypeScript measurement parsers for application metrics; use raw
 APIs for wire representations. C APIs use fixed-point integers. Keep BLE, timing,
@@ -18,8 +20,11 @@ create replacement codecs or import private source paths to complete these recip
 
 - [TypeScript package guide](../packages/typescript/README.md)
 - [C package guide](../packages/c/README.md) and [installation](../packages/c/INSTALL.md)
+- [Rust source-candidate guide](../packages/rust/README.md) and
+  [verification evidence](../packages/rust/docs/verification.md)
 - [API index and generated TypeScript reference](api.md)
-- [Architecture](architecture.md), [coverage](coverage.md), [versioning](versioning.md)
+- [Architecture](architecture.md), [support profiles](support-profiles.md),
+  [coverage](coverage.md), [versioning](versioning.md)
 - [Capability evidence contract](../shared/protocol/capability-discovery.md)
 - [Wire compatibility](../shared/protocol/wire-compatibility.md) and [numeric inputs](../shared/protocol/numeric-inputs.md)
 - [Conformance runner and corpus accounting](../shared/conformance/README.md)

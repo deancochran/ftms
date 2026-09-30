@@ -145,5 +145,6 @@ corpus was extended with explicit resistance-format cases. See the
 
 Optional future extensions: seeded fault exploration with shrinkable replay
 traces; stateful command ownership/queue policies; an Open Trainer adapter; virtual
-BLE; physical-device validation; and Swift/Kotlin ports. None is required to run
+BLE; physical-device validation; and additional package runners where a consumer
+needs simulation coverage. None is required to run
 or pass this standalone suite.

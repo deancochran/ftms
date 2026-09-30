@@ -1,17 +1,18 @@
 # C release and installation runbook
 
 These are maintainer instructions, not authorization to execute remote actions.
-The C source archive is released; see the [canonical release matrix](released-packages.md)
-for verified identity and platform evidence. Public registry registration remains
-separate. `packages/c/VERSION` owns the source version. npm keeps its existing
-`v*` tags and independent version. These instructions apply to a future approved
-release; do not recreate or overwrite an existing tag or release.
+C 0.2.0 is published as a GitHub source release whose bytes must not be replaced;
+see the [canonical release matrix](released-packages.md) for verified identity and
+platform evidence. Public Conan/vcpkg registry submission remains separate and
+unverified. `packages/c/VERSION` owns the source version. npm and every other
+language package keep independent tags and versions. These instructions apply to
+a future approved release; do not recreate or overwrite an existing tag or release.
 
 ## Before integration
 
-1. Review **all** tracked and untracked source files; tracked-only diffs can
-   omit new files. Keep machine-local `.context` and workspace guidance
-   out of the product. Never stage build outputs, Conan caches or local tools.
+1. Review **all** tracked and untracked files in the candidate checkout. Keep
+   machine-local `.context` and workspace guidance out of the product. Never stage
+   build outputs, Conan caches or local tools.
 2. Reconcile coverage: the later C packet planner and bounded record assembler
    are currently C-only. Raw codec
    and capability parity does not imply identical convenience APIs. Record
@@ -72,8 +73,8 @@ not become skipped-success checks. The checked-in overlay reads
 by the helper. It is not itself a public-registry submission.
 
 CI adds Linux package-manager checks and standalone source consumers on Linux,
-macOS and Windows. Historical release results are recorded in the release matrix;
-every new release must pass its own platform gates before making those claims.
+macOS and Windows. C 0.2.0 passed that remote release matrix; future releases must
+rerun it before claiming the same platform evidence.
 
 ## Merge and publication
 
@@ -101,7 +102,7 @@ After publishing the immutable GitHub artifact and confirming its URL resolves:
 
 ```sh
 python3 packages/c/scripts/prepare-registry-recipes.py \
-   /path/to/ftms-c-0.2.0.tar.gz --tag c-v0.2.0 \
+  /path/to/ftms-c-0.2.0.tar.gz --tag c-v0.2.0 \
   --output packages/c/build/public-vcpkg-ftms
 ```
 
@@ -118,17 +119,11 @@ reference and upstream contribution; the included local recipe does not establis
 ConanCenter availability. Do not advertise a public `conan install` or bare
 `vcpkg install ftms` command until the chosen registry actually contains it.
 
-## Future Swift and Kotlin distributions
+## Other language distributions
 
-Do not publish empty packages. Implement and verify them first against the shared
-contracts. Swift should use SwiftPM with a real root manifest or a generated
-distribution repository. Resolve its semantic-version tag namespace before
-release: arbitrary `swift-v*` tags must not be assumed to work with normal SwiftPM
-resolution, and existing npm `v*` tags must not be repurposed. An independently
-versioned generated Swift distribution repository is a reasonable future choice;
-creating one requires explicit remote authority.
-
-Kotlin/JVM should publish a JAR through Maven Central after namespace verification,
-signing/metadata setup and a real Gradle consumer test. An Android-only AAR is not
-required for a pure JVM protocol library. Kotlin Multiplatform, remote registry
-accounts and publishing credentials remain separately scoped decisions.
+Swift, Kotlin and Python now have independent release runbooks and public
+artifacts. Their tags, registries and verification are not C release steps. See
+[support profiles](support-profiles.md) and [released packages](released-packages.md).
+Do not synchronize versions or repurpose another package's tags. New language
+ports still require a named consumer, a real implementation and installed-package
+verification before any publication work.

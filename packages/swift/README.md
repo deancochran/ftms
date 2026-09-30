@@ -1,6 +1,9 @@
 # FTMS Swift
 
 Native Swift 6 FTMS 1.0 + EC23224 protocol/domain library, package version **0.1.0**.
+Its [support profile](../../docs/support-profiles.md) is `FullWire`, with
+`CapabilityEvidence`, `RangeInspection` and `NormalizedViews`; that claim includes
+no BLE or execution authorization.
 `Package.swift` is deliberately
 thin; all Swift source and tests remain package-owned. The API accepts `[UInt8]`
 and uses value types with explicit errors/diagnostics. It implements both codec

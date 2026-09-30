@@ -7,8 +7,9 @@ receives security fixes. C is also released; see the
 [current release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md).
 This policy does not establish a C maintenance window or response-time guarantee.
 Reports affecting any implementation are welcome through the private channel
-below. Native and Python packages have independent versions; include the exact
-package version and tag/commit when reporting.
+below. C, Swift, Kotlin, Python and Rust have independent versions; include the exact
+package version, tag and commit when reporting. Host tests and publication do not
+imply Bluetooth qualification or safe equipment-control execution.
 
 ## Reporting a vulnerability
 
