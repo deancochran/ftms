@@ -1,7 +1,11 @@
 # Dart verification and evidence
 
-Source implementation base: `accc347f12d1244b24f2e8a422627cca0dad2763`.
-This is an unpublished, uncommitted source candidate until separately delivered.
+This is a historical pre-release verification record, based on source commit
+`accc347f12d1244b24f2e8a422627cca0dad2763` with uncommitted implementation changes.
+It describes the local candidate at that time, not current publication status.
+The [release matrix](../../../docs/released-packages.md#published-dart-010)
+records the verified pub.dev **0.1.0** release separately.
+
 The runner always records its actual HEAD and dirty state; never describe dirty
 local evidence as a clean tagged release.
 

@@ -1,4 +1,4 @@
-# Install FTMS C / C++
+# Install FTMS for C
 
 This source package builds a portable C99 static library. C++ consumers use the
 same library through its C-linkage headers; no wrapper library is required.

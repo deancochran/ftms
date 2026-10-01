@@ -14,7 +14,7 @@ publication evidence.
 | [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
 | [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive with CMake; Make tooling is source-checkout-only |
 | [Swift](swift/README.md) | iOS and other supported Apple applications | SwiftPM `swift-v0.1.0` |
-| [Kotlin](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
+| [Kotlin/JVM](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
 | [Go](go/README.md) | Go applications, gateways and protocol tools | Published Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
 | [C#](csharp/README.md) | .NET applications and protocol tools | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1; evolving prerelease |
 | [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a2; evolving alpha |

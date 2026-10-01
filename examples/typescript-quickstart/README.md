@@ -1,4 +1,4 @@
-# TypeScript / JavaScript quickstart
+# TypeScript quickstart
 
 Prerequisites: Node.js 20+ and npm. The package is ESM-only; `.mjs` works without
 changing an application's module setting. TypeScript declarations ship with it.

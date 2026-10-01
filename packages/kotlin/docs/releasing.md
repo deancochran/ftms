@@ -40,7 +40,7 @@ or incomplete protocol implementation to bypass a publication blocker.
 
 ## Normal release: GitHub Actions (no recurring local setup)
 
-The **Release Kotlin** workflow at `.github/workflows/release-kotlin.yml` owns
+The **Release Kotlin/JVM** workflow at `.github/workflows/release-kotlin.yml` owns
 routine publishing. The persistent GitHub environment **`maven-central`** is
 provisioned with the existing Central account token and encrypted signing key.
 It permits `main` and `kotlin-v*` tags only; pull requests never receive its secrets.
@@ -83,7 +83,7 @@ failed or ambiguous duplicate deployment stops rather than silently choosing one
 Only after public checks pass is the draft made public. Actions additionally
 retains public evidence for 90 days; completed GitHub release assets are durable.
 
-Use **Actions → Release Kotlin → Run workflow** on main or a matching release tag
+Use **Actions → Release Kotlin/JVM → Run workflow** on main or a matching release tag
 for the credential-free artifact gate only. Manual dispatch does not import keys,
 validate account credentials, contact Central, create tags or publish releases.
 Publication requires pushing the exact signed tag; an authorized retry can rerun

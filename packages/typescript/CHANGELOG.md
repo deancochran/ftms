@@ -25,8 +25,6 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## 0.3.0
 
-Release prepared for publication through the verified tag workflow.
-
 ### Added
 
 - Explicit resistance-command formats in raw and normalized APIs: the default

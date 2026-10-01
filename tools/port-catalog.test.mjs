@@ -49,6 +49,16 @@ test("release titles preserve native versions and reject ambiguous input", () =>
   assert.throws(() => portInfo("toString"));
 });
 
+test("current package chooser tables use catalog language labels", async () => {
+  for (const path of ["README.md", "site/landing.md", "docs/ftms-explained.md"]) {
+    const source = await readFile(path, "utf8");
+    const labels = [...source.matchAll(/^\| ([^|]+) \|/gm)].map((match) => match[1].trim());
+    for (const { language } of Object.values(portCatalog)) {
+      assert.equal(labels.filter((label) => label === language).length, 1, `${path}: ${language}`);
+    }
+  }
+});
+
 test("title CLI reads native version and rejects extra arguments", async () => {
   const result = spawnSync(process.execPath, ["tools/release-title.mjs", "rust"], {
     encoding: "utf8",

@@ -353,17 +353,17 @@ Pick the implementation matching the host application; do not install every port
 The math above does not change with the programming language. The public interfaces
 do change to fit that language's types, memory model and error handling.
 
-| Environment | Package guide | Integration point |
+| Language | Package guide | Integration point |
 | --- | --- | --- |
-| JavaScript / TypeScript | [npm guide](../packages/typescript/README.md) | `Uint8Array` / `ArrayBuffer`; normalized parsers and raw codecs |
-| C / C++ | [C guide](../packages/c/README.md) | Received byte pointer and length; fixed-point values and caller-owned storage |
+| TypeScript | [npm guide](../packages/typescript/README.md) | JavaScript/TypeScript `Uint8Array` / `ArrayBuffer`; normalized parsers and raw codecs |
+| C | [C guide](../packages/c/README.md) | C/C++ byte pointer and length; fixed-point values and caller-owned storage |
 | Swift | [Swift guide](../packages/swift/README.md) | `[UInt8]`; convert CoreBluetooth `Data` in the application |
-| Kotlin / Java | [JVM guide](../packages/kotlin/README.md) | `ByteArray` / `byte[]`; no Android or coroutine dependency in the codec |
+| Kotlin/JVM | [JVM guide](../packages/kotlin/README.md) | Kotlin `ByteArray` / Java `byte[]`; no Android or coroutine dependency in the codec |
 | Python | [Python guide](../packages/python/README.md) | Synchronous byte codecs beneath a client, server or offline tool |
 | Rust | [Rust guide](../packages/rust/README.md) | Byte slices and caller-owned buffers; allocation-free `no_std` implementation |
-| Dart / Flutter | [Dart guide](../packages/dart/README.md) | Pure Dart codecs beneath the application's Flutter/BLE integration |
+| Dart | [Dart guide](../packages/dart/README.md) | Pure Dart codecs beneath the application's Flutter/BLE integration |
 | Go | [Go guide](../packages/go/README.md) | Native Go codecs; no other port required at runtime |
-| C# / .NET | [.NET guide](../packages/csharp/README.md) | Native .NET codecs; transport remains application-owned |
+| C# | [.NET guide](../packages/csharp/README.md) | Native .NET codecs; transport remains application-owned |
 
 Consult the [release matrix](released-packages.md) for exact installation versions,
 prerelease status and toolchain requirements, and [support profiles](support-profiles.md)
