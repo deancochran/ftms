@@ -4,12 +4,12 @@ Packages are independently versioned; a version in one package does not imply a 
 
 | Package / runbook | Tag | Workflow | Publication |
 | --- | --- | --- | --- |
-| [TypeScript](../packages/typescript/README.md) | `vVERSION` | `publish.yml` | npm (`next` for prereleases) |
+| [TypeScript](../packages/typescript/README.md#release) | `typescript-vVERSION` for 1.0+; `vVERSION` for 0.x | `publish.yml` | npm (`next` for prereleases) |
 | [Python](../packages/python/RELEASING.md) | `python-vVERSION` | `release-python.yml` | PyPI trusted publishing |
 | [Kotlin](../packages/kotlin/docs/releasing.md) | `kotlin-vVERSION` | `release-kotlin.yml` | Maven Central |
 | [Rust](../packages/rust/docs/releasing.md) | `rust-vVERSION` | `release-rust.yml` | crates.io |
 | [Swift](../packages/swift/RELEASING.md) | `swift-vVERSION` | `release-swift.yml` | GitHub source/evidence release; SwiftPM revision pins |
-| [C](../packages/c/docs/release-readiness.md) | `c-vVERSION` | `release-c.yml` | GitHub source release; Conan/vcpkg submissions are separate |
+| [C](releasing-c.md) | `c-vVERSION` | `release-c.yml` | GitHub source release; Conan/vcpkg submissions are separate |
 | [Dart](../packages/dart/RELEASING.md) | `dart-vVERSION` | `release-dart.yml` | pub.dev; first manual bootstrap, then protected tag/OIDC publishing |
 | [C#](../packages/csharp/docs/releasing.md) | `csharp-vVERSION` | `release-csharp.yml` | NuGet Trusted Publishing through the protected `nuget` environment |
 | [Go](../packages/go/docs/releasing.md) | `packages/go/vVERSION` | No automatic publication workflow; `go-ci.yml` verifies source | Nested Go module tag, public proxy/checksum database and isolated consumer verification |
@@ -18,6 +18,13 @@ Run `pnpm release:prepare PORT --dry-run` first. It is deliberately read-only:
 version/changelog updates can require package-specific lockfile or metadata changes,
 so make them in a reviewed PR using the package runbook. It never tags, pushes,
 publishes, or contacts credentials; Python readiness retains PEP 440 validation.
+
+The [coordinated 1.0 milestone](release-1.0.md) tracks stable-interface reviews and
+package-specific blockers. It is not a claim that 1.0 artifacts are available.
+Before the first `typescript-v1.0.0` (or 1.0 prerelease) push, verify tag/ruleset
+and environment restrictions protect and permit `typescript-v*`. An absent tag
+rule or approval boundary is a release blocker, not implicit permission. The npm trusted-publisher
+workflow filename remains `publish.yml`; no remote settings change is implied.
 
 ### Release entry naming
 

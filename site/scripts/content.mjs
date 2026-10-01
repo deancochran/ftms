@@ -86,7 +86,7 @@ export function convertMarkdown(markdown, page, titleAnchors) {
     metadata.hero = {
       tagline: "Decode telemetry. Understand capabilities. Keep your Bluetooth stack.",
       actions: [
-        { text: "Get started", link: sitePath("start/typescript"), icon: "right-arrow" },
+        { text: "Get started", link: sitePath("start/choose-language"), icon: "right-arrow" },
         { text: "Explore C / C++", link: sitePath("start/c"), variant: "secondary" },
       ],
     };

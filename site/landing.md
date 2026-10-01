@@ -12,15 +12,19 @@ codec saves applications from maintaining the same protocol logic.
 
 | Build with | What you get | Start |
 | --- | --- | --- |
-| TypeScript | JavaScript/TypeScript ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |
 | C | Portable C99 with C++ consumers, fixed-point values, caller-owned memory | [Install the source archive](../examples/c-client/README.md) |
-| Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
+| C# | Managed .NET codecs and capability evidence | [C# package guide](../packages/csharp/README.md) |
+| Dart | Pure Dart codecs for Dart and Flutter applications | [Dart package guide](../packages/dart/README.md) |
+| Go | Raw codecs and capability evidence for Go applications | [Go package guide](../packages/go/README.md) |
 | Kotlin/JVM | Independent Kotlin and Java codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
-| Python | Published 0.1.0a2 alpha with static capability evidence | [Python package guide](../packages/python/README.md) |
-| Rust | Published 0.1.1 allocation-free `no_std` codecs and normalized views | [Rust package guide](../packages/rust/README.md) |
-| Dart | Published pure Dart codecs and capabilities for Dart and Flutter applications | [Dart package guide](../packages/dart/README.md) |
-| Go | Published nested module with raw codecs and capabilities | [Go package guide](../packages/go/README.md) |
-| C# | Published 0.1.0-alpha.1 .NET codecs and capabilities | [C# package guide](../packages/csharp/README.md) |
+| Python | Synchronous codecs and static capability evidence | [Python package guide](../packages/python/README.md) |
+| Rust | Allocation-free `no_std` codecs and normalized views | [Rust package guide](../packages/rust/README.md) |
+| Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
+| TypeScript | JavaScript/TypeScript ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |
+
+See [current releases](../docs/released-packages.md) for verified versions and
+prerelease status. The [planned 1.0 milestone](../docs/release-1.0.md) is not yet a
+published family. [Choose a language](../packages/README.md) for a step-by-step entry point.
 
 ## A focused boundary
 
@@ -34,8 +38,8 @@ Bluetooth qualification.
 
 ## Integrate with confidence
 
-- [Cookbook](../docs/integration.md): choose the right public API for the task.
-- [Transport recipes](../docs/transport-recipes.md): preserve the exact received byte span.
+- [TypeScript and C cookbook](../docs/integration.md): choose the right public API for the task.
+- [Transport recipes](../docs/transport-recipes.md): JavaScript and C byte-boundary examples.
 - [Releases and support](../docs/released-packages.md): distinguish source from published packages.
 - [Support profiles](../docs/support-profiles.md): select client and equipment wire directions.
 - [Protocol coverage](../docs/coverage.md): inspect tested scope and evidence limits.

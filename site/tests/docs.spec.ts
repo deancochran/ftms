@@ -13,6 +13,9 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
     page.getByRole("heading", { name: "FTMS Protocol Libraries", exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Get started", exact: true }).click();
+  await expect(page).toHaveURL(/\/ftms\/start\/choose-language\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Choose a language");
+  await page.getByRole("link", { name: "Installed-package quickstart", exact: true }).click();
   await expect(page).toHaveURL(/\/ftms\/start\/typescript\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("TypeScript");
   await expect(page.getByText("speedMps=10 cadenceRpm=90", { exact: false })).toBeVisible();
@@ -37,6 +40,25 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
   await expect(
     page.getByRole("heading", { name: "Coordinated release checklist", exact: true }),
   ).toBeVisible();
+  await page.goto("/ftms/project/releases/");
+  await expect(
+    page.getByRole("heading", { name: "Current verified releases", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Record", exact: true }).first().click();
+  await expect(page).toHaveURL(/#published-typescript-040--c-020$/);
+  await page.goto("/ftms/project/evidence/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Historical audits and evidence",
+  );
+  await page.goto("/ftms/project/documentation/");
+  for (const id of [
+    "start-here-humans-and-coding-assistants",
+    "reference-and-contracts",
+    "evidence-not-installation-instructions",
+    "maintainers-and-contributors",
+  ]) {
+    await expect(page.locator(`[id="${id}"]`)).toHaveCount(1);
+  }
   await page.goto("/ftms/reference/api/");
   await page.getByRole("link", { name: "Open the generated TypeScript API reference" }).click();
   await expect(page).toHaveURL(/\/ftms\/api\/typescript\/$/);

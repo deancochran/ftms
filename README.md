@@ -17,18 +17,19 @@ with runnable examples—and shows which code your application no longer needs t
 
 | Language | Start here | Distribution |
 | --- | --- | --- |
-| TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms`; JavaScript and TypeScript |
 | C | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation and C++ consumers |
-| Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
-| Kotlin/JVM | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0`; Kotlin and Java |
-| Go | [Go guide](packages/go/README.md) | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
-| Python | [Python guide](packages/python/README.md) | PyPI: `deancochran-ftms` 0.1.0a2 alpha; includes static capability evidence |
-| Rust | [Rust guide](packages/rust/README.md) | crates.io `ftms` 0.1.1; normalized range/control/status projections and 97-case codec-v1 coverage |
-| Dart | [Dart guide](packages/dart/README.md) | pub.dev: `deancochran_ftms` 0.1.0; Dart and Flutter |
-| C# | [C# guide](packages/csharp/README.md) | NuGet: `DeanCochran.Ftms` 0.1.0-alpha.1; .NET |
+| C# | [C# guide](packages/csharp/README.md) | NuGet: `DeanCochran.Ftms`; .NET |
+| Dart | [Dart guide](packages/dart/README.md) | pub.dev: `deancochran_ftms`; Dart and Flutter |
+| Go | [Go guide](packages/go/README.md) | Go module `github.com/deancochran/ftms/packages/go` |
+| Kotlin/JVM | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms`; Kotlin and Java |
+| Python | [Python guide](packages/python/README.md) | PyPI: `deancochran-ftms` |
+| Rust | [Rust guide](packages/rust/README.md) | crates.io: `ftms` |
+| Swift | [Swift guide](packages/swift/README.md) | SwiftPM revision-pinned Git dependency |
+| TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms`; JavaScript and TypeScript |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
-publication identity, installation requirements and evidence limits.
+publication identity, prerelease status, installation requirements and evidence limits.
+For a guided entry point, [choose a language](packages/README.md).
 See [releasing](docs/releasing.md) for independent package tags and release steps.
 The role-based [support profiles](docs/support-profiles.md) distinguish client and
 equipment wire directions from optional package modules.

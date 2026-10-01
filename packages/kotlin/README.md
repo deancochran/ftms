@@ -38,27 +38,6 @@ dependency is Kotlin's standard library. It contains no Android framework, BLE,
 coroutine, connection, permission, retry, control-ownership or cadence policy.
 It neither connects to equipment nor grants permission to execute controls.
 
-## Build and verify
-
-Use JDK 17 and the checked-in Gradle 8.14.3 wrapper:
-
-```sh
-cd packages/kotlin
-./gradlew clean check
-./gradlew publishMavenJavaPublicationToLocalVerificationRepository
-ANDROID_HOME=/path/to/android-sdk bash verification/verify.sh
-```
-
-Kotlin compiler: 2.2.0. JVM bytecode baseline: Java 17. Java 17 is required for
-desktop JVM callers; Android consumption is separately checked through D8 with
-min SDK 26, compile/target SDK 35 and AGP 8.10.1. No Android SDK is required to
-build or test the core. `verification/verify.sh` does require it for the APK gate.
-
-Tests read canonical files directly under `../../shared/`; they do not use copied
-fixtures or install another language port. Gson, NetworkNT and JUnit are test-only.
-`check` includes the checked-in binary API baseline. Regenerate that baseline with
-`apiDump` only after reviewing an intentional public API change.
-
 ## Kotlin example
 
 ```kotlin
@@ -95,6 +74,27 @@ repository's file URL as a Maven repository and use the same coordinates:
 ```kotlin
 dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
 ```
+
+## Build and verify
+
+Use JDK 17 and the checked-in Gradle 8.14.3 wrapper:
+
+```sh
+cd packages/kotlin
+./gradlew clean check
+./gradlew publishMavenJavaPublicationToLocalVerificationRepository
+ANDROID_HOME=/path/to/android-sdk bash verification/verify.sh
+```
+
+Kotlin compiler: 2.2.0. JVM bytecode baseline: Java 17. Java 17 is required for
+desktop JVM callers; Android consumption is separately checked through D8 with
+min SDK 26, compile/target SDK 35 and AGP 8.10.1. No Android SDK is required to
+build or test the core. `verification/verify.sh` does require it for the APK gate.
+
+Tests read canonical files directly under `../../shared/`; they do not use copied
+fixtures or install another language port. Gson, NetworkNT and JUnit are test-only.
+`check` includes the checked-in binary API baseline. Regenerate that baseline with
+`apiDump` only after reviewing an intentional public API change.
 
 ## Values, errors and compatibility
 

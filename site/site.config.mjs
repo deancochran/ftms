@@ -16,26 +16,32 @@ export const pages = [
     title: "What is FTMS?",
     group: "Getting started",
   },
-  ...["dart", "go", "csharp", "swift", "kotlin", "python", "rust", "typescript", "c"].map(
+  {
+    source: "packages/README.md",
+    slug: "start/choose-language",
+    title: "Choose a language",
+    group: "Getting started",
+  },
+  ...["c", "csharp", "dart", "go", "kotlin", "python", "rust", "swift", "typescript"].map(
     guidePage,
   ),
   {
     source: "docs/integration.md",
     slug: "integration/cookbook",
-    title: "Cookbook",
-    group: "Integration",
+    title: "TypeScript and C cookbook",
+    group: "Guides",
   },
   {
     source: "docs/transport-recipes.md",
     slug: "integration/transports",
     title: "Transport recipes",
-    group: "Integration",
+    group: "Guides",
   },
   {
     source: "docs/troubleshooting.md",
     slug: "integration/troubleshooting",
     title: "Troubleshooting",
-    group: "Integration",
+    group: "Guides",
   },
   { source: "docs/api.md", slug: "reference/api", title: "API index", group: "Reference" },
   {
@@ -72,41 +78,65 @@ export const pages = [
   {
     source: "docs/released-packages.md",
     slug: "project/releases",
-    title: "Releases and support",
-    group: "Project",
+    title: "Current releases and evidence",
+    group: "Releases",
   },
   {
     source: "CONTRIBUTING.md",
     slug: "project/contributing",
     title: "Contributing",
-    group: "Project",
+    group: "Contributing",
   },
-  { source: "docs/roadmap.md", slug: "project/roadmap", title: "Roadmap", group: "Project" },
+  { source: "docs/roadmap.md", slug: "project/roadmap", title: "Roadmap", group: "Contributing" },
   {
     source: "docs/README.md",
     slug: "project/documentation",
-    title: "Documentation and evidence",
-    group: "Project",
+    title: "Documentation map",
+    group: "Reference",
   },
-  { source: "SECURITY.md", slug: "project/security", title: "Security", group: "Project" },
+  { source: "SECURITY.md", slug: "project/security", title: "Security", group: "Releases" },
   {
     source: "docs/releasing.md",
     slug: "project/releasing",
     title: "Release process",
-    group: "Project",
+    group: "Contributing",
+  },
+  {
+    source: "docs/release-1.0.md",
+    slug: "project/release-one-zero",
+    title: "1.0 release milestone",
+    group: "Contributing",
   },
   {
     source: "docs/versioning.md",
     slug: "project/versioning",
     title: "Versioning",
-    group: "Project",
+    group: "Releases",
+  },
+  {
+    source: "docs/evidence.md",
+    slug: "project/evidence",
+    title: "Historical audits and evidence",
+    group: "Contributing",
+  },
+  {
+    source: "docs/architecture.md",
+    slug: "project/architecture",
+    title: "Architecture",
+    group: "Contributing",
+  },
+  {
+    source: "docs/equipment-testing.md",
+    slug: "project/equipment-testing",
+    title: "Equipment testing",
+    group: "Contributing",
   },
 ];
 
 export const sidebar = [
   // Starlight prefixes sidebar links with Astro's base; Markdown/hero links are explicit.
   { label: "Overview", link: "/" },
-  ...["Getting started", "Integration", "Reference", "Project"].map((label) => ({
+  ...["Getting started", "Guides", "Reference", "Releases", "Contributing"].map((label) => ({
     label,
     items: pages
       .filter((page) => page.group === label)

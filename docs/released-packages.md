@@ -4,18 +4,31 @@ Last checked against npm, GitHub, Maven Central, PyPI, crates.io, NuGet and the 
 **2026-09-30 UTC**.
 This is a point-in-time record, not a promise that branch source is published.
 
-This is the **canonical current release matrix**. Begin with the
-[current TypeScript quickstart](../examples/typescript-quickstart/README.md),
-[C/C++ archive quickstart](../examples/c-client/README.md),
-[Swift guide](../packages/swift/README.md), or
-[Kotlin guide](../packages/kotlin/README.md).
-The [Python package](../packages/python/README.md) is a published 0.1.0a2 alpha
-with an evolving API and static capability evidence; see its release evidence below.
-The [Rust crate](../packages/rust/README.md) **0.1.1** is published on crates.io;
-unreleased branch source must not be represented as part of that artifact.
-The [Dart package](../packages/dart/README.md) is published on pub.dev as
-`deancochran_ftms` **0.1.0**; see its release evidence below.
+This is the **canonical current release matrix**. [Choose a language](../packages/README.md)
+for installation and a first example. Unreleased branch source must not be
+represented as part of a published artifact. All versions below remain pre-1.0;
+the [1.0 milestone](release-1.0.md) is preparation, not publication.
 Source, package, protocol and corpus versions are distinct; see [versioning](versioning.md).
+
+## Current verified releases
+
+| Language | Verified version | Install | Publication evidence |
+| --- | --- | --- | --- |
+| C | GitHub `c-v0.2.0` | [Source archive / CMake](../packages/c/INSTALL.md) | [Record](#published-typescript-040--c-020) |
+| C# | 0.1.0-alpha.1 | [NuGet](../packages/csharp/README.md) | [Record](#published-prerelease-c-010-alpha1) |
+| Dart | 0.1.0 | [pub.dev](../packages/dart/README.md) | [Record](#published-dart-010) |
+| Go | v0.1.0 | [Go module](../packages/go/README.md) | [Record](#published-go-v010) |
+| Kotlin/JVM | 0.1.0 | [Maven Central](../packages/kotlin/README.md) | [Record](#published-kotlinjvm-010) |
+| Python | 0.1.0a2 (alpha) | [PyPI](../packages/python/README.md) | [Record](#published-alpha-python-010a2) |
+| Rust | 0.1.1 | [crates.io](../packages/rust/README.md) | [Record](#published-rust-011) |
+| Swift | 0.1.0 | [SwiftPM revision](../packages/swift/README.md) | [Record](#published-swift-010) |
+| TypeScript | npm `@deancochran/ftms@0.4.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-040--c-020) |
+
+## Release evidence ledger
+
+The records below retain original hashes, checks and limitations. Existing links
+and anchors are preserved. They are publication evidence, not instructions for
+preparing the next release; maintainers should use the [release procedure](releasing.md).
 
 ## Published prerelease: C# 0.1.0-alpha.1
 
@@ -383,26 +396,25 @@ corpus, Cortex-M0 compile-only and packed-consumer evidence.
 
 ## Current public packages
 
-| Port | Public release verified | Runnable example | What is not released |
-| --- | --- | --- | --- |
-| TypeScript | npm `@deancochran/ftms@0.4.0` | [Current quickstart](../examples/typescript-quickstart/README.md); the separate client preserves a 0.2.0 compatibility baseline | Native implementations are separate packages, not npm exports |
-| C / C++ | GitHub `c-v0.2.0` source archive | [Installed C client](../examples/c-client/README.md) and [passive replay](../examples/c-passive-replay/README.md) exercise installed artifacts | Public vcpkg/Conan registry availability is not established by this check |
-| Swift | GitHub/SwiftPM `swift-v0.1.0` | Public tag-pinned Linux/macOS consumers and Apple SDK builds | BLE integration and Apple-device runtime evidence |
-| Kotlin | Maven Central `io.github.deancochran:ftms:0.1.0` | Public-artifact Kotlin/Java execution and Android APK build; [consumers](../packages/kotlin/verification/README.md) | Kotlin Multiplatform, BLE transport and Android-runtime/device evidence |
-| Python | PyPI `deancochran-ftms==0.1.0a2` | Verified public wheel/sdist consumers including capability evaluation; no repository BLE example | Stable interface and live-device evidence |
-| Rust | crates.io `ftms==0.1.1` | Public-registry installed consumer and docs.rs | BLE/device runtime and qualification evidence |
-| Dart / Flutter | pub.dev `deancochran_ftms` 0.1.0 | Fresh hosted consumer; see Dart evidence above | Physical-device and Bluetooth qualification evidence |
-| Go | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 | Public proxy/checksum database and isolated consumers | Measurement normalization, record planning/assembly and device evidence |
-| C# | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1 | Both public target assemblies executed in isolated consumers | Stable API, Unity/MAUI/device runtime and BLE/qualification evidence |
+Exact versions and installation links are in [Current verified releases](#current-verified-releases).
+The following summarizes the boundaries of the records above, not additional releases.
+
+| Language | Verified consumer evidence | Not established by that evidence |
+| --- | --- | --- |
+| C | Installed C client and passive replay | Public vcpkg/Conan registry availability |
+| C# | Both public target assemblies executed in isolated consumers | Stable API, Unity/MAUI/device runtime or BLE qualification |
+| Dart | Fresh hosted consumer | Physical-device or Bluetooth qualification evidence |
+| Go | Public proxy/checksum database and isolated consumers | Measurement normalization, record planning/assembly or device evidence |
+| Kotlin/JVM | Public-artifact Kotlin/Java execution and Android APK build | Kotlin Multiplatform, BLE transport or Android runtime/device evidence |
+| Python | Public wheel/sdist consumers including capability evaluation | Stable interface or live-device evidence |
+| Rust | Public-registry installed consumer and docs.rs | BLE/device runtime or qualification evidence |
+| Swift | Public revision-pinned Linux/macOS consumers and Apple SDK builds | BLE integration or Apple-device runtime evidence |
+| TypeScript | Current quickstart; separate client preserves a historical compatibility baseline | Native implementations as npm exports |
 
 ## Start with the released TypeScript package
 
-```sh
-cd examples/typescript-quickstart
-npm install --ignore-scripts --no-audit --no-fund
-npm start
-npm test
-```
+Follow the [installed-package quickstart](../examples/typescript-quickstart/README.md)
+for installation and execution commands.
 
 The current-release quickstart asserts normalized metrics, truncation behavior,
 capabilities, ranges and byte conversions without communicating with equipment.

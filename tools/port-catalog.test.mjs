@@ -14,7 +14,7 @@ test("catalog accounts for every port and preserves tag namespaces", async () =>
   assert.deepEqual(Object.keys(portCatalog).sort(), directories);
   assert.deepEqual(Object.keys(ports).sort(), directories);
   const prefixes = {
-    typescript: "v",
+    typescript: "typescript-v",
     c: "c-v",
     swift: "swift-v",
     kotlin: "kotlin-v",
@@ -47,6 +47,16 @@ test("release titles preserve native versions and reject ambiguous input", () =>
   assert.throws(() => releaseTitle("go", "v0.1.0"));
   assert.throws(() => releaseTitle("missing", "1.0.0"));
   assert.throws(() => portInfo("toString"));
+});
+
+test("TypeScript migrates only the 1.0-and-later tag namespace", () => {
+  for (const version of ["0.2.0", "0.4.0", "0.5.0-beta.1"]) {
+    assert.equal(releaseTag("typescript", version), `v${version}`);
+  }
+  for (const version of ["1.0.0-alpha.1", "1.0.0", "1.0.1", "2.0.0"]) {
+    assert.equal(releaseTag("typescript", version), `typescript-v${version}`);
+  }
+  assert.equal(releaseTag("go", "1.0.0"), "packages/go/v1.0.0");
 });
 
 test("current package chooser tables use catalog language labels", async () => {

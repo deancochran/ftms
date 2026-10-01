@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+      - "typescript-v*"
   workflow_dispatch:
 
 permissions:
@@ -52,6 +53,7 @@ jobs:
 
           node --input-type=module <<'NODE'
           import { appendFileSync, readFileSync } from "node:fs";
+          import { releaseTag } from "./tools/port-catalog.mjs";
 
           const manifest = JSON.parse(readFileSync("packages/typescript/package.json", "utf8"));
           const version = manifest.version;
@@ -61,8 +63,9 @@ jobs:
             throw new Error(`packages/typescript/package.json version is not valid SemVer: ${version}`);
           }
 
-          if (process.env.GITHUB_REF_NAME !== `v${version}`) {
-            throw new Error(`tag ${process.env.GITHUB_REF_NAME} must exactly match packages/typescript/package.json version v${version}`);
+          const expectedTag = releaseTag("typescript", version);
+          if (process.env.GITHUB_REF_NAME !== expectedTag) {
+            throw new Error(`tag ${process.env.GITHUB_REF_NAME} must exactly match ${expectedTag}`);
           }
 
           const changelog = readFileSync("packages/typescript/CHANGELOG.md", "utf8").split(/\r?\n/);

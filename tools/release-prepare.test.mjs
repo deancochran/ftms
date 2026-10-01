@@ -19,6 +19,15 @@ test("CLI rejects extra arguments after dry-run", () => {
   assert.notEqual(result.status, 0);
 });
 
+test("1.0 metadata uses port-specific tags without changing native versions", () => {
+  assert.equal(
+    validateMetadata("typescript", '{"version":"1.0.0"}', "## 1.0.0").tag,
+    "typescript-v1.0.0",
+  );
+  assert.equal(validateMetadata("typescript", '{"version":"0.4.0"}', "## 0.4.0").tag, "v0.4.0");
+  assert.equal(validateMetadata("go", "## 1.0.0", "## 1.0.0").tag, "packages/go/v1.0.0");
+});
+
 test("all-package readiness includes every implemented distribution", async () => {
   const result = await allReadiness();
   assert.equal(result.passed, true);
@@ -65,7 +74,7 @@ test("requires exact version and changelog identity", () => {
   assert.equal(
     validateMetadata("typescript", '{"version":"1.2.3-beta.1"}', "## [1.2.3-beta.1] - 2026-09-30")
       .tag,
-    "v1.2.3-beta.1",
+    "typescript-v1.2.3-beta.1",
   );
 });
 

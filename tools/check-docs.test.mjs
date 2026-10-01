@@ -46,7 +46,7 @@ test("release guards reject mismatched quickstarts and package-external relative
   try {
     put(
       "docs/released-packages.md",
-      `npm \`@deancochran/ftms@0.4.0\`\n| C / C++ | GitHub \`c-v0.2.0\` |\nC **0.2.0** archive SHA-256:\n\`${hash}\``,
+      `npm \`@deancochran/ftms@0.4.0\`\n| C | GitHub \`c-v0.2.0\` |\nC **0.2.0** archive SHA-256:\n\`${hash}\``,
     );
     put("README.md", "npm install @deancochran/ftms@0.4.0");
     put("SECURITY.md", "[policy](https://example.com)");
