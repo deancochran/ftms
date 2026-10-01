@@ -18,6 +18,11 @@ repositories { mavenCentral() }
 dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
 ```
 
+The concrete dependency above is the verified public release, not a candidate
+manifest version. Avoid Gradle `+` or `latest.release`; review upgrades and use
+dependency locking. [Current installation guidance](../../docs/install.md) is
+updated only after public artifact verification.
+
 Releases use the package-owned `VERSION` file and the
 [automated GitHub Actions release process](docs/releasing.md). A reviewed version
 bump merged into `main` runs verification, signing, Central publication and public

@@ -13,7 +13,15 @@ The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has
 no runtime dependencies and declares Python >=3.11. Python 3.11 and 3.14 are
 tested by the package verification commands in this milestone.
 
-Install this explicitly selected prerelease from PyPI:
+In a virtual environment, explicitly opt into current prereleases from PyPI:
+
+```sh
+python -m pip install --pre deancochran-ftms
+```
+
+The interface remains alpha. Inspect the resolved version and lock dependencies
+with your project's tooling; pip install alone does not create a lockfile.
+For a future stable release, omit `--pre`. To reproduce the verified alpha exactly:
 
 ```sh
 python -m pip install 'deancochran-ftms==0.1.0a2'

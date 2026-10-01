@@ -6,6 +6,7 @@
 
 1. [Understand FTMS](ftms-explained.md): protocol bytes, units, and what the libraries do.
 2. [Choose a language](../packages/README.md): install and decode using any of the nine ports.
+   [Installation and upgrades](install.md) distinguishes latest selection from reproducible pins.
 3. Check [current releases](released-packages.md) and prerelease status before choosing a dependency.
 4. Find your [API reference](api.md), then consult the
    [TypeScript and C cookbook](integration.md) or your package's examples.

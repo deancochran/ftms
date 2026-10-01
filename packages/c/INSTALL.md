@@ -7,6 +7,11 @@ An artifact's existence is not evidence that it is registered in vcpkg or ConanC
 
 ## Download, verify, extract, install
 
+For the current verified archive and checksum, use the
+[installation directory](https://github.com/deancochran/ftms/blob/main/docs/install.md#c).
+Do not use the repository-wide GitHub latest release: it can refer to another
+language. Keep the selected archive version and digest in your build inputs.
+
 Obtain the source archive and SHA-256 sidecar from the chosen immutable `c-vVERSION`
 GitHub release. Verify the sidecar in the archive's directory before extracting:
 

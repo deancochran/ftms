@@ -17,7 +17,9 @@ dart pub add deancochran_ftms
 # Or: flutter pub add deancochran_ftms
 ```
 
-For an exact release pin:
+The add command selects a compatible hosted release and saves the constraint.
+Retain pubspec.lock for applications; review upgrades rather than introducing
+an unconstrained dependency. For an exact reproduction of the recorded release:
 
 ```yaml
 dependencies:

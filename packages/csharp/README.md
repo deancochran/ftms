@@ -6,8 +6,14 @@
 The interface remains an evolving prerelease.
 
 ```sh
-dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1
+dotnet add package DeanCochran.Ftms --prerelease
 ```
+
+This explicitly includes prereleases while the package is alpha. Retain the
+resolved dependency in your project and use a NuGet lockfile for reproducible
+restores. Once stable releases are available, omit `--prerelease` to select those.
+To reproduce the recorded alpha, use
+`dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1` instead.
 
 ## Scope
 

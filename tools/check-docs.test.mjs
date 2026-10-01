@@ -48,7 +48,7 @@ test("release guards reject mismatched quickstarts and package-external relative
       "docs/released-packages.md",
       `npm \`@deancochran/ftms@0.4.0\`\n| C | GitHub \`c-v0.2.0\` |\nC **0.2.0** archive SHA-256:\n\`${hash}\``,
     );
-    put("README.md", "npm install @deancochran/ftms@0.4.0");
+    put("README.md", "npm install @deancochran/ftms");
     put("SECURITY.md", "[policy](https://example.com)");
     put("packages/typescript/README.md", "# Package");
     put(
@@ -59,7 +59,7 @@ test("release guards reject mismatched quickstarts and package-external relative
     assert.doesNotThrow(() => checkStatus(root));
     put("README.md", "npm install @deancochran/ftms@0.2.0");
     assert.throws(() => checkStatus(root));
-    put("README.md", "npm install @deancochran/ftms@0.4.0");
+    put("README.md", "npm install @deancochran/ftms");
     put("examples/c-client/README.md", cExample.replaceAll("0.2.0", "0.1.0"));
     assert.throws(() => checkStatus(root));
     put("examples/c-client/README.md", cExample);

@@ -45,8 +45,11 @@ With Node.js 20+ in a new directory:
 
 ```sh
 npm init -y
-npm install @deancochran/ftms@0.4.0
+npm install @deancochran/ftms
 ```
+
+Retain the saved dependency and lockfile. The repository quickstart separately
+pins the verified artifact for reproducible tests. See [all-port installation guidance](docs/install.md).
 
 Save as `reading.mjs`, then run `node reading.mjs`:
 

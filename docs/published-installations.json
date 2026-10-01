@@ -1,0 +1,19 @@
+{
+  "typescript": { "version": "0.4.0", "evidence": "published-typescript-040--c-020" },
+  "c": {
+    "version": "0.2.0",
+    "evidence": "published-typescript-040--c-020",
+    "sha256": "3aa60d809f3dcd02634417018d39f325c46a552734f0fe311ba748261914e61f"
+  },
+  "swift": {
+    "version": "0.1.0",
+    "evidence": "published-swift-010",
+    "revision": "a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8"
+  },
+  "kotlin": { "version": "0.1.0", "evidence": "published-kotlinjvm-010" },
+  "python": { "version": "0.1.0a2", "evidence": "published-alpha-python-010a2" },
+  "rust": { "version": "0.1.1", "evidence": "published-rust-011" },
+  "dart": { "version": "0.1.0", "evidence": "published-dart-010" },
+  "go": { "version": "0.1.0", "evidence": "published-go-v010" },
+  "csharp": { "version": "0.1.0-alpha.1", "evidence": "published-prerelease-c-010-alpha1" }
+}
