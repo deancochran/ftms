@@ -4,7 +4,9 @@
 matching APIs in other ports. For every language's installation and usage entry
 point, see [Choose a language](../packages/README.md). Shared protocol concepts
 are explained in [What is FTMS?](ftms-explained.md); optional modules are listed
-in [support profiles](support-profiles.md).
+in [support profiles](support-profiles.md). Every port follows the same
+[consumer adapter seam](architecture.md#consumer-adapter-seam): these TypeScript
+and C recipes are examples of that seam, not a shared transport interface.
 
 Start with the [installed TypeScript quickstart](../examples/typescript-quickstart/README.md)
 or [C/C++ quickstart](../examples/c-client/README.md). The complete, executable

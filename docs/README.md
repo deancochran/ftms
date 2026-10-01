@@ -10,8 +10,9 @@
 3. Check [current releases](released-packages.md) and prerelease status before choosing a dependency.
 4. Find your [API reference](api.md), then consult the
    [TypeScript and C cookbook](integration.md) or your package's examples.
-5. Integrate the byte boundary using the [JavaScript/C transport recipes](transport-recipes.md)
-   where applicable. Consult [troubleshooting](troubleshooting.md) for diagnostics.
+5. Keep the [consumer adapter seam](architecture.md#consumer-adapter-seam) explicit,
+   then use the [JavaScript/C transport recipes](transport-recipes.md) where applicable.
+   Consult [troubleshooting](troubleshooting.md) for diagnostics.
 
 Keep Bluetooth discovery, timing, permissions, session ownership and physical
 control safety in your application. A valid request or capability report is not

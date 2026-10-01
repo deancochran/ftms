@@ -7,6 +7,10 @@ Its wire [support profile](../../docs/support-profiles.md) is `FullWire` raw cod
 with `RangeInspection`, selected `NormalizedViews`, and `CapabilityEvidence`.
 `FullWire` does not mean cross-language convenience parity.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 ## Install and compatibility
 
 The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has

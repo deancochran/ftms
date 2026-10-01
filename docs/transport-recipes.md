@@ -6,6 +6,9 @@ These are not transport implementations for all nine ports. Start with your
 [language guide](../packages/README.md) for its native input and ownership contracts.
 
 These are integration examples, not additions to the protocol package. The
+[consumer adapter seam](architecture.md#consumer-adapter-seam) assigns platform
+conversion and transport/session policy to the application while each port keeps
+its native byte interface. The
 [tested conversion module](../examples/typescript-quickstart/transport.mjs) and
 [assertions](../examples/typescript-quickstart/recipes.mjs) run with the installed
 package. They perform no scanning, connecting, subscribing or writing.

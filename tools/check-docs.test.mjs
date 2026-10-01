@@ -3,7 +3,16 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { anchors, checkLinks, checkStatus, links } from "./check-docs.mjs";
+import {
+  anchors,
+  checkConsumerAdapterSeam,
+  checkLinks,
+  checkStatus,
+  consumerAdapterProjectLinks,
+  consumerAdapterUrl,
+  links,
+} from "./check-docs.mjs";
+import { portCatalog } from "./port-catalog.mjs";
 
 test("headings, duplicate anchors, inline code and explicit HTML anchors", () => {
   assert.deepEqual(
@@ -65,6 +74,76 @@ test("release guards reject mismatched quickstarts and package-external relative
     put("examples/c-client/README.md", cExample);
     put("packages/typescript/README.md", "[guide](../../docs/README.md)");
     assert.throws(() => checkStatus(root));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("consumer adapter seam stays canonical across every port guide", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "ftms-doc-adapter-seam-"));
+  const put = (name, text) => {
+    const file = path.join(root, name);
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, text);
+  };
+  const architecture = `# Architecture
+## Consumer adapter seam
+The project does not define one cross-language runtime adapter interface.
+| Protocol package owns | Consumer adapter/application owns |
+| --- | --- |
+| record planning/assembly, including deterministic expiry evaluation | clock/tick source and selected expiry/freshness policy; physical safety |
+Static prerequisites are not execution permission.
+`;
+  try {
+    put("docs/architecture.md", architecture);
+    for (const [file, target] of Object.entries(consumerAdapterProjectLinks))
+      put(file, `[Consumer adapter seam](${target})`);
+    for (const port of Object.keys(portCatalog))
+      put(
+        `packages/${port}/README.md`,
+        `[Consumer adapter seam](${consumerAdapterUrl})\n${
+          port === "typescript"
+            ? "`writeControlPoint` above is supplied by the consumer adapter"
+            : ""
+        }`,
+      );
+    assert.doesNotThrow(() => checkConsumerAdapterSeam(root));
+    put("packages/go/README.md", consumerAdapterUrl);
+    assert.throws(() => checkConsumerAdapterSeam(root));
+    put("packages/go/README.md", `[Consumer adapter seam](${consumerAdapterUrl})`);
+    put("docs/integration.md", "architecture.md#consumer-adapter-seam");
+    assert.throws(() => checkConsumerAdapterSeam(root));
+    put(
+      "docs/integration.md",
+      `[Consumer adapter seam](${consumerAdapterProjectLinks["docs/integration.md"]})`,
+    );
+    put(
+      "docs/architecture.md",
+      `${architecture}\nCapability interpretation (TypeScript, C, Swift and Kotlin implemented)`,
+    );
+    assert.throws(() => checkConsumerAdapterSeam(root));
+    put(
+      "docs/architecture.md",
+      `# Architecture
+## Consumer adapter seam
+See the next section.
+## Other
+${architecture}`,
+    );
+    assert.throws(() => checkConsumerAdapterSeam(root));
+    put(
+      "docs/architecture.md",
+      `# Architecture
+## Consumer adapter seam
+
+\`\`\`text
+${architecture}
+\`\`\`
+
+## Other
+`,
+    );
+    assert.throws(() => checkConsumerAdapterSeam(root));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -12,6 +12,10 @@ raw codecs with `RangeInspection`, `CapabilityEvidence`, `RecordPlanning`,
 `RecordAssembly`, and `NormalizedViews`.
 The release matrix records archive identity and public-consumer evidence separately.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 Select a compatible current release in your application:
 
 ```sh

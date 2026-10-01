@@ -22,6 +22,8 @@ is authoritative for what is available from this source tree.
 - Consistent installation and release guidance.
 - Runnable current-release examples and a task-oriented API reference.
 - Tested byte-boundary recipes and actionable contributor reports.
+- Ecosystem-specific [consumer-adapter recipes](architecture.md#consumer-adapter-seam)
+  that leave transport and session dependencies outside the protocol packages.
 - Executable profile-aware directional accounting in package conformance reports,
   without changing immutable codec-v1 assets.
 
@@ -29,6 +31,8 @@ is authoritative for what is available from this source tree.
 
 - Offline packet playground.
 - Reviewed external application integrations and additional equipment evidence.
+- Granular package entry points or artifact splits only after measured consumer
+  size/startup evidence justifies the additional public surface.
 - Public native package-manager registration.
 - Additional native ports only after a named adopter selects a justified profile
   and supplies implementation, compiler and consumer evidence.
@@ -41,5 +45,7 @@ Other development branches are not releases from this checkout.
 
 BLE connections, OS permissions, UI frameworks, session timers, reconnect policy,
 automatic device-format inference, workout scheduling and actuator authorization.
+A cross-language transport/session adapter interface is also a non-goal; consumer
+adapters remain ecosystem- and application-owned.
 Fixture coverage is not Bluetooth qualification. Broad “works with every device”
 or “best implementation” claims require evidence not established by these libraries.

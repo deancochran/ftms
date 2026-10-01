@@ -5,6 +5,10 @@ Pure Go codecs for Bluetooth Fitness Machine Service bytes. Module:
 No runtime dependencies beyond the standard library. No BLE, cgo, timers,
 logging, background goroutines, or control authority.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 **Version 0.1.0: raw codecs and static capability interpretation.**
 The pre-1.0 interface may change in minor releases. See
 [coverage](docs/coverage.md), [verification](docs/verification.md), and

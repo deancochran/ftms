@@ -387,7 +387,10 @@ Explicit alternative layouts also exist in deployed equipment. Consult
 select a format from packet length, device name, or another characteristic's
 layout. When a measurement spans More Data notifications, decoding a packet is
 not the same as assembling a record. Use a port's supported assembly module where
-appropriate, with caller-owned lifecycle/freshness policy.
+appropriate. The application supplies the connection generation, clock/ticks,
+selected expiry/freshness policy and lifecycle resets; where implemented, the
+assembler deterministically applies those inputs. The
+[consumer adapter seam](architecture.md#consumer-adapter-seam) defines this split.
 
 **The reason to use the package is focused:** keep the Bluetooth stack, application
 architecture and equipment policy you already have, while replacing repeated

@@ -29,6 +29,10 @@ Targets **`netstandard2.1`** and **`net10.0`**, with no runtime package dependen
 Inputs use `ReadOnlySpan<byte>`; encoders return fresh arrays or write to caller
 spans after validation. Retained bytes and collections are defensively copied.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 ## Decode a measurement
 
 ```csharp
