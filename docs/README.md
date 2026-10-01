@@ -2,6 +2,9 @@
 
 ## Start here: humans and coding assistants
 
+New to the protocol? Read [FTMS explained: from bytes to a workout](ftms-explained.md)
+for packet diagrams, scaling math, runnable examples and the package's purpose.
+
 1. Check the [release matrix](released-packages.md). Do not infer publication from a source version.
 2. Select the required client or equipment directions from the
    [support profiles](support-profiles.md).

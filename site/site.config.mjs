@@ -9,6 +9,12 @@ export const sitePath = (route = "") => `${base}/${route ? `${route}/` : ""}`;
 export const pages = [
   { source: "site/landing.md", slug: "", title: "FTMS Protocol Libraries", group: null },
   {
+    source: "docs/ftms-explained.md",
+    slug: "start/ftms-explained",
+    title: "What is FTMS?",
+    group: "Getting started",
+  },
+  {
     source: "packages/dart/README.md",
     slug: "start/dart",
     title: "Dart / Flutter",
