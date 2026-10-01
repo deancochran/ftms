@@ -29,7 +29,7 @@ Add the Git repository as a **revision-pinned** SwiftPM dependency and select th
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/deancochran/ftms.git", revision: "swift-v0.1.0")
+  .package(url: "https://github.com/deancochran/ftms.git", revision: "a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8")
 ],
 targets: [
   .target(name: "YourTarget", dependencies: [.product(name: "FTMS", package: "ftms")])

@@ -114,6 +114,19 @@ evidence, then recheck live state before any authorized release.
    and site landing copy only from verified publication evidence. Build the site
    again; approved Pages deployment is separate from registry publication.
 
+## Refresh public installation guidance
+
+After public artifacts and fresh installed consumers pass, update
+`docs/published-installations.json` with the verified version, evidence anchor,
+and C checksum or Swift full revision as applicable. Do not copy candidate
+manifest versions into this record. Retain historical evidence in the release
+ledger, update its current table, and run `pnpm docs:install:generate`.
+The generated `docs/install.md` is committed Markdown for both GitHub and the site.
+Keep matching Kotlin/Swift README snippets synchronized; `pnpm docs:check` detects drift.
+Update current quickstart pins/lockfiles in the same reviewed release-follow-up
+change and rerun their installed-consumer tests. Leave historical fixtures pinned.
+Generation is offline: it neither discovers registry versions nor proves publication.
+
 ## Failure triage and recovery
 
 | Failure stage | What to inspect | Safe next action |

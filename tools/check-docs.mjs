@@ -79,7 +79,7 @@ export function checkStatus(root) {
     matrix.includes(`npm \`@deancochran/ftms@${version}\``),
     "Quickstart must match a recorded release",
   );
-  assert.ok(read("README.md").includes(`npm install @deancochran/ftms@${version}`));
+  assert.match(read("README.md"), /^npm install @deancochran\/ftms$/m);
   const cVersion = matrix.match(/\| C \| GitHub `c-v(\d+\.\d+\.\d+)`/u)?.[1];
   assert.ok(cVersion, "Release matrix must identify the public C archive tag");
   const cExample = read("examples/c-client/README.md");

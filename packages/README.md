@@ -8,6 +8,11 @@ spelling or assume matching package versions imply identical convenience APIs.
 
 ## Install and decode your first packet
 
+Use the [installation directory](../docs/install.md) for latest-selection commands
+and the verified concrete dependencies required by C, Swift and Kotlin. Repository
+verification examples remain pinned; they are not a requirement to start new apps
+on an old version.
+
 Follow your language's guide for the published dependency, a decoding example,
 and its actual value/error representation. TypeScript and C also have runnable
 installed-consumer quickstarts. No equipment connection is required for those examples.

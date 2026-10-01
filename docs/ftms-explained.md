@@ -126,7 +126,7 @@ With Node.js 20+, in an empty directory:
 
 ```sh
 npm init -y
-npm install @deancochran/ftms@0.4.0
+npm install @deancochran/ftms
 ```
 
 Save each JavaScript block in this guide as a separate `.mjs` file and run it with

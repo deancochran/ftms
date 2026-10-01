@@ -41,6 +41,23 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
     page.getByRole("heading", { name: "Coordinated release checklist", exact: true }),
   ).toBeVisible();
   await page.goto("/ftms/project/releases/");
+  await page.goto("/ftms/start/installation/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Installation and upgrades");
+  for (const language of [
+    "C",
+    "C#",
+    "Dart",
+    "Go",
+    "Kotlin/JVM",
+    "Python",
+    "Rust",
+    "Swift",
+    "TypeScript",
+  ]) {
+    await expect(page.getByRole("heading", { name: language, exact: true })).toHaveCount(1);
+  }
+  await expect(page.locator("pre").filter({ hasText: "--prerelease" })).toHaveCount(1);
+  await page.goto("/ftms/project/releases/");
   await expect(
     page.getByRole("heading", { name: "Current verified releases", exact: true }),
   ).toBeVisible();

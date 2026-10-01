@@ -3,7 +3,18 @@
 Prerequisites: Node.js 20+ and npm. The package is ESM-only; `.mjs` works without
 changing an application's module setting. TypeScript declarations ship with it.
 
-From this directory in a source checkout:
+## Add to your application
+
+```sh
+npm install @deancochran/ftms
+```
+
+This selects npm's `latest` dist-tag. Retain the saved dependency and lockfile,
+and consult the changelog when upgrading. See [all-port installation guidance](../../docs/install.md).
+
+## Reproduce the verified example
+
+From this directory in a source checkout (the example deliberately pins its tested release):
 
 ```sh
 npm install --ignore-scripts --no-audit --no-fund

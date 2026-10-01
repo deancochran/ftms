@@ -11,11 +11,15 @@ The pre-1.0 interface may change in minor releases. See
 [release gates](docs/releasing.md). Publication evidence is recorded in the
 [canonical release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md).
 
-Install the tagged module:
+Select the latest release for your application, then retain `go.mod` and `go.sum`:
 
 ```sh
-go get github.com/deancochran/ftms/packages/go@v0.1.0
+go get github.com/deancochran/ftms/packages/go@latest
 ```
+
+To reproduce the recorded release specifically, use
+`go get github.com/deancochran/ftms/packages/go@v0.1.0`. Existing constraints may
+affect resolution; inspect the selected version before adopting changes.
 
 ## Implemented
 

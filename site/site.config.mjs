@@ -26,6 +26,12 @@ export const pages = [
     guidePage,
   ),
   {
+    source: "docs/install.md",
+    slug: "start/installation",
+    title: "Installation and upgrades",
+    group: "Getting started",
+  },
+  {
     source: "docs/integration.md",
     slug: "integration/cookbook",
     title: "TypeScript and C cookbook",

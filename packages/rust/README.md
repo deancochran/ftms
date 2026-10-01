@@ -12,11 +12,14 @@ raw codecs with `RangeInspection`, `CapabilityEvidence`, `RecordPlanning`,
 `RecordAssembly`, and `NormalizedViews`.
 The release matrix records archive identity and public-consumer evidence separately.
 
-Install the verified release in your application:
+Select a compatible current release in your application:
 
 ```sh
-cargo add ftms@=0.1.1
+cargo add ftms
 ```
+
+Retain the saved dependency and, for applications, Cargo.lock. To reproduce the
+recorded release specifically, use `cargo add ftms@=0.1.1` instead.
 
 For the published crate, see [crates.io](https://crates.io/crates/ftms/0.1.1)
 and then see the existing [raw measurement and status interfaces](#raw-measurement-and-status-interfaces)
