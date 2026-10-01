@@ -12,6 +12,17 @@ raw codecs with `RangeInspection`, `CapabilityEvidence`, `RecordPlanning`,
 `RecordAssembly`, and `NormalizedViews`.
 The release matrix records archive identity and public-consumer evidence separately.
 
+Install the verified release in your application:
+
+```sh
+cargo add ftms@=0.1.1
+```
+
+For the published crate, see [crates.io](https://crates.io/crates/ftms/0.1.1)
+and then see the existing [raw measurement and status interfaces](#raw-measurement-and-status-interfaces)
+before the contributor [toolchain and verification](#toolchain-and-verification)
+instructions below.
+
 ## Implemented surface
 
 Raw, bidirectional codecs are supported for:

@@ -1,12 +1,31 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { pages, sitePath } from "../site.config.mjs";
+import { pages, sidebar, sitePath } from "../site.config.mjs";
 import { convertMarkdown, rewriteLink } from "./content.mjs";
 
 test("routes and sources are unique and constrained", () => {
   assert.equal(new Set(pages.map((page) => page.source)).size, pages.length);
   assert.equal(new Set(pages.map((page) => page.slug)).size, pages.length);
   for (const page of pages) assert.match(page.slug, /^(?:[a-z]+\/[a-z-]+)?$/);
+});
+
+test("reader navigation separates getting started, releases and contributor evidence", () => {
+  const groups = sidebar.filter((entry) => entry.items).map((entry) => entry.label);
+  assert.deepEqual(groups, ["Getting started", "Guides", "Reference", "Releases", "Contributing"]);
+  assert.deepEqual(
+    pages
+      .filter((page) =>
+        /^start\/(c|csharp|dart|go|kotlin|python|rust|swift|typescript)$/.test(page.slug),
+      )
+      .map((page) => page.title),
+    ["C", "C#", "Dart", "Go", "Kotlin/JVM", "Python", "Rust", "Swift", "TypeScript"],
+  );
+  assert.equal(pages.find((page) => page.source === "docs/releasing.md").group, "Contributing");
+  assert.equal(pages.find((page) => page.source === "docs/released-packages.md").group, "Releases");
+  assert.equal(
+    pages.find((page) => page.source === "packages/README.md").slug,
+    "start/choose-language",
+  );
 });
 
 test("mapped links preserve base, query and fragments; unmapped source stays on GitHub", () => {

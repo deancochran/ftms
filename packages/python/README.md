@@ -7,6 +7,41 @@ Its wire [support profile](../../docs/support-profiles.md) is `FullWire` raw cod
 with `RangeInspection`, selected `NormalizedViews`, and `CapabilityEvidence`.
 `FullWire` does not mean cross-language convenience parity.
 
+## Install and compatibility
+
+The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has
+no runtime dependencies and declares Python >=3.11. Python 3.11 and 3.14 are
+tested by the package verification commands in this milestone.
+
+Install this explicitly selected prerelease from PyPI:
+
+```sh
+python -m pip install 'deancochran-ftms==0.1.0a2'
+```
+
+```python
+from deancochran_ftms import decode_features, encode_features_raw, FeaturesRaw
+
+wire = encode_features_raw(FeaturesRaw(machine=0, target=1 << 3))
+result = decode_features(wire)
+assert result.ok and result.value is not None
+assert result.value.power_target_setting_supported
+```
+
+`decode_features_raw()` and `encode_features_raw()` are strict wire codecs and
+raise `RawCodecError` for wrong byte inputs, non-8-byte payloads, or invalid raw
+words. `decode_features()` instead returns an immutable `FeatureDecodeResult`:
+wrong lengths produce a `FeatureDiagnostic` with `code="length"`. Feature
+payloads are exactly eight bytes; trailing bytes are rejected, matching the
+canonical TypeScript Feature behavior. `bytes`, `bytearray`, and contiguous
+one-dimensional byte `memoryview` inputs are accepted and copied as immutable
+evidence. Raw words retain all unknown/reserved bits. Integer raw words must be
+plain `int` values from 0 through 2^32-1; `bool` is rejected.
+
+The normalized `Features` model exposes the canonical v1 feature names in
+snake_case. Its three convenience properties (`supports_erg`, `supports_sim`,
+and `supports_resistance`) correspond to the v1 compatibility names.
+
 ## Static capability evidence
 
 `evaluate_capabilities(snapshot, options=None)` is a pure interpretation of one immutable,
@@ -67,41 +102,6 @@ exported enums. Positional report rows follow the
 [shared capability report layout](../../shared/conformance/capabilities/README.md).
 Missing Control Point/Machine Status evidence and unknown C.7 facts in this
 example are retained as diagnostics, not silently treated as satisfied.
-
-## Install and compatibility
-
-The distribution name is `deancochran-ftms`; import `deancochran_ftms`. It has
-no runtime dependencies and declares Python >=3.11. Python 3.11 and 3.14 are
-tested by the package verification commands in this milestone.
-
-Install this explicitly selected prerelease from PyPI:
-
-```sh
-python -m pip install 'deancochran-ftms==0.1.0a2'
-```
-
-```python
-from deancochran_ftms import decode_features, encode_features_raw, FeaturesRaw
-
-wire = encode_features_raw(FeaturesRaw(machine=0, target=1 << 3))
-result = decode_features(wire)
-assert result.ok and result.value is not None
-assert result.value.power_target_setting_supported
-```
-
-`decode_features_raw()` and `encode_features_raw()` are strict wire codecs and
-raise `RawCodecError` for wrong byte inputs, non-8-byte payloads, or invalid raw
-words. `decode_features()` instead returns an immutable `FeatureDecodeResult`:
-wrong lengths produce a `FeatureDiagnostic` with `code="length"`. Feature
-payloads are exactly eight bytes; trailing bytes are rejected, matching the
-canonical TypeScript Feature behavior. `bytes`, `bytearray`, and contiguous
-one-dimensional byte `memoryview` inputs are accepted and copied as immutable
-evidence. Raw words retain all unknown/reserved bits. Integer raw words must be
-plain `int` values from 0 through 2^32-1; `bool` is rejected.
-
-The normalized `Features` model exposes the canonical v1 feature names in
-snake_case. Its three convenience properties (`supports_erg`, `supports_sim`,
-and `supports_resistance`) correspond to the v1 compatibility names.
 
 ## Ranges and inspection
 

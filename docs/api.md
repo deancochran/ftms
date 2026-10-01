@@ -1,22 +1,35 @@
 # Public API index
 
-Use this task index before browsing the full reference. Import TypeScript APIs
+## References by language
+
+Start with the public reference or package guide for your language. There is not
+yet a uniform generated reference for all nine ports; guides below are real entry
+points, not promises of equivalent documentation tooling.
+
+| Language | Reference / usage guide |
+| --- | --- |
+| C | [Public header index](#c-public-headers) and [C guide](../packages/c/README.md) |
+| C# | [Public API](../packages/csharp/docs/api.md) |
+| Dart | [Dart package guide](../packages/dart/README.md) |
+| Go | [Go package guide](../packages/go/README.md) and [capabilities](../packages/go/docs/capabilities.md) |
+| Kotlin/JVM | [Kotlin and Java guide](../packages/kotlin/README.md) |
+| Python | [Python package guide](../packages/python/README.md) |
+| Rust | [Rust package guide](../packages/rust/README.md) |
+| Swift | [Swift package guide](../packages/swift/README.md) |
+| TypeScript | [Task index](#typescript-reference) and [package guide](../packages/typescript/README.md) |
+
+Need installation first? [Choose a language](../packages/README.md).
+The detailed task tables below cover TypeScript and C. Import TypeScript APIs
 from `@deancochran/ftms`, never `src/` or unexported subpaths. Include installed C
 headers as `<ftms/measurement.h>`, for example, and link `ftms::ftms`.
 
 ## TypeScript reference
 
-From a checkout with dependencies installed:
-
-```sh
-pnpm docs:build
-```
-
-Open `packages/typescript/docs/api/index.html` locally. TypeDoc generates searchable
-HTML from the public `src/index.ts` exports and source comments. Output is ignored,
-reproducible, not separately maintained, and not added to the npm artifact. The
-installed package's `dist/index.d.ts` and referenced declarations remain the
-offline API authority. No public documentation deployment is implied.
+The documentation site publishes searchable TypeDoc HTML from public exports and
+source comments. The installed package's `dist/index.d.ts` and referenced
+declarations remain the offline API authority. Generated HTML is not included in
+the npm artifact. Contributors can reproduce it using the
+[site development instructions](../site/README.md).
 
 | Task | Public API |
 | --- | --- |

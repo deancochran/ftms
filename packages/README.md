@@ -1,58 +1,56 @@
-# FTMS packages
+# Choose a language
 
-TypeScript **0.4.0**, C **0.2.0**, Swift **0.1.0** and Kotlin/JVM **0.1.0** are
-published with bidirectional codecs, range inspection and static capability
-interpretation. Python **0.1.0a2** is a published alpha with bidirectional
-raw codecs, range inspection and static capability evaluation against the shared
-corpus. See the role-based
-[support profiles](../docs/support-profiles.md) and exact
-[release identities](../docs/released-packages.md); source metadata alone is not
-publication evidence.
+<a id="ftms-packages"></a>
 
-| Port | Initial consumers | Distribution status |
+All nine packages implement FTMS protocol bytes without owning your Bluetooth
+connection. Choose the language used by your application; do not choose by tag
+spelling or assume matching package versions imply identical convenience APIs.
+
+## Install and decode your first packet
+
+Follow your language's guide for the published dependency, a decoding example,
+and its actual value/error representation. TypeScript and C also have runnable
+installed-consumer quickstarts. No equipment connection is required for those examples.
+
+| Language | Install and start | Package guide / API entry point |
 | --- | --- | --- |
-| [TypeScript](typescript/README.md) ([source](typescript/src/)) | JavaScript, TypeScript, and React Native applications | npm: `@deancochran/ftms` |
-| [C](c/README.md) | Embedded firmware and C++ applications | Released C99 source archive with CMake; Make tooling is source-checkout-only |
-| [Swift](swift/README.md) | iOS and other supported Apple applications | SwiftPM `swift-v0.1.0` |
-| [Kotlin/JVM](kotlin/README.md) | Android, Kotlin/JVM, and Java applications | Maven Central `io.github.deancochran:ftms:0.1.0` |
-| [Go](go/README.md) | Go applications, gateways and protocol tools | Published Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
-| [C#](csharp/README.md) | .NET applications and protocol tools | NuGet `DeanCochran.Ftms` 0.1.0-alpha.1; evolving prerelease |
-| [Python](python/README.md) | Python applications, tooling and protocol analysis | PyPI `deancochran-ftms` 0.1.0a2; evolving alpha |
-| [Rust](rust/README.md) | Embedded firmware and Rust applications | crates.io: `ftms` 0.1.1; normalized views and public consumer verified |
-| [Dart](dart/README.md) | Flutter applications and standalone Dart tools | pub.dev: `deancochran_ftms` 0.1.0 |
+| C | [Installed-library quickstart](../examples/c-client/README.md) | [C guide](c/README.md); [installation options](c/INSTALL.md) |
+| C# | [Install and decode](csharp/README.md) | [API reference](csharp/docs/api.md) |
+| Dart | [Install and decode](dart/README.md) | [Dart guide](dart/README.md); [Flutter integration](dart/doc/flutter_integration.md) |
+| Go | [Install and decode](go/README.md) | [Go guide](go/README.md) |
+| Kotlin/JVM | [Install and decode](kotlin/README.md) | [Kotlin and Java examples](kotlin/README.md) |
+| Python | [Install and decode](python/README.md) | [Python guide](python/README.md) |
+| Rust | [Install and decode](rust/README.md) | [Rust guide](rust/README.md) |
+| Swift | [Install and decode](swift/README.md) | [Swift guide](swift/README.md) |
+| TypeScript | [Installed-package quickstart](../examples/typescript-quickstart/README.md) | [TypeScript guide](typescript/README.md) |
 
-Start from the [architecture](../docs/architecture.md) and the shared
-[capability contract](../shared/protocol/capability-discovery.md). Capability coverage must
-not require an indoor bike, a particular brand, or an application control mode.
-Use the shared [conformance runner contract](../shared/conformance/README.md),
-[coverage matrix](../docs/coverage.md), and [versioning boundaries](../docs/versioning.md)
-when an implementation begins.
+## Understand the result
 
-Keep each port's sources, manifest, tests, toolchain-specific files and
-package-owned documentation within its directory. Reuse the canonical
-`shared/conformance/v1/` corpus rather than copying
-it. Add build manifests and CI with real implementations, not empty packages.
-Do not infer future registry names, minimum platform versions or release dates
-from a directory or deferred-port mention.
+- Check each guide's units: raw wire integers are not necessarily display units.
+- Treat missing values, malformed input and unknown fields according to that
+  package's documented contract, not another language's return types.
+- A capability report is evidence, not permission to operate equipment.
+- Keep discovery, security, connection lifecycle and control safety in the application.
 
-Rust 0.1.1 is released on crates.io with capability interpretation, record
-assembly and normalized Feature/measurement views. Version 0.1.1 also includes
-range/control/status projections and 97-case evidence; see its
-[coverage and evidence](rust/docs/verification.md).
-C# is published as a full-wire prerelease with normalized views, range inspection
-and static capability evaluation; see its [release evidence](../docs/released-packages.md#published-prerelease-c-010-alpha1).
-Other future ports remain deferred until a consumer justifies
-a specific support profile. The TypeScript npm build/release remains independent;
-the private root pnpm workspace orchestrates TypeScript and the documentation site,
-not native package builds.
-Dart's requested full-wire port additionally implements static capability evidence,
-range inspection and normalized measurement views. It has independent
-[verification](dart/doc/verification.md) and [release gates](dart/RELEASING.md);
-source/host evidence does not imply pub.dev publication or Flutter device testing.
-Ports and package tooling consume the independent [shared layer](../shared/README.md),
-which has no dependency on any port. TypeScript owns its npm staging/verification
-scripts, API README, and changelog; root policy and orchestration remain at root.
+See [current verified releases](../docs/released-packages.md) for exact published
+versions and prerelease status. The [1.0 milestone](../docs/release-1.0.md) is a
+preparation checklist, not an available package family.
 
-Swift has one ecosystem exception: Swift Package Manager Git dependencies look
-for the thin repository-root `Package.swift`, which points into package-owned
-sources and tests under `packages/swift/`.
+## Next steps
+
+- [API references by language](../docs/api.md)
+- [TypeScript and C cookbook](../docs/integration.md)
+- [Transport recipes: JavaScript and C](../docs/transport-recipes.md)
+- [Support profiles](../docs/support-profiles.md) and [protocol coverage](../docs/coverage.md)
+- [Troubleshooting](../docs/troubleshooting.md)
+
+## Working on a port
+
+Start with [contributing](../CONTRIBUTING.md), [architecture](../docs/architecture.md)
+and the [conformance runner contract](../shared/conformance/README.md).
+Sources, manifests, tests and language-specific tooling remain package-owned;
+ports consume canonical shared assets rather than other ports or fixture copies.
+The root pnpm workspace verifies TypeScript and the site, not native packages.
+SwiftPM's thin root `Package.swift` is an ecosystem-required entry point into
+package-owned Swift sources. See the [release process](../docs/releasing.md) for
+each port's independent runbook and gates.

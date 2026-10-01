@@ -22,6 +22,48 @@ security, control ownership, response matching, and actuator safety.
 `evaluateCapabilities` follows `shared/protocol/capability-discovery.md`, performs
 no I/O, and deliberately does **not** expose a "can execute" result.
 
+## Usage
+
+Add the Git repository as a **revision-pinned** SwiftPM dependency and select the
+`FTMS` product. The release tag is `swift-v0.1.0`:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/deancochran/ftms.git", revision: "swift-v0.1.0")
+],
+targets: [
+  .target(name: "YourTarget", dependencies: [.product(name: "FTMS", package: "ftms")])
+]
+```
+
+For an immutable dependency pin, use the full release commit recorded on the
+[release page](https://github.com/deancochran/ftms/releases/tag/swift-v0.1.0).
+In Xcode, choose a **Commit** requirement with that full commit. Do not use a
+normal version range (`from:` / `.exact()`): SwiftPM does not interpret the
+`swift-v` prefix as an independent version namespace and the repository's `v*`
+tags belong to npm. No registry submission or separate repository is required.
+Local development can instead use `.package(path: "/path/to/ftms")`.
+
+Swift 6.0+ is required. Declared Apple deployment minima are macOS 13, iOS 16,
+tvOS 16, watchOS 9 and visionOS 1. CI verifies host execution on Linux/macOS and
+SDK compilation of an installed library consumer for the other platforms; it
+does not execute apps on each minimum OS version.
+
+```swift
+import FTMS
+
+let request = ControlRequest(opcode: 5, operands: [75])
+let bytes = try encodeControlRequest(request) // [0x05, 0x4b, 0x00]
+// The application transports bytes; the codec never sends a command.
+let response = try decodeControlResponse([0x80, 0x05, 0x01])
+```
+
+Raw operands preserve wire integers, not inferred percentages. Decoded ranges
+and measurements retain their format options; pass matching options when encoding
+an explicitly selected alternative. Normalization preserves unavailable values,
+movement direction and unknown legacy pace units. Machine Status resistance is
+always signed 16-bit tenths and does not inherit a Control Point format selection.
+
 ## Verification
 
 Build with `swift build` and run native regressions with `swift test` at repository
@@ -77,48 +119,6 @@ Swift package semantic versioning is independent of FTMS and corpus versions.
 The report hashes every conformance-contract README, each validated schema and
 instance, and the capability-discovery and wire-compatibility protocol contracts; capability case categories
 come from the fixture's declared category rather than a generic `cases` bucket.
-
-## Usage
-
-Add the Git repository as a **revision-pinned** SwiftPM dependency and select the
-`FTMS` product. The release tag is `swift-v0.1.0`:
-
-```swift
-dependencies: [
-  .package(url: "https://github.com/deancochran/ftms.git", revision: "swift-v0.1.0")
-],
-targets: [
-  .target(name: "YourTarget", dependencies: [.product(name: "FTMS", package: "ftms")])
-]
-```
-
-For an immutable dependency pin, use the full release commit recorded on the
-[release page](https://github.com/deancochran/ftms/releases/tag/swift-v0.1.0).
-In Xcode, choose a **Commit** requirement with that full commit. Do not use a
-normal version range (`from:` / `.exact()`): SwiftPM does not interpret the
-`swift-v` prefix as an independent version namespace and the repository's `v*`
-tags belong to npm. No registry submission or separate repository is required.
-Local development can instead use `.package(path: "/path/to/ftms")`.
-
-Swift 6.0+ is required. Declared Apple deployment minima are macOS 13, iOS 16,
-tvOS 16, watchOS 9 and visionOS 1. CI verifies host execution on Linux/macOS and
-SDK compilation of an installed library consumer for the other platforms; it
-does not execute apps on each minimum OS version.
-
-```swift
-import FTMS
-
-let request = ControlRequest(opcode: 5, operands: [75])
-let bytes = try encodeControlRequest(request) // [0x05, 0x4b, 0x00]
-// The application transports bytes; the codec never sends a command.
-let response = try decodeControlResponse([0x80, 0x05, 0x01])
-```
-
-Raw operands preserve wire integers, not inferred percentages. Decoded ranges
-and measurements retain their format options; pass matching options when encoding
-an explicitly selected alternative. Normalization preserves unavailable values,
-movement direction and unknown legacy pace units. Machine Status resistance is
-always signed 16-bit tenths and does not inherit a Control Point format selection.
 
 ## Release and verification boundaries
 

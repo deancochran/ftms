@@ -1,61 +1,58 @@
 # Documentation
 
-## Start here: humans and coding assistants
+<a id="start-here-humans-and-coding-assistants"></a>
 
-New to the protocol? Read [FTMS explained: from bytes to a workout](ftms-explained.md)
-for packet diagrams, scaling math, runnable examples and the package's purpose.
+## Start here
 
-1. Check the [release matrix](released-packages.md). Do not infer publication from a source version.
-2. Select the required client or equipment directions from the
-   [support profiles](support-profiles.md).
-3. Run the [TypeScript quickstart](../examples/typescript-quickstart/README.md) or
-   [C/C++ quickstart](../examples/c-client/README.md) against an installed artifact.
-4. Select APIs using the [cookbook](integration.md) and [API index](api.md).
-5. Connect your application's byte boundary using [transport recipes](transport-recipes.md).
-6. Check expected outputs and diagnostics; use [troubleshooting](troubleshooting.md).
+1. [Understand FTMS](ftms-explained.md): protocol bytes, units, and what the libraries do.
+2. [Choose a language](../packages/README.md): install and decode using any of the nine ports.
+3. Check [current releases](released-packages.md) and prerelease status before choosing a dependency.
+4. Find your [API reference](api.md), then consult the
+   [TypeScript and C cookbook](integration.md) or your package's examples.
+5. Integrate the byte boundary using the [JavaScript/C transport recipes](transport-recipes.md)
+   where applicable. Consult [troubleshooting](troubleshooting.md) for diagnostics.
 
-Prefer normalized TypeScript measurement parsers for application metrics; use raw
-APIs for wire representations. C APIs use fixed-point integers. Keep BLE, timing,
-session policy and physical control authorization in the application. Do not
-create replacement codecs or import private source paths to complete these recipes.
+Keep Bluetooth discovery, timing, permissions, session ownership and physical
+control safety in your application. A valid request or capability report is not
+authorization to execute a command.
 
-## Reference and contracts
+<a id="reference-and-contracts"></a>
 
-- [TypeScript package guide](../packages/typescript/README.md)
-- [C package guide](../packages/c/README.md) and [installation](../packages/c/INSTALL.md)
-- [Rust source-candidate guide](../packages/rust/README.md) and
-  [verification evidence](../packages/rust/docs/verification.md)
-- [API index and generated TypeScript reference](api.md)
-- [Architecture](architecture.md), [support profiles](support-profiles.md),
-  [coverage](coverage.md), [versioning](versioning.md)
+## Reference and compatibility
+
+- [API references by language](api.md)
+- [Support profiles](support-profiles.md): definitions of wire roles and optional modules
+- [Protocol coverage](coverage.md): implementation and verification scope
+- [Versioning](versioning.md): package compatibility, protocol and corpus identities
 - [Capability evidence contract](../shared/protocol/capability-discovery.md)
 - [Wire compatibility](../shared/protocol/wire-compatibility.md) and [numeric inputs](../shared/protocol/numeric-inputs.md)
+
+## Releases
+
+- [Current public packages and exact release evidence](released-packages.md)
+- Package-owned changelogs describe changes; publication records establish artifact identity.
+- [Planned 1.0 milestone](release-1.0.md): preparation status, not a published release
+
+Migration guidance will be based on reviewed interface differences, not inferred
+from the target version. Current installation commands remain valid until a new
+public artifact is verified.
+
+<a id="evidence-not-installation-instructions"></a>
+
+Historical records are indexed in [Audits and evidence](evidence.md); they are not
+current installation instructions.
+
+<a id="maintainers-and-contributors"></a>
+
+## Contributors and maintainers
+
+- [Contributing](../CONTRIBUTING.md), [architecture](architecture.md), [roadmap](roadmap.md), [security](../SECURITY.md)
 - [Conformance runner and corpus accounting](../shared/conformance/README.md)
+- [Release process and per-port runbooks](releasing.md)
+- [Equipment testing](equipment-testing.md) and [simulation](simulation.md)
+- [Historical audits and evidence](evidence.md)
+- [Documentation site development and deployment](../site/README.md)
 
-## Evidence, not installation instructions
-
-- [Adoption-readiness local verification](adoption-verification.md)
-
-The following records describe specific historical runs. Their counts, source
-identities and candidate versions are not automatically the current release:
-
-- [Compatibility verification](compatibility-verification.md)
-- [Boundary hardening verification](hardening-verification.md)
-- [Cross-port parity](parity.md)
-- [C verification record](../packages/c/docs/verification.md)
-- [Equipment procedure](equipment-testing.md) and [passive pilot](equipment-results/2026-09-29-kickr-core-linux.md)
-- [Deterministic simulation](simulation.md)
-
-Host tests, synthetic traces, packet replay, live equipment observations and
-Bluetooth qualification are separate evidence categories.
-
-## Maintainers and contributors
-
-- [Documentation website: develop, customize and deploy](../site/README.md)
-
-- [Contributing](../CONTRIBUTING.md), [roadmap](roadmap.md), [security](../SECURITY.md)
-- [TypeScript release guidance](../packages/typescript/README.md#release) and [C releases](releasing-c.md)
-
-Public integration does not require private specification context, machine-local
-agent instructions, or a repository checkout. The generated API reference is a
-local convenience; exported declarations and public C headers ship with packages.
+Public integration does not require a repository checkout or private specification
+context. Exported declarations and public headers remain package-owned references;
+the site also publishes generated TypeScript API documentation.

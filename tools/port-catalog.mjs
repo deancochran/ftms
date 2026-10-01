@@ -5,7 +5,8 @@ export const portCatalog = {
     language: "TypeScript",
     packageId: "@deancochran/ftms",
     versionSource: "packages/typescript/package.json",
-    tagPrefix: "v",
+    tagPrefix: "typescript-v",
+    legacyTagPrefix: "v",
     guide: "examples/typescript-quickstart/README.md",
   },
   c: {
@@ -80,7 +81,12 @@ export function releaseTitle(port, version) {
 
 export function releaseTag(port, version) {
   releaseTitle(port, version);
-  return `${portInfo(port).tagPrefix}${version}`;
+  const info = portInfo(port);
+  // Keep the entire pre-1.0 line in its original namespace. The 1.0 milestone
+  // (including prereleases) starts the language-prefixed npm tag namespace.
+  const prefix =
+    port === "typescript" && version.startsWith("0.") ? info.legacyTagPrefix : info.tagPrefix;
+  return `${prefix}${version}`;
 }
 
 export function guidePage(port) {

@@ -352,7 +352,10 @@ copies of repository documentation.
 ## Release
 
 Update the source-controlled version and changelog together, merge the verified
-change, then push the matching tag (for example, `v0.4.0`). Publishing rejects a
+change, then push the matching tag: `vVERSION` for the 0.x line (for example,
+`v0.4.0`) and `typescript-vVERSION` for 1.0 and later, including prereleases.
+The 1.0 milestone targets `typescript-v1.0.0`; it is not yet a published version.
+Publishing rejects a
 tag that does not exactly match `packages/typescript/package.json` or lacks a
 `packages/typescript/CHANGELOG.md` entry.
 

@@ -1,5 +1,10 @@
 # Transport byte-boundary recipes
 
+**Example languages: JavaScript/TypeScript and C.** Web Bluetooth and React Native
+examples below adapt JavaScript values; the C recipe adapts a pointer and length.
+These are not transport implementations for all nine ports. Start with your
+[language guide](../packages/README.md) for its native input and ownership contracts.
+
 These are integration examples, not additions to the protocol package. The
 [tested conversion module](../examples/typescript-quickstart/transport.mjs) and
 [assertions](../examples/typescript-quickstart/recipes.mjs) run with the installed

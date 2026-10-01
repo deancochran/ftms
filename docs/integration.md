@@ -1,5 +1,11 @@
 # Integration cookbook
 
+**Example languages: TypeScript and C.** These executable recipes do not imply
+matching APIs in other ports. For every language's installation and usage entry
+point, see [Choose a language](../packages/README.md). Shared protocol concepts
+are explained in [What is FTMS?](ftms-explained.md); optional modules are listed
+in [support profiles](support-profiles.md).
+
 Start with the [installed TypeScript quickstart](../examples/typescript-quickstart/README.md)
 or [C/C++ quickstart](../examples/c-client/README.md). The complete, executable
 TypeScript recipes live in [recipes.mjs](../examples/typescript-quickstart/recipes.mjs)

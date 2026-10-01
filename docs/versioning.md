@@ -23,8 +23,26 @@ Preserve native version spelling, including Python `0.1.0a2` and NuGet
 `0.1.0-alpha.1`; use `v` only where required by tags or ecosystem installation syntax.
 
 Package IDs, import names and tag namespaces are compatibility contracts and are
-not renamed to match presentation. In particular, Go requires `packages/go/vVERSION`,
-and Swift uses revision pins rather than competing with npm's `vVERSION` tags.
+not rewritten retroactively to match presentation. Go requires
+`packages/go/vVERSION` because its module is nested under `packages/go`.
+TypeScript's `vVERSION` is a legacy convention, not an npm requirement: the 0.x
+line retains it, while 1.0 and later use `typescript-vVERSION`, including
+prereleases. Swift continues to use immutable revision pins; language-prefixed
+tags are not SwiftPM semantic-version dependency constraints.
+
+## Coordinated 1.0 milestone
+
+All nine ports target an initial stable **1.0.0** package release as described in
+the [milestone and acceptance checklist](release-1.0.md). Package numbers may
+align at this milestone without becoming permanently coupled to each other or to
+the protocol revision. Compatible fixes and additions may then produce independent
+patch and minor releases. Breaking public-interface changes require a package
+major release. A protocol revision does not automatically determine a package bump.
+
+The protocol basis remains **FTMS 1.0 plus the applicable errata documented in the
+specification audit**. A package version is neither protocol certification nor
+proof of identical optional APIs across languages. A stable scope can exclude
+record assembly or normalized convenience APIs while preserving raw `FullWire`.
 
 Workflow display names use `Verify LANGUAGE` or `Release LANGUAGE`. The combined
 Python workflow is named `Release Python`; TypeScript verification remains within
@@ -37,7 +55,7 @@ have independent version histories. Do not synchronize them by implication.
 
 | Boundary | Meaning | Current evidence |
 | --- | --- | --- |
-| Package semantic version | A package's public interface and distribution compatibility | TypeScript 0.4.0, C 0.2.0, Swift 0.1.0, Kotlin 0.1.0, Python 0.1.0a2, Rust 0.1.1, Dart 0.1.0, Go v0.1.0 and C# 0.1.0-alpha.1 are published independently. Verified identities are tracked in [released packages](released-packages.md). TypeScript uses `vVERSION`, Go uses `packages/go/vVERSION`, and the remaining packages use their language-prefixed tags listed in the [release process](releasing.md). |
+| Package semantic version | A package's public interface and distribution compatibility | Ports are published independently. Verified current identities are tracked in [released packages](released-packages.md), rather than duplicated in this policy. Tag namespaces and ecosystem exceptions are listed in the [release process](releasing.md). |
 | FTMS specification and errata | Bluetooth SIG service semantics and corrections used to review behavior | FTMS 1.0 plus ESR11 and EC23224 provenance; [1.0.1 annotated-redline reconciliation](specification-audit.md), with all nine incorporated errata attributed and remaining source conflicts explicitly recorded. |
 | Corpus schema format | Shape and comparison rules for fixtures | `schemaVersion: 1`, under `shared/conformance/v1/`. |
 | Corpus content revision | The exact schema/vector/contract bytes and checkout consumed by a runner | Pin immutable source commit, dirty indicator, and SHA-256 of both JSON assets plus `shared/conformance/README.md`. |
