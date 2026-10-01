@@ -6,6 +6,10 @@ Replace handwritten Fitness Machine Service packet parsing with typed values,
 explicit diagnostics, and bidirectional codecs. Build a fitness application,
 embedded integration, or protocol tool without taking on another connection stack.
 
+[Understand FTMS: from bytes to a workout](../docs/ftms-explained.md). See how eight
+bytes become speed, cadence and power, how control messages work, and why a shared
+codec saves applications from maintaining the same protocol logic.
+
 | Build with | What you get | Start |
 | --- | --- | --- |
 | TypeScript / JavaScript | ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |

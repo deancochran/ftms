@@ -9,6 +9,10 @@ encode protocol messages—without replacing your Bluetooth stack.
 For application developers, firmware authors, and protocol tooling maintainers.
 Created and maintained by Dean Cochran; contributions are welcome.
 
+**Why use a protocol library?** [FTMS explained: from bytes to a workout](docs/ftms-explained.md)
+walks through flags, little-endian values, measurement scaling and control messages
+with runnable examples—and shows which code your application no longer needs to own.
+
 ## Choose your implementation
 
 | Environment | Start here | Distribution |
