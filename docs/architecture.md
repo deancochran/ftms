@@ -32,7 +32,7 @@ establish publication; consult the release matrix above.
 | `shared/conformance/v1/` | Versioned, language-neutral codec vectors and schema | Existing regression corpus |
 | `shared/conformance/README.md` | v1 comparison and runner-accounting contract | Existing documentation |
 | `docs/support-profiles.md` | Role-based wire-direction and optional-module claims | Current package taxonomy |
-| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented independently by TypeScript, C, Swift, Kotlin and Python |
+| `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by ports according to the `CapabilityEvidence` entries in the support-profile matrix |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
 | `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released 0.2.0 source archive |
@@ -83,7 +83,7 @@ only for real reusable tooling, not speculative infrastructure or npm-only scrip
 
 1. **Protocol codecs:** bytes to values and values to bytes; deterministic,
    transport-independent, with explicit units and malformed-input behavior.
-2. **Capability interpretation (TypeScript, C, Swift and Kotlin implemented):**
+2. **Capability interpretation (where listed in the support-profile matrix):**
    a pure evaluation of caller-supplied discovery/read evidence. Report declared
    capabilities, missing evidence, and contradictions. Do not scan, connect, read
    characteristics, or authorize motion.
@@ -99,6 +99,31 @@ uses an idiomatic pointer/count boundary; neither API allocates or claims contro
 Do not infer a unique machine type from its name, manufacturer, or measurement
 flags. A set of observed FTMS data characteristics is evidence, not machine
 identity. Do not make Indoor Bike Data, ERG mode, or simulation mode prerequisites.
+
+## Consumer adapter seam
+
+A **consumer adapter** sits at the seam between one port's native byte/value
+interface and a specific transport or application. It is consumer-owned, not a
+feature of the protocol package. The project does not define one cross-language
+runtime adapter interface: `DataView`, `Data`, `ByteArray`, `Uint8List`, slices,
+spans and pointer/length pairs have different ownership and lifetime contracts.
+
+| Protocol package owns | Consumer adapter/application owns |
+| --- | --- |
+| Deterministic byte/value codecs, wire widths, signedness, scaling, sentinels and diagnostics | Conversion from platform transport values into the port's documented native byte input |
+| Validation of an explicitly caller-selected wire format, without device-name or packet-shape inference | BLE/GATT discovery, service-instance scope, characteristic properties and construction of capability evidence |
+| Pure interpretation of caller-supplied capability evidence, including missing and contradictory facts | Connection generation, cache invalidation, Service Changed handling, security, subscriptions and reconnects |
+| Optional pure record planning/assembly driven by explicit buffers, generation values and caller ticks, including deterministic expiry evaluation where implemented | Clock/tick source, selected expiry/freshness policy, lifecycle resets, scheduling, queues, retries, notification ordering and packet-loss policy |
+| Encoding and decoding Control Point requests and responses | Control ownership, procedure serialization, indication correlation, timeouts, disconnects and permission loss |
+| Native protocol values and explicit units appropriate to each language | Application models, display units, logging, UI state, user intent, equipment policy and physical safety |
+
+Capability declarations and satisfied static prerequisites are protocol facts,
+not execution permission. Encoding a request does not authorize its transmission.
+Likewise, record planning/assembly may deterministically apply caller-supplied
+generation, tick and maximum-age inputs, but it does not own a clock, timer,
+connection, subscription or session. Transport-shaped examples belong under
+`examples/`, package verification or consumer applications; they do not add BLE,
+OS lifecycle, UI or safety dependencies to a protocol package.
 
 ## Both ends of the wire
 

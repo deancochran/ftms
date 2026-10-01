@@ -20,6 +20,10 @@ same version; building it is not publication evidence. See the exact
 `RecordPlanning` and `RecordAssembly`. This names transport-independent protocol
 interfaces, not a complete equipment/server implementation.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 ## Additive range inspection in 0.2.0
 
 `ftms_inspect_range` and `ftms_inspect_range_with_format` report the caller's

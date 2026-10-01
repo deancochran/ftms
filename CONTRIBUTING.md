@@ -36,14 +36,15 @@ evidence—not a linked firmware image or board test. pnpm does not validate C.
 - TypeScript source/tests/manifests/build tools: `packages/typescript/`.
 - C source/tests/manifests/build tools: `packages/c/`.
 - Language-neutral contracts and canonical fixtures: `shared/`.
-- Application/transport recipes: `examples/`, outside protocol cores.
+- Application/consumer-adapter recipes: `examples/`, outside protocol cores.
 - Cross-language documentation checks: `tools/`; root configs orchestrate only.
 
+Follow the [consumer adapter seam](docs/architecture.md#consumer-adapter-seam).
 Do not add BLE, UI frameworks, logging, timers or application session contracts
 to protocol packages. TypeScript protocol bytes are `Uint8Array`/`ArrayBuffer`,
 not Buffer or base64; relative ESM imports retain `.js` suffixes. C uses native
-pointer/count and fixed-point contracts. Do not copy fixtures into ports or
-edit generated npm snapshots. Preserve package exports and release boundaries.
+pointer/count and fixed-point contracts. Do not copy fixtures into ports or edit
+generated npm snapshots. Preserve package exports and release boundaries.
 
 ## Tests and protocol corrections
 

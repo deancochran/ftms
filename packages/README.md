@@ -5,6 +5,10 @@
 All nine packages implement FTMS protocol bytes without owning your Bluetooth
 connection. Choose the language used by your application; do not choose by tag
 spelling or assume matching package versions imply identical convenience APIs.
+Integrate each package through the project-wide
+[consumer adapter seam](../docs/architecture.md#consumer-adapter-seam): native
+transport conversion, session lifecycle, application policy and control safety
+remain consumer-owned.
 
 ## Install and decode your first packet
 
@@ -46,6 +50,7 @@ preparation checklist, not an available package family.
 - [API references by language](../docs/api.md)
 - [TypeScript and C cookbook](../docs/integration.md)
 - [Transport recipes: JavaScript and C](../docs/transport-recipes.md)
+- [Consumer adapter seam](../docs/architecture.md#consumer-adapter-seam)
 - [Support profiles](../docs/support-profiles.md) and [protocol coverage](../docs/coverage.md)
 - [Troubleshooting](../docs/troubleshooting.md)
 

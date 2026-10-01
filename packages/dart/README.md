@@ -4,6 +4,10 @@ Pure Dart codecs for the Bluetooth **Fitness Machine Service**, usable from
 Flutter and standalone Dart. No Flutter, BLE, FFI, platform-channel or runtime
 package dependencies. Requires Dart 3.11 or newer, below Dart 4.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 **Status: 0.1.0 published on pub.dev.** See the repository's
 [release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md)
 for published identities.

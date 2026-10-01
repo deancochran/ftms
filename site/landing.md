@@ -31,6 +31,8 @@ published family. [Choose a language](../packages/README.md) for a step-by-step 
 Decode measurements, features, ranges and statuses. Construct control messages.
 Interpret capability evidence. Keep Bluetooth discovery, connections, permissions,
 timeouts, procedure ownership and physical safety in your application.
+The [consumer adapter seam](../docs/architecture.md#consumer-adapter-seam) gives
+the complete project-wide ownership split.
 
 **A valid packet is not permission to control equipment.** Host tests and shared
 fixtures are evidence of tested behavior, not universal device compatibility or
@@ -40,6 +42,7 @@ Bluetooth qualification.
 
 - [TypeScript and C cookbook](../docs/integration.md): choose the right public API for the task.
 - [Transport recipes](../docs/transport-recipes.md): JavaScript and C byte-boundary examples.
+- [Consumer adapter seam](../docs/architecture.md#consumer-adapter-seam): protocol-package and application ownership.
 - [Releases and support](../docs/released-packages.md): distinguish source from published packages.
 - [Support profiles](../docs/support-profiles.md): select client and equipment wire directions.
 - [Protocol coverage](../docs/coverage.md): inspect tested scope and evidence limits.

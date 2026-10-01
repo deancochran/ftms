@@ -3,6 +3,23 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { portCatalog } from "./port-catalog.mjs";
+
+export const consumerAdapterUrl =
+  "https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam";
+
+export const consumerAdapterProjectLinks = Object.freeze({
+  "README.md": "docs/architecture.md#consumer-adapter-seam",
+  "CONTRIBUTING.md": "docs/architecture.md#consumer-adapter-seam",
+  "docs/README.md": "architecture.md#consumer-adapter-seam",
+  "docs/ftms-explained.md": "architecture.md#consumer-adapter-seam",
+  "docs/integration.md": "architecture.md#consumer-adapter-seam",
+  "docs/roadmap.md": "architecture.md#consumer-adapter-seam",
+  "docs/support-profiles.md": "architecture.md#consumer-adapter-seam",
+  "docs/transport-recipes.md": "architecture.md#consumer-adapter-seam",
+  "packages/README.md": "../docs/architecture.md#consumer-adapter-seam",
+  "site/landing.md": "../docs/architecture.md#consumer-adapter-seam",
+});
 
 export function withoutCode(text) {
   return text.replace(/^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1\s*$/gm, "");
@@ -106,6 +123,70 @@ export function checkStatus(root) {
   }
 }
 
+export function checkConsumerAdapterSeam(root) {
+  const read = (file) => readFileSync(path.join(root, file), "utf8");
+  const architecture = read("docs/architecture.md");
+  const seamHeading = /^## Consumer adapter seam\s*$/m.exec(architecture);
+  assert.ok(seamHeading, "Architecture must define the consumer adapter seam");
+  const afterHeading = architecture.slice(seamHeading.index + seamHeading[0].length);
+  const nextHeading = /^#{1,2}\s+/m.exec(afterHeading);
+  const seam = afterHeading.slice(0, nextHeading?.index ?? afterHeading.length);
+  const architectureProse = architecture.replace(/\s+/g, " ");
+  const seamProse = withoutCode(seam)
+    .replace(/`[^`\n]*`/g, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  assert.ok(
+    anchors(architecture).has("consumer-adapter-seam"),
+    "Architecture must define the consumer adapter seam",
+  );
+  for (const phrase of [
+    "protocol package owns",
+    "consumer adapter/application owns",
+    "record planning/assembly",
+    "deterministic expiry evaluation",
+    "clock/tick source",
+    "selected expiry/freshness policy",
+    "not execution permission",
+    "physical safety",
+    "does not define one cross-language runtime adapter interface",
+  ]) {
+    assert.ok(seamProse.includes(phrase), `Consumer adapter seam must retain: ${phrase}`);
+  }
+  assert.ok(
+    !seamProse.includes("fragment expiry, freshness"),
+    "Consumer side must not claim deterministic fragment-expiry evaluation",
+  );
+  for (const stale of [
+    "Capability interpretation (TypeScript, C, Swift and Kotlin implemented)",
+    "Implemented independently by TypeScript, C, Swift, Kotlin and Python",
+  ]) {
+    assert.ok(
+      !architectureProse.includes(stale),
+      `Architecture retains stale capability list: ${stale}`,
+    );
+  }
+  for (const port of Object.keys(portCatalog)) {
+    const readme = read(`packages/${port}/README.md`);
+    assert.ok(
+      links(readme).includes(consumerAdapterUrl),
+      `packages/${port}/README.md must link the canonical consumer adapter seam`,
+    );
+  }
+  for (const [file, target] of Object.entries(consumerAdapterProjectLinks)) {
+    assert.ok(
+      links(read(file)).includes(target),
+      `${file} must link the canonical consumer adapter seam`,
+    );
+  }
+  assert.ok(
+    read("packages/typescript/README.md").includes(
+      "`writeControlPoint` above is supplied by the consumer adapter",
+    ),
+    "TypeScript control example must identify writeControlPoint as consumer-owned",
+  );
+}
+
 export function main(root) {
   // Includes new work without requiring staging; respects generated/ignored paths.
   const files = execFileSync(
@@ -125,8 +206,9 @@ export function main(root) {
   }
   assert.equal(errors.length, 0, errors.join("\n"));
   checkStatus(root);
+  checkConsumerAdapterSeam(root);
   console.log(
-    `Documentation checks passed: ${new Set(files).size} Markdown files; local links/anchors and release quickstart identity.`,
+    `Documentation checks passed: ${new Set(files).size} Markdown files; local links/anchors, release quickstart identity and consumer adapter seam.`,
   );
 }
 

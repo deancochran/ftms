@@ -14,6 +14,10 @@ Repository links describe main; use a matching release tag for older packages.
 `CapabilityEvidence`, `RangeInspection` and `NormalizedViews`. This names codec
 directions, not BLE transport or permission to control equipment.
 
+Integrate through the [consumer adapter seam](https://github.com/deancochran/ftms/blob/main/docs/architecture.md#consumer-adapter-seam):
+transport conversion, BLE/session lifecycle, retries, subscriptions,
+UI/application policy and control safety remain outside this protocol package.
+
 The package accepts `Uint8Array` or `ArrayBuffer` values and returns typed,
 normalized data. It does not create BLE connections, own GATT subscriptions,
 schedule command timeouts, log, or depend on React Native.
@@ -103,6 +107,7 @@ if (!encoded.ok) {
   throw new RangeError(encoded.error.message);
 }
 
+// Consumer adapter function; this package does not provide transport I/O.
 await writeControlPoint(encoded.value);
 
 const response = decodeFtmsControlResponse(indicationBytes);
@@ -113,6 +118,8 @@ if (!response.ok || !response.value.success) {
 
 `encodeFtmsControlRequest` is the throwing convenience variant.
 `tryEncodeFtmsControlRequest` is recommended at untrusted boundaries.
+`writeControlPoint` above is supplied by the consumer adapter, which also owns
+procedure serialization, response correlation and timeout/disconnect policy.
 
 Both normalized encoders accept an optional second `FtmsControlFormatOptions`
 argument, as do `encodeFtmsControlRequestRaw` and `decodeFtmsControlRequestRaw`:

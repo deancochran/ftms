@@ -87,6 +87,8 @@ Bluetooth discovery, permissions, connections, subscriptions, timing, reconnecti
 control ownership, procedure serialization and physical safety. Encoding a valid
 command or observing a supported feature does **not** authorize sending it.
 This is not a complete trainer controller or a Bluetooth-qualified product.
+The [consumer adapter seam](docs/architecture.md#consumer-adapter-seam) defines
+the project-wide split between protocol packages and application integration.
 
 ## Integrate
 
@@ -95,6 +97,7 @@ This is not a complete trainer controller or a Bluetooth-qualified product.
 - [Static documentation site: local preview and deployment](site/README.md)
 - [Integration cookbook](docs/integration.md)
 - [Web Bluetooth, React Native and C byte-boundary recipes](docs/transport-recipes.md)
+- [Consumer adapter seam and ownership table](docs/architecture.md#consumer-adapter-seam)
 - [Public API selection and reference](docs/api.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [TypeScript package details](packages/typescript/README.md) · [C installation](packages/c/INSTALL.md)

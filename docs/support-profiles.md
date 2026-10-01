@@ -3,6 +3,9 @@
 Status: current package-coverage taxonomy. These profiles describe protocol
 directions, not Bluetooth transport, device compatibility, execution permission,
 or a requirement that language packages expose identical interfaces.
+All profiles use the same [consumer adapter seam](architecture.md#consumer-adapter-seam):
+platform conversion, transport/session lifecycle, UI policy and control safety
+remain outside the protocol packages.
 
 ## Why profiles are role-based
 
