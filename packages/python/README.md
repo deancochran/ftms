@@ -1,4 +1,4 @@
-# deancochran-ftms
+# FTMS for Python
 
 `deancochran-ftms` is a pure, synchronous Python protocol package.  This
 **0.1.0a2 is an alpha with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, bidirectional Machine/Training Status, and static capability evaluation. The earlier 0.1.0a1 artifact has no capability API. It has no BLE, lifecycle, or logging APIs and is not a complete port of every API in the TypeScript/C packages.

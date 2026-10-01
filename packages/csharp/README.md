@@ -1,4 +1,4 @@
-# DeanCochran.Ftms
+# FTMS for C#
 
 **Pure managed Bluetooth Fitness Machine Service protocol library for .NET.**
 

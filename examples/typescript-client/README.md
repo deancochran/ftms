@@ -26,7 +26,7 @@ control procedure, the application must discover the proper characteristic state
 and properties, satisfy security requirements, handle control ownership and
 indications, and validate the requested value against the actual supported range.
 
-The released 0.2.0 package does not expose the unreleased aggregate capability
-evaluation API, so this example deliberately does not claim that API is available.
+The released 0.2.0 package does not expose the aggregate capability evaluation API
+available in later releases, so this pinned example deliberately does not use it.
 It does not perform BLE I/O, write a control point, identify hardware, or provide
 real-equipment or Bluetooth qualification evidence.

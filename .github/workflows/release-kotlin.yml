@@ -1,4 +1,4 @@
-name: Release Kotlin
+name: Release Kotlin/JVM
 
 on:
   push:

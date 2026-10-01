@@ -12,15 +12,15 @@ codec saves applications from maintaining the same protocol logic.
 
 | Build with | What you get | Start |
 | --- | --- | --- |
-| TypeScript / JavaScript | ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |
-| C / C++ | Portable C99, fixed-point values, caller-owned memory | [Install the source archive](../examples/c-client/README.md) |
+| TypeScript | JavaScript/TypeScript ESM, normalized metrics, raw codecs and declarations | [Run the quickstart](../examples/typescript-quickstart/README.md) |
+| C | Portable C99 with C++ consumers, fixed-point values, caller-owned memory | [Install the source archive](../examples/c-client/README.md) |
 | Swift | Native SwiftPM codecs and capabilities | [Swift package guide](../packages/swift/README.md) |
-| Kotlin / Java | Independent JVM codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
+| Kotlin/JVM | Independent Kotlin and Java codecs and capabilities | [Kotlin package guide](../packages/kotlin/README.md) |
 | Python | Published 0.1.0a2 alpha with static capability evidence | [Python package guide](../packages/python/README.md) |
 | Rust | Published 0.1.1 allocation-free `no_std` codecs and normalized views | [Rust package guide](../packages/rust/README.md) |
-| Dart / Flutter | Published pure Dart codecs and capabilities | [Dart package guide](../packages/dart/README.md) |
+| Dart | Published pure Dart codecs and capabilities for Dart and Flutter applications | [Dart package guide](../packages/dart/README.md) |
 | Go | Published nested module with raw codecs and capabilities | [Go package guide](../packages/go/README.md) |
-| C# / .NET | Published 0.1.0-alpha.1 codecs and capabilities | [C# package guide](../packages/csharp/README.md) |
+| C# | Published 0.1.0-alpha.1 .NET codecs and capabilities | [C# package guide](../packages/csharp/README.md) |
 
 ## A focused boundary
 

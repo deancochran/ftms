@@ -1,5 +1,37 @@
 # Versioning boundaries
 
+## Naming conventions
+
+Use **FTMS** as the shared brand. Package guide headings are `FTMS for LANGUAGE`;
+navigation uses the language alone. Audience/runtime names (JavaScript, C++, Java,
+Flutter and .NET) belong in descriptions, not stability-dependent page titles.
+`tools/port-catalog.mjs` supplies the language labels, native package IDs, version
+sources, tag prefixes and guide routes used by site navigation and release readiness.
+It contains no duplicate version numbers.
+
+Changelogs use `# Changelog` and `## VERSION` for new version entries, with optional
+`Date: YYYY-MM-DD` on a separate line. Historical entry formats remain supported.
+Changelogs describe changes; the [release matrix](released-packages.md) records
+publication evidence. Do not put temporary publication claims in changelog entries.
+An optional `## Unreleased` section records next-release work, except for Go:
+its first version heading remains the release-readiness version authority.
+
+Keep **version**, **publication** (candidate or verified published), and **stability**
+(alpha, beta, release candidate or non-prerelease) distinct. A published alpha is
+still an alpha; a non-prerelease `0.x` version does not promise a stable 1.0 interface.
+Preserve native version spelling, including Python `0.1.0a2` and NuGet
+`0.1.0-alpha.1`; use `v` only where required by tags or ecosystem installation syntax.
+
+Package IDs, import names and tag namespaces are compatibility contracts and are
+not renamed to match presentation. In particular, Go requires `packages/go/vVERSION`,
+and Swift uses revision pins rather than competing with npm's `vVERSION` tags.
+
+Workflow display names use `Verify LANGUAGE` or `Release LANGUAGE`. The combined
+Python workflow is named `Release Python`; TypeScript verification remains within
+central `CI`. Workflow filenames, job/check names and publisher bindings stay intact.
+
+## Independent identities
+
 FTMS specification text, corpus format/content, and each distributable package
 have independent version histories. Do not synchronize them by implication.
 

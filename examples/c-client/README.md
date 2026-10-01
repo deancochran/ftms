@@ -1,4 +1,4 @@
-# C / C++ installed-library quickstart
+# C installed-library quickstart
 
 Decode Indoor Bike and Treadmill data, detect truncation, and encode—but never
 send—Request Control bytes. [main.c](main.c) checks expected values and exits

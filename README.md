@@ -15,17 +15,17 @@ with runnable examples—and shows which code your application no longer needs t
 
 ## Choose your implementation
 
-| Environment | Start here | Distribution |
+| Language | Start here | Distribution |
 | --- | --- | --- |
-| JavaScript / TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms` |
-| C / C++ | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation |
+| TypeScript | [Five-minute quickstart](examples/typescript-quickstart/README.md) | npm: `@deancochran/ftms`; JavaScript and TypeScript |
+| C | [Installed-library quickstart](examples/c-client/README.md) | C99 source archive; CMake installation and C++ consumers |
 | Swift | [Swift guide](packages/swift/README.md) | SwiftPM: `swift-v0.1.0` |
-| Kotlin / Java | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0` |
+| Kotlin/JVM | [Kotlin guide](packages/kotlin/README.md) | Maven Central: `io.github.deancochran:ftms:0.1.0`; Kotlin and Java |
 | Go | [Go guide](packages/go/README.md) | Go module `github.com/deancochran/ftms/packages/go` v0.1.0 |
 | Python | [Python guide](packages/python/README.md) | PyPI: `deancochran-ftms` 0.1.0a2 alpha; includes static capability evidence |
 | Rust | [Rust guide](packages/rust/README.md) | crates.io `ftms` 0.1.1; normalized range/control/status projections and 97-case codec-v1 coverage |
-| Dart / Flutter | [Dart guide](packages/dart/README.md) | pub.dev: `deancochran_ftms` 0.1.0 |
-| C# / .NET | [C# guide](packages/csharp/README.md) | NuGet: `DeanCochran.Ftms` 0.1.0-alpha.1 |
+| Dart | [Dart guide](packages/dart/README.md) | pub.dev: `deancochran_ftms` 0.1.0; Dart and Flutter |
+| C# | [C# guide](packages/csharp/README.md) | NuGet: `DeanCochran.Ftms` 0.1.0-alpha.1; .NET |
 
 The [canonical release matrix](docs/released-packages.md) records verified versions,
 publication identity, installation requirements and evidence limits.

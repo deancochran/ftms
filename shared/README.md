@@ -6,10 +6,11 @@ fixtures**, never the reverse. Nothing here requires npm, a language-specific
 package, a native toolchain, BLE, or an OS lifecycle API.
 
 - [protocol/capability-discovery.md](protocol/capability-discovery.md) describes
-  static protocol interpretation rules and acceptance scenarios. TypeScript, C,
-  Swift and Kotlin implement them without BLE or control authorization; Python's
-  current alpha does not. Rust 0.1.0 implements them; later range/control/status
-  projections and expanded normalized codec evidence are separately unreleased.
+  static protocol interpretation rules and acceptance scenarios, without BLE or
+  control authorization. Consult the [current support profiles](../docs/support-profiles.md)
+  and [verified release matrix](../docs/released-packages.md) for each port's
+  implementation and publication evidence. Those records include Python's static
+  capability evaluation and Rust's published normalized projections.
 - [conformance/v1/schema.json](conformance/v1/schema.json) and
   [conformance/v1/vectors.json](conformance/v1/vectors.json) are the canonical
   versioned codec regression corpus. Fixtures are executable expectations and
@@ -34,5 +35,5 @@ runner, without installing another port. Do not independently maintain copies.
 TypeScript's package-owned build script stages distribution snapshots into
 `packages/typescript/conformance/v1/` solely to preserve npm content paths.
 Language-specific scripts and manifests belong to their packages; root configs
-orchestrate the repository. Shared tooling belongs in a future `tools/` only
-when there is real reusable implementation to own.
+orchestrate the repository. Reusable repository tooling lives in `tools/`;
+port-specific verification and publishing scripts remain package-owned.

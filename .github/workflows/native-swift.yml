@@ -1,4 +1,4 @@
-name: Native Swift
+name: Verify Swift
 
 on:
   workflow_call:

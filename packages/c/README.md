@@ -1,4 +1,4 @@
-# FTMS for C / C++
+# FTMS for C
 
 Portable C99 codecs for Bluetooth Fitness Machine Service telemetry, features,
 ranges, statuses and control messages. Keep your existing Bluetooth stack.

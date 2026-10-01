@@ -1,4 +1,4 @@
-# FTMS Swift
+# FTMS for Swift
 
 Native Swift 6 FTMS 1.0 + EC23224 protocol/domain library, package version **0.1.0**.
 Its [support profile](../../docs/support-profiles.md) is `FullWire`, with

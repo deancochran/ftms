@@ -19,6 +19,27 @@ version/changelog updates can require package-specific lockfile or metadata chan
 so make them in a reviewed PR using the package runbook. It never tags, pushes,
 publishes, or contacts credentials; Python readiness retains PEP 440 validation.
 
+### Release entry naming
+
+Future GitHub release titles use **`FTMS LANGUAGE VERSION`**, with the native version
+and no extra `v` prefix. Generate the title from the current package metadata with
+`node tools/release-title.mjs PORT` (read-only). For example: `FTMS Go 0.1.0`,
+`FTMS C# 0.1.0-alpha.1`, or `FTMS Python 0.1.0a2`. Put the registry/package ID,
+exact tag/commit, public-consumer result and artifact checksums in the body.
+Only create a publication evidence entry after public verification succeeds.
+
+Existing automated C, Swift, Kotlin and Rust release titles already follow this
+format. Other publication workflows do not automatically create GitHub entries;
+record those as a separate authorized release-completion step using the generated
+title and verified evidence. A missing GitHub entry does not imply an unpublished
+registry package. Do not backfill historical releases without their exact evidence.
+
+Do not rename historical releases or regenerate their notes from current source:
+immutable tagged retry tooling can compare titles and bodies exactly. Preserve
+historical tags, assets and metadata. Source documentation updates never authorize
+republishing the same version with changed README, changelog or classifier bytes.
+See [naming and versioning conventions](versioning.md#naming-conventions).
+
 C# readiness validates canonical NuGet version identity, not public availability.
 Its native verification remains credential-free. The tag-only release workflow
 requires a signed annotated tag, main ancestry, all-host native checks and the

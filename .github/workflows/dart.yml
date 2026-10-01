@@ -1,4 +1,4 @@
-name: Dart verification
+name: Verify Dart
 
 on:
   workflow_dispatch:

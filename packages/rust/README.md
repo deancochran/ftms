@@ -1,4 +1,4 @@
-# FTMS Rust
+# FTMS for Rust
 
 `ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.1 is
 published on crates.io, including the normalized range/control/status projections.
