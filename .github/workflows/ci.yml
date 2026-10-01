@@ -91,7 +91,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tools -p 'test_*.py' -v
           python3 -m unittest discover -s packages/python/tests -p test_release_retry.py -v
-          node --test tools/release-prepare.test.mjs packages/typescript/scripts/test-npm-release.mjs packages/typescript/scripts/test-verify-public.mjs
+          node --test tools/release-prepare.test.mjs tools/port-catalog.test.mjs packages/typescript/scripts/test-npm-release.mjs packages/typescript/scripts/test-verify-public.mjs
       - name: Validate all package release metadata
         if: always()
         run: node tools/release-prepare.mjs all --dry-run > release-readiness.json

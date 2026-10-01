@@ -1,4 +1,4 @@
-name: Python verification and release
+name: Release Python
 
 on:
   push:

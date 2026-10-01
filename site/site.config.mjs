@@ -1,3 +1,5 @@
+import { guidePage } from "../tools/port-catalog.mjs";
+
 // One source for the Pages URL, repository links and mapped documentation routes.
 export const site = "https://deancochran.github.io";
 export const base = "/ftms";
@@ -14,60 +16,9 @@ export const pages = [
     title: "What is FTMS?",
     group: "Getting started",
   },
-  {
-    source: "packages/dart/README.md",
-    slug: "start/dart",
-    title: "Dart / Flutter",
-    group: "Getting started",
-  },
-  {
-    source: "packages/go/README.md",
-    slug: "start/go",
-    title: "Go",
-    group: "Getting started",
-  },
-  {
-    source: "packages/csharp/README.md",
-    slug: "start/csharp",
-    title: "C# / .NET (alpha)",
-    group: "Getting started",
-  },
-  {
-    source: "packages/swift/README.md",
-    slug: "start/swift",
-    title: "Swift",
-    group: "Getting started",
-  },
-  {
-    source: "packages/kotlin/README.md",
-    slug: "start/kotlin",
-    title: "Kotlin / Java",
-    group: "Getting started",
-  },
-  {
-    source: "packages/python/README.md",
-    slug: "start/python",
-    title: "Python (alpha)",
-    group: "Getting started",
-  },
-  {
-    source: "packages/rust/README.md",
-    slug: "start/rust",
-    title: "Rust",
-    group: "Getting started",
-  },
-  {
-    source: "examples/typescript-quickstart/README.md",
-    slug: "start/typescript",
-    title: "TypeScript / JavaScript",
-    group: "Getting started",
-  },
-  {
-    source: "examples/c-client/README.md",
-    slug: "start/c",
-    title: "C / C++",
-    group: "Getting started",
-  },
+  ...["dart", "go", "csharp", "swift", "kotlin", "python", "rust", "typescript", "c"].map(
+    guidePage,
+  ),
   {
     source: "docs/integration.md",
     slug: "integration/cookbook",

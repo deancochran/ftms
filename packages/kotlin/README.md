@@ -1,4 +1,4 @@
-# FTMS Kotlin/JVM
+# FTMS for Kotlin/JVM
 
 Independent, transport-neutral Kotlin and Java codecs for Bluetooth Fitness
 Machine Service 1.0 plus the applicable errata recorded in the repository's

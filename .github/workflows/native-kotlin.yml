@@ -1,4 +1,4 @@
-name: Kotlin JVM
+name: Verify Kotlin/JVM
 
 on:
   workflow_call:

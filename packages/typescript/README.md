@@ -1,4 +1,4 @@
-# @deancochran/ftms
+# FTMS for TypeScript
 
 Runtime-neutral TypeScript codecs for the Bluetooth Fitness Machine Service
 (FTMS).

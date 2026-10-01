@@ -1,4 +1,4 @@
-name: Release C# NuGet
+name: Release C#
 
 on:
   push:

@@ -2,6 +2,7 @@
 // Release readiness is intentionally read-only. Version/changelog edits have
 // ecosystem-specific lockfile and metadata consequences and are reviewed in PRs.
 import { readFile } from "node:fs/promises";
+import { portCatalog, portInfo, releaseTag } from "./port-catalog.mjs";
 
 // Deliberately narrower than NuGet's accepted input: VERSION must already be
 // canonical. NuGet ignores build metadata and normalizes abbreviated versions.
@@ -18,58 +19,47 @@ export function validNuGetVersion(version) {
   );
 }
 
-export const ports = {
+const formats = {
   typescript: {
-    version: "packages/typescript/package.json",
-    changelog: "packages/typescript/CHANGELOG.md",
     match: (s) => JSON.parse(s).version,
   },
   python: {
-    version: "packages/python/pyproject.toml",
-    changelog: "packages/python/CHANGELOG.md",
     match: (s) => s.match(/^version\s*=\s*"([^"]+)"/m)?.[1],
     valid: (v) =>
       /^[0-9]+(?:\.[0-9]+)*(?:(a|b|rc)[0-9]+)?(?:\.post[0-9]+)?(?:\.dev[0-9]+)?$/.test(v),
   },
   kotlin: {
-    version: "packages/kotlin/VERSION",
-    changelog: "packages/kotlin/CHANGELOG.md",
     match: (s) => s.trim(),
   },
   c: {
-    version: "packages/c/VERSION",
-    changelog: "packages/c/CHANGELOG.md",
     match: (s) => s.trim(),
   },
   rust: {
-    version: "packages/rust/Cargo.toml",
-    changelog: "packages/rust/CHANGELOG.md",
     match: (s) => s.match(/^version\s*=\s*"([^"]+)"/m)?.[1],
   },
   swift: {
-    version: "packages/swift/VERSION",
-    changelog: "packages/swift/CHANGELOG.md",
     match: (s) => s.trim(),
   },
   csharp: {
-    version: "packages/csharp/VERSION",
-    changelog: "packages/csharp/CHANGELOG.md",
     match: (s) => s.trim(),
     valid: validNuGetVersion,
   },
   dart: {
-    version: "packages/dart/pubspec.yaml",
-    changelog: "packages/dart/CHANGELOG.md",
     match: (s) => s.match(/^version:\s*([^\s#]+)\s*$/m)?.[1],
   },
   go: {
     // Go has no manifest package-version field: the release heading is the
     // candidate identity; only the nested-module tag establishes publication.
-    version: "packages/go/CHANGELOG.md",
-    changelog: "packages/go/CHANGELOG.md",
     match: (s) => s.match(/^## (\S+)(?: — .+)?$/m)?.[1],
   },
 };
+
+export const ports = Object.fromEntries(
+  Object.keys(portCatalog).map((port) => {
+    const info = portInfo(port);
+    return [port, { ...formats[port], version: info.versionSource, changelog: info.changelog }];
+  }),
+);
 
 export function validateMetadata(port, source, changelog, candidate) {
   const spec = ports[port];
@@ -100,12 +90,7 @@ export function validateMetadata(port, source, changelog, candidate) {
   return {
     port,
     version,
-    tag:
-      port === "typescript"
-        ? `v${version}`
-        : port === "go"
-          ? `packages/go/v${version}`
-          : `${port}-v${version}`,
+    tag: releaseTag(port, version),
     remoteMutation: false,
   };
 }

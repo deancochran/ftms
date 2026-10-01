@@ -3,6 +3,12 @@
 Python distribution versions are independent of FTMS specification, shared
 conformance corpus, and other language-package versions.
 
+## Unreleased
+
+- Correct the development-status classifier from Pre-Alpha to Alpha to match
+  the native alpha version and documented API maturity. This source-only change
+  is for the next versioned release; immutable PyPI 0.1.0a2 metadata is unchanged.
+
 ## 0.1.0a2
 
 - Add pure static capability evaluation with immutable discovery/read evidence,

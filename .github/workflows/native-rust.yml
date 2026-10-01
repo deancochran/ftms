@@ -1,4 +1,4 @@
-name: Native Rust
+name: Verify Rust
 
 on:
   workflow_call:

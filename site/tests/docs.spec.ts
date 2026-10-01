@@ -14,16 +14,25 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
   ).toBeVisible();
   await page.getByRole("link", { name: "Get started", exact: true }).click();
   await expect(page).toHaveURL(/\/ftms\/start\/typescript\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("TypeScript / JavaScript");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("TypeScript");
   await expect(page.getByText("speedMps=10 cadenceRpm=90", { exact: false })).toBeVisible();
   await page.goto("/ftms/start/c/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("C / C++");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("C");
   await page.goto("/ftms/start/dart/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Dart / Flutter");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Dart");
   await page.goto("/ftms/start/go/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Go");
   await page.goto("/ftms/start/csharp/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("C# / .NET (alpha)");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("C#");
+  for (const [port, language] of [
+    ["python", "Python"],
+    ["rust", "Rust"],
+    ["swift", "Swift"],
+    ["kotlin", "Kotlin/JVM"],
+  ]) {
+    await page.goto(`/ftms/start/${port}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(language);
+  }
   await page.goto("/ftms/project/releasing/");
   await expect(
     page.getByRole("heading", { name: "Coordinated release checklist", exact: true }),
