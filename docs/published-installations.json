@@ -1,5 +1,5 @@
 {
-  "typescript": { "version": "0.5.0", "evidence": "published-typescript-050" },
+  "typescript": { "version": "0.6.0", "evidence": "published-typescript-060" },
   "c": {
     "version": "0.2.0",
     "evidence": "published-typescript-040--c-020",
