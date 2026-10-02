@@ -1,6 +1,6 @@
 {
   "name": "@deancochran/ftms",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Runtime-neutral TypeScript codecs for Bluetooth Fitness Machine Service (FTMS)",
   "private": false,
   "license": "MIT",
@@ -24,6 +24,8 @@
     "typescript"
   ],
   "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
@@ -37,10 +39,16 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
       "react-native": "./dist/index.js",
       "development": "./dist/index.js",
-      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./conformance/schema": "./conformance/v1/schema.json",
@@ -54,7 +62,7 @@
     "test": "vitest run",
     "check-types": "tsc --noEmit -p tsconfig.json",
     "docs:build": "typedoc --options typedoc.json",
-    "build": "pnpm run clean && tsc -p tsconfig.build.json && node ./scripts/stage-package.mjs",
+    "build": "pnpm run clean && tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node ./scripts/stage-package.mjs",
     "verify:package": "node ./scripts/verify-package.mjs",
     "test:release": "node --test ./scripts/test-npm-release.mjs",
     "verify": "pnpm lint && pnpm check-types && pnpm test && pnpm verify:package",

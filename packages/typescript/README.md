@@ -34,9 +34,11 @@ npm install @deancochran/ftms
 pnpm add @deancochran/ftms
 ```
 
-The package is ESM-only. It publishes JavaScript and TypeScript declarations
-from `dist/`. It is intended for Node.js 20+, modern bundlers, and modern
-React Native/Metro projects.
+The package publishes ESM and CommonJS JavaScript from the same TypeScript
+sources, with matching declarations (`import` resolves `dist/`; `require`
+resolves `dist/cjs/`). Its legacy `main` and `module` entries remain available.
+It is intended for Node.js 20+, modern bundlers, and modern React Native/Metro
+projects.
 
 ## Parse measurements
 
@@ -70,6 +72,32 @@ Use `parseRegisteredFtmsPayload(characteristicUuid, bytes, formatOptions)` when 
 characteristic UUID. Measurement parsers accept explicit caller-owned format
 options; legacy treadmill pace is retained only by raw decoding because its unit
 is unknown, so normalized pace remains null.
+
+### Named Indoor Bike reading
+
+`decodeIndoorBikeData(bytes, options?)` is an additive Indoor Bike-only view for
+consumers that need stable named fields rather than the generic metric bag. It
+returns a `measurement` object in physical units, a `raw` object retaining
+unscaled wire integers, and `diagnostics`. All named fields are present in each
+object; `null` means the field was not selected by flags, was truncated, or used
+its FTMS unavailable sentinel. `diagnostics.unavailableFields` distinguishes the
+last case. Zero remains a valid value.
+
+```ts
+import { decodeIndoorBikeData } from "@deancochran/ftms";
+
+const reading = decodeIndoorBikeData(notificationBytes);
+console.log(reading.measurement.speedKph, reading.measurement.speedMps);
+console.log(reading.raw.cadenceHalfRpm);
+```
+
+Speed is exposed directly from the wire value as hundredths of km/h and as m/s;
+cadence is half-rpm; MET is tenths; times are seconds. The default resistance
+layout is the existing unsigned whole-level format. Select the alternate layout
+only from caller-owned evidence: `{ resistanceFormat: "signed16Tenths" }` makes
+`raw.resistance` a signed integer in tenths and `measurement.resistanceLevel` a
+scaled value. The decoder never guesses a layout from packet length or device
+identity, and it does not assemble `moreData` fragments.
 
 ## Decode features and supported ranges
 

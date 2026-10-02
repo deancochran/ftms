@@ -2,7 +2,7 @@
 
 | Symptom | Check | Next step |
 | --- | --- | --- |
-| Import fails in Node | Package is ESM-only | Use `.mjs` or an ESM project, Node 20+, and the package root import; run the isolated quickstart |
+| Import fails in Node | Check runtime, module format and installed version | Use Node 20+ and the package root. From 0.5.0, ESM `import` and CommonJS `require` are supported; earlier versions require ESM. Run the isolated quickstart |
 | TypeScript reports missing APIs | Installed version may differ from main | Check the installed manifest and [release matrix](released-packages.md); do not import private source files |
 | Browser packet decodes nonsense | A DataView may cover only part of its buffer | Preserve `byteOffset` and `byteLength`; see [transport recipes](transport-recipes.md) |
 | React Native value is a string | BLE library may expose base64 | Convert using the documented transport contract; do not treat it as UTF-8 or pass it directly to the parser |

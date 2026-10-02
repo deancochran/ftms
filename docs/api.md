@@ -33,7 +33,7 @@ the npm artifact. Contributors can reproduce it using the
 
 | Task | Public API |
 | --- | --- |
-| Measurement, normalized | `parseFtmsTreadmillData`, `parseFtmsCrossTrainerData`, `parseFtmsStepClimberData`, `parseFtmsStairClimberData`, `parseFtmsRowerData`, `parseFtmsIndoorBikeMeasurement` |
+| Measurement, normalized | `parseFtmsTreadmillData`, `parseFtmsCrossTrainerData`, `parseFtmsStepClimberData`, `parseFtmsStairClimberData`, `parseFtmsRowerData`, `parseFtmsIndoorBikeMeasurement`; `decodeIndoorBikeData` (named Indoor Bike measurement/raw/diagnostics view) |
 | Characteristic dispatch | `parseRegisteredFtmsPayload`, `FTMS_CHARACTERISTICS`, `FTMS_DATA_CHARACTERISTICS` |
 | Features | `decodeFtmsFeatures`; `decodeFtmsFeaturesRaw` / `encodeFtmsFeaturesRaw` |
 | Ranges | `decodeFtmsRange`, `decodeSupportedPowerRange` and the other named range decoders; `decodeFtmsRangeRaw` / `encodeFtmsRangeRaw`; `inspectFtmsRangeRaw` |
