@@ -2,6 +2,7 @@
 
 Last checked against npm, GitHub, Maven Central, PyPI, crates.io, NuGet and the Go module proxy:
 **2026-09-30 UTC**.
+TypeScript additionally verified **2026-10-02 UTC** at 0.5.0.
 This is a point-in-time record, not a promise that branch source is published.
 
 This is the **canonical current release matrix**. [Choose a language](../packages/README.md)
@@ -22,13 +23,39 @@ Source, package, protocol and corpus versions are distinct; see [versioning](ver
 | Python | 0.1.0a2 (alpha) | [PyPI](../packages/python/README.md) | [Record](#published-alpha-python-010a2) |
 | Rust | 0.1.1 | [crates.io](../packages/rust/README.md) | [Record](#published-rust-011) |
 | Swift | 0.1.0 | [SwiftPM revision](../packages/swift/README.md) | [Record](#published-swift-010) |
-| TypeScript | npm `@deancochran/ftms@0.4.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-040--c-020) |
+| TypeScript | npm `@deancochran/ftms@0.5.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-050) |
 
 ## Release evidence ledger
 
 The records below retain original hashes, checks and limitations. Existing links
 and anchors are preserved. They are publication evidence, not instructions for
 preparing the next release; maintainers should use the [release procedure](releasing.md).
+
+## Published TypeScript 0.5.0
+
+npm serves **`@deancochran/ftms@0.5.0`**. Tag `v0.5.0` identifies reviewed
+main commit `b79bb9e5dfc1af4dbd59ceeddb9e0b26f1d27176`, integrated by
+[PR #41](https://github.com/deancochran/ftms/pull/41).
+
+- [Release run 37030719970](https://github.com/deancochran/ftms/actions/runs/37030719970)
+  published through npm trusted publishing with provenance. The first public
+  verification attempt timed out while npm processed the accepted upload; the
+  retry verified the existing immutable archive and passed without replacing it.
+- Public archive integrity:
+  `sha512-6DhDyn51mj5Ywh7wtv+gcB+GS7O8BwaXVD6oR2poD5ORZ90v2nruDQwJcWg8RQZ4jh3Vrpm7n2VrUginGEGj+g==`.
+  The workflow retains the tested archive and installed public-consumer evidence.
+- 594 TypeScript tests pass. CI verifies Node 20, 22 and 24; packed-artifact
+  verification covers ESM/CommonJS loading and declarations, browser resolution,
+  source maps, runtime neutrality and canonical conformance asset identity.
+- The additive `decodeIndoorBikeData` interface exposes named measurements, raw
+  values and diagnostics. ESM/CommonJS are generated from the same source;
+  existing protocol interfaces and shared corpus versions are unchanged.
+- A public-npm install in Auuki passes its 17 indoor-bike tests and production
+  Parcel build without Parcel/Jest configuration changes. Its full suite retains
+  the same baseline failures (52 tests, 14 suites); 465 tests pass versus 451 at
+  baseline. The proposed integration remains an unmerged upstream PR, not adoption
+  evidence. Minified main bundle increase is 11.44 kB before compression.
+- No live-device, PTS or Bluetooth qualification evidence is implied.
 
 ## Published prerelease: C# 0.1.0-alpha.1
 
@@ -151,6 +178,11 @@ permission, or Bluetooth qualification. See the [Go guide](../packages/go/README
   Bluetooth qualification.
 
 ## Published: TypeScript 0.4.0 / C 0.2.0
+
+Historical release: npm `@deancochran/ftms@0.4.0`. The reproducible TypeScript
+quickstart remains pinned to this version; the current installation table above
+records the newer release. The status statements below describe verification at
+the time of this historical release.
 
 PR [#5](https://github.com/deancochran/ftms/pull/5) merged at
 `a32de9c0b108bc55c9dc11752d928e959efd73ac`; both version tags identify that commit.
