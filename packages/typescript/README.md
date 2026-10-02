@@ -42,20 +42,39 @@ projects.
 
 ## Parse measurements
 
+The universal decoder below is available from 0.6.0. Earlier releases provide
+`decodeIndoorBikeData` (from 0.5.0) and `parseRegisteredFtmsPayload`.
+
 ```ts
-import { parseFtmsIndoorBikeMeasurement } from "@deancochran/ftms";
+import { decodeFtmsMeasurement } from "@deancochran/ftms";
 
 const notificationBytes = Uint8Array.of(0x44, 0x00, 0x10, 0x0e, 0xb4, 0x00, 0xfa, 0x00);
-const reading = parseFtmsIndoorBikeMeasurement(notificationBytes);
+const reading = decodeFtmsMeasurement("2ad2", notificationBytes);
 
-if (reading.diagnostics.truncated) {
+if (reading.status === "known" && reading.diagnostics.truncated) {
   // The notification ended before every advertised field could be read.
 }
 
-console.log(reading.metrics.cadenceRpm);
-console.log(reading.metrics.powerWatts);
-console.log(reading.metrics.speedMps);
+if (reading.status === "known") {
+  console.log(reading.metrics.cadenceRpm, reading.metrics.powerWatts, reading.metrics.speedMps);
+}
 ```
+
+`decodeFtmsMeasurement(characteristicUuid, bytes, options?)` is the preferred
+single entry point for all six specified FTMS machine-data characteristics. It
+accepts standard 16-bit (`"2ad2"`/`"0x2ad2"`) and full UUID spellings, returning a
+`status: "known"` discriminant with family identity, common physical-unit metrics,
+named raw wire fields, and diagnostics. Unknown UUIDs and Training/Fitness Machine
+Status are `status: "unsupported"`; no layout is guessed from packet bytes. It is
+universal across current FTMS measurement characteristics, not all BLE protocols
+or future unknown layouts.
+
+Common metrics need no equipment-specific switch: read `metrics.powerWatts`,
+`metrics.heartRateBpm`, or `metrics.speedKph` when non-null. All named metric and
+raw properties exist; null means inapplicable, absent, incomplete or unavailable.
+Zero is a reading, not missing data. Diagnostics preserve truncation and named
+unavailable-field evidence. A `known` characteristic can still carry a malformed
+or partial packet: inspect diagnostics rather than treating it as validation.
 
 Parsers are available for:
 
@@ -68,15 +87,16 @@ Parsers are available for:
 - Training Status
 - Fitness Machine Status
 
-Use `parseRegisteredFtmsPayload(characteristicUuid, bytes, formatOptions)` when dispatching by
-characteristic UUID. Measurement parsers accept explicit caller-owned format
+The existing `parseRegisteredFtmsPayload(characteristicUuid, bytes, formatOptions)`
+remains available for dispatch including status characteristics. Measurement parsers accept explicit caller-owned format
 options; legacy treadmill pace is retained only by raw decoding because its unit
 is unknown, so normalized pace remains null.
 
 ### Named Indoor Bike reading
 
-`decodeIndoorBikeData(bytes, options?)` is an additive Indoor Bike-only view for
-consumers that need stable named fields rather than the generic metric bag. It
+`decodeIndoorBikeData(bytes, options?)` retains the 0.5.0 Indoor Bike-only view for
+existing consumers. It delegates to the universal decoder rather than maintaining
+a separate parsing implementation. It
 returns a `measurement` object in physical units, a `raw` object retaining
 unscaled wire integers, and `diagnostics`. All named fields are present in each
 object; `null` means the field was not selected by flags, was truncated, or used

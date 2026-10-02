@@ -1,10 +1,7 @@
 import { isByteSource, toBytes } from "./binary.js";
-import { decodeFtmsMeasurementRaw } from "./parsers.js";
-import {
-  type FtmsMeasurementFormatOptions,
-  type FtmsMeasurementRaw,
-  RawCodecError,
-} from "./types.js";
+import { FTMS_CHARACTERISTICS } from "./constants.js";
+import { decodeFtmsMeasurement } from "./measurement.js";
+import { type FtmsMeasurementFormatOptions, RawCodecError } from "./types.js";
 
 /** Indoor Bike values in physical units. Null means absent, incomplete or
  * unavailable; diagnostics retain unavailable-field evidence. Zero is a value. */
@@ -68,9 +65,6 @@ export interface DecodedIndoorBikeData {
   diagnostics: IndoorBikeDiagnostics;
 }
 
-const scale = (value: number | null, factor: number): number | null =>
-  value === null ? null : value * factor;
-
 /** Decode one Indoor Bike Data value (0x2AD2), not a connection or assembled
  * record. Uses the existing raw codec; performs no device/layout inference.
  *
@@ -85,79 +79,60 @@ export function decodeIndoorBikeData(
   if (!isByteSource(data))
     throw new RawCodecError("null", "Indoor Bike input must be an ArrayBuffer or Uint8Array");
   const bytes = toBytes(data);
-  let decoded: FtmsMeasurementRaw | null;
-  try {
-    decoded = decodeFtmsMeasurementRaw(5, bytes, options);
-  } catch (error) {
-    // The raw codec validates options before requiring a complete flags field.
-    if (!(error instanceof RawCodecError) || error.code !== "length" || bytes.length >= 2)
-      throw error;
-    decoded = null;
-  }
-
-  const unavailableFields: (keyof IndoorBikeRawFields)[] = [];
-  const field = (name: keyof IndoorBikeRawFields, index: number): number | null => {
-    if (decoded === null || !(decoded.present & (1 << index))) return null;
-    if (decoded.unavailable & (1 << index)) {
-      unavailableFields.push(name);
-      return null;
-    }
-    return decoded.values[index] as number;
-  };
-  // These indices belong to the shared raw codec contract, never caller code.
+  const decoded = decodeFtmsMeasurement(FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA, bytes, options);
+  if (decoded.status !== "known")
+    throw new RawCodecError("kind", "Indoor Bike characteristic unavailable");
+  const field = (name: keyof IndoorBikeRawFields): number | null =>
+    (decoded.raw[name] as number | null | undefined) ?? null;
   const raw: IndoorBikeRawFields = {
-    speedHundredthsKph: field("speedHundredthsKph", 0),
-    averageSpeedHundredthsKph: field("averageSpeedHundredthsKph", 1),
-    cadenceHalfRpm: field("cadenceHalfRpm", 28),
-    averageCadenceHalfRpm: field("averageCadenceHalfRpm", 29),
-    distanceMeters: field("distanceMeters", 2),
-    resistance: field("resistance", 21),
-    powerWatts: field("powerWatts", 17),
-    averagePowerWatts: field("averagePowerWatts", 22),
-    energyKcal: field("energyKcal", 9),
-    energyPerHourKcal: field("energyPerHourKcal", 10),
-    energyPerMinuteKcal: field("energyPerMinuteKcal", 11),
-    heartRateBpm: field("heartRateBpm", 12),
+    speedHundredthsKph: field("speedHundredthsKph"),
+    averageSpeedHundredthsKph: field("averageSpeedHundredthsKph"),
+    cadenceHalfRpm: field("cadenceHalfRpm"),
+    averageCadenceHalfRpm: field("averageCadenceHalfRpm"),
+    distanceMeters: field("distanceMeters"),
+    resistance: field("resistance"),
+    powerWatts: field("powerWatts"),
+    averagePowerWatts: field("averagePowerWatts"),
+    energyKcal: field("energyKcal"),
+    energyPerHourKcal: field("energyPerHourKcal"),
+    energyPerMinuteKcal: field("energyPerMinuteKcal"),
+    heartRateBpm: field("heartRateBpm"),
     // biome-ignore lint/security/noSecrets: FTMS field name, not a credential.
-    metabolicEquivalentTenths: field("metabolicEquivalentTenths", 13),
-    elapsedTimeSeconds: field("elapsedTimeSeconds", 14),
-    remainingTimeSeconds: field("remainingTimeSeconds", 15),
+    metabolicEquivalentTenths: field("metabolicEquivalentTenths"),
+    elapsedTimeSeconds: field("elapsedTimeSeconds"),
+    remainingTimeSeconds: field("remainingTimeSeconds"),
   };
 
   return {
     measurement: {
-      speedKph: scale(raw.speedHundredthsKph, 0.01),
-      speedMps: raw.speedHundredthsKph === null ? null : raw.speedHundredthsKph / 360,
-      averageSpeedKph: scale(raw.averageSpeedHundredthsKph, 0.01),
-      averageSpeedMps:
-        raw.averageSpeedHundredthsKph === null ? null : raw.averageSpeedHundredthsKph / 360,
-      cadenceRpm: scale(raw.cadenceHalfRpm, 0.5),
-      averageCadenceRpm: scale(raw.averageCadenceHalfRpm, 0.5),
-      distanceMeters: raw.distanceMeters,
-      resistanceLevel:
-        options?.resistanceFormat === "signed16Tenths"
-          ? scale(raw.resistance, 0.1)
-          : raw.resistance,
-      powerWatts: raw.powerWatts,
-      averagePowerWatts: raw.averagePowerWatts,
-      energyKcal: raw.energyKcal,
-      energyPerHourKcal: raw.energyPerHourKcal,
-      energyPerMinuteKcal: raw.energyPerMinuteKcal,
-      heartRateBpm: raw.heartRateBpm,
-      metabolicEquivalent: scale(raw.metabolicEquivalentTenths, 0.1),
-      elapsedTimeSeconds: raw.elapsedTimeSeconds,
-      remainingTimeSeconds: raw.remainingTimeSeconds,
+      speedKph: decoded.metrics.speedKph,
+      speedMps: decoded.metrics.speedMps,
+      averageSpeedKph: decoded.metrics.averageSpeedKph,
+      averageSpeedMps: decoded.metrics.averageSpeedMps,
+      cadenceRpm: decoded.metrics.cadenceRpm,
+      averageCadenceRpm: decoded.metrics.averageCadenceRpm,
+      distanceMeters: decoded.metrics.distanceMeters,
+      resistanceLevel: decoded.metrics.resistanceLevel,
+      powerWatts: decoded.metrics.powerWatts,
+      averagePowerWatts: decoded.metrics.averagePowerWatts,
+      energyKcal: decoded.metrics.energyKcal,
+      energyPerHourKcal: decoded.metrics.energyPerHourKcal,
+      energyPerMinuteKcal: decoded.metrics.energyPerMinuteKcal,
+      heartRateBpm: decoded.metrics.heartRateBpm,
+      metabolicEquivalent: decoded.metrics.metabolicEquivalent,
+      elapsedTimeSeconds: decoded.metrics.elapsedTimeSeconds,
+      remainingTimeSeconds: decoded.metrics.remainingTimeSeconds,
     },
     raw,
     diagnostics: {
-      flags: decoded?.flags ?? null,
-      moreData: decoded === null ? null : decoded.moreData !== 0,
-      truncated: decoded === null || decoded.truncated !== 0,
-      reservedFlags: decoded !== null && decoded.reservedFlags !== 0,
-      trailingBytes: decoded?.trailingBytes ? bytes.length - decoded.bytesRead : 0,
-      bytesRead: decoded?.bytesRead ?? 0,
+      flags: decoded.diagnostics.flags,
+      moreData: decoded.diagnostics.moreData,
+      truncated: decoded.diagnostics.truncated,
+      reservedFlags: decoded.diagnostics.reservedFlags,
+      trailingBytes: decoded.diagnostics.trailingBytes,
+      bytesRead: decoded.diagnostics.bytesRead,
       byteLength: bytes.length,
-      unavailableFields,
+      unavailableFields: decoded.diagnostics.unavailableFields as (keyof IndoorBikeRawFields)[],
     },
   };
 }

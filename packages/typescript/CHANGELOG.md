@@ -3,6 +3,15 @@
 All notable changes to `@deancochran/ftms` are documented here. The package
 follows [Semantic Versioning](https://semver.org/).
 
+## 0.6.0
+
+### Added
+
+- Add `decodeFtmsMeasurement`, one UUID-selected, byte-only normalized projection
+  for all six FTMS machine-data characteristics. It returns named raw fields,
+  physical-unit common metrics, family identity, and complete packet diagnostics;
+  unknown and status UUIDs are explicitly unsupported rather than guessed.
+
 ## 0.5.0
 
 ### Added
