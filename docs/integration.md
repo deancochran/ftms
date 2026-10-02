@@ -17,7 +17,7 @@ and run with `npm test`. Their assertions are the expected results—not device 
 
 | Task | TypeScript | C |
 | --- | --- | --- |
-| Display measurements | `parseFtmsIndoorBikeMeasurement` or the corresponding family parser | `ftms_decode_measurement`; convert documented fixed-point fields in the application |
+| Display measurements | `decodeFtmsMeasurement` with the discovered machine-data UUID | `ftms_decode_measurement`; convert documented fixed-point fields in the application |
 | Dispatch by characteristic | `parseRegisteredFtmsPayload` | Select the explicit kind from caller-owned discovery |
 | Decode feature declarations | `decodeFtmsFeatures` | `ftms_decode_features` |
 | Read a supported range | `decodeFtmsRange` / `decodeSupportedPowerRange` | `ftms_decode_range` |
@@ -37,8 +37,10 @@ The dispatch recipe uses the full Indoor Bike characteristic UUID
 `00002ad2-0000-1000-8000-00805f9b34fb`. Handle an unrecognized UUID explicitly;
 do not assume every notification contains indoor-bike data.
 
-For new application code prefer `ParsedFtmsPayload` parsers over compatibility
-projections such as `parseFtmsIndoorBikeData`. Raw APIs preserve wire values and
+For new application code prefer `decodeFtmsMeasurement` for UUID-selected machine
+data; it returns a known/unsupported union, common metrics and named raw values.
+Use the older family parsers when their `ParsedFtmsPayload` shape is required.
+Raw APIs preserve wire values and
 are useful for protocol tools, equipment-side encoding and fixture comparisons.
 Raw values are not display units; consult types/headers before conversion.
 

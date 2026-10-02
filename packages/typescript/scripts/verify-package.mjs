@@ -27,6 +27,7 @@ const sourceModules = [
   "features",
   "index",
   "indoor-bike",
+  "measurement",
   "parsers",
   "types",
 ];
@@ -303,6 +304,9 @@ const measurement = parseFtmsIndoorBikeMeasurement(Uint8Array.of(0, 0, 0, 0));
 if (measurement.kind !== "measurement") throw new Error("Measurement parser mismatch");
 
 const root = await import("${sourceManifest.name}");
+const universal = root.decodeFtmsMeasurement("2ad2", Uint8Array.of(0, 0, 0x10, 0x0e));
+if (universal.status !== "known" || universal.metrics.speedKph !== 36) throw new Error("ESM universal measurement mismatch");
+if (root.decodeFtmsMeasurement("2ad3", new Uint8Array()).status !== "unsupported") throw new Error("ESM unsupported characteristic mismatch");
 if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
   throw new Error("Application policy leaked into the root protocol API");
 }
@@ -314,10 +318,13 @@ if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
 
   await writeFile(
     path.join(consumerDirectory, "runtime.cjs"),
-    `const { decodeFtmsFeatures, decodeIndoorBikeData } = require("${sourceManifest.name}");
+    `const { decodeFtmsFeatures, decodeIndoorBikeData, decodeFtmsMeasurement } = require("${sourceManifest.name}");
 if (!decodeFtmsFeatures(new Uint8Array(8)).ok) throw new Error("CommonJS feature decoder mismatch");
 const reading = decodeIndoorBikeData(Uint8Array.of(0, 0, 0x10, 0x0e));
 if (reading.measurement.speedKph !== 36) throw new Error("CommonJS Indoor Bike decoder mismatch");
+const universal = decodeFtmsMeasurement("2ad1", Uint8Array.of(0, 0, 60, 1, 0));
+if (universal.status !== "known" || universal.metrics.strokeRateSpm !== 30) throw new Error("CommonJS universal measurement mismatch");
+if (decodeFtmsMeasurement("unknown", new Uint8Array()).status !== "unsupported") throw new Error("CommonJS unsupported characteristic mismatch");
 `,
   );
   await run("node", ["runtime.cjs"], consumerDirectory);
@@ -433,7 +440,17 @@ if (!features.ok || measurement.kind !== "measurement") {
 
   await writeFile(
     path.join(consumerDirectory, "consumer.cts"),
-    `import { decodeIndoorBikeData, type DecodedIndoorBikeData } from "${sourceManifest.name}";
+    `import { decodeIndoorBikeData, decodeFtmsMeasurement, type DecodedIndoorBikeData } from "${sourceManifest.name}";
+const result = decodeFtmsMeasurement("2ad2", new Uint8Array());
+if (result.status === "known") {
+  const watts: number | null = result.metrics.powerWatts;
+  const rawWatts: number | null = result.raw.powerWatts;
+  // @ts-expect-error Public raw values reject unknown property names.
+  result.raw.powerWats;
+} else {
+  // @ts-expect-error Unsupported characteristics do not invent measurements.
+  result.metrics;
+}
 const decoded: DecodedIndoorBikeData = decodeIndoorBikeData(Uint8Array.of(0, 0, 0x10, 0x0e));
 void decoded;
 `,

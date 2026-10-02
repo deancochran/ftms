@@ -1,6 +1,6 @@
 {
   "name": "@deancochran/ftms",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Runtime-neutral TypeScript codecs for Bluetooth Fitness Machine Service (FTMS)",
   "private": false,
   "license": "MIT",

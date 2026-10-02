@@ -2,6 +2,7 @@ export * from "./constants.js";
 export * from "./control.js";
 export * from "./features.js";
 export * from "./indoor-bike.js";
+export * from "./measurement.js";
 export * from "./parsers.js";
 export * from "./types.js";
 
