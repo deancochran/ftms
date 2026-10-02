@@ -109,7 +109,7 @@ Add this entry to your Package.swift dependencies and select the FTMS product. K
 
 ### TypeScript
 
-Recorded release: **0.5.0** ([evidence](released-packages.md#published-typescript-050)).
+Recorded release: **0.6.0** ([evidence](released-packages.md#published-typescript-060)).
 
 ```sh
 npm install @deancochran/ftms

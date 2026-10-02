@@ -2,7 +2,7 @@
 
 Last checked against npm, GitHub, Maven Central, PyPI, crates.io, NuGet and the Go module proxy:
 **2026-09-30 UTC**.
-TypeScript additionally verified **2026-10-02 UTC** at 0.5.0.
+TypeScript additionally verified **2026-10-02 UTC** at 0.6.0.
 This is a point-in-time record, not a promise that branch source is published.
 
 This is the **canonical current release matrix**. [Choose a language](../packages/README.md)
@@ -23,13 +23,38 @@ Source, package, protocol and corpus versions are distinct; see [versioning](ver
 | Python | 0.1.0a2 (alpha) | [PyPI](../packages/python/README.md) | [Record](#published-alpha-python-010a2) |
 | Rust | 0.1.1 | [crates.io](../packages/rust/README.md) | [Record](#published-rust-011) |
 | Swift | 0.1.0 | [SwiftPM revision](../packages/swift/README.md) | [Record](#published-swift-010) |
-| TypeScript | npm `@deancochran/ftms@0.5.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-050) |
+| TypeScript | npm `@deancochran/ftms@0.6.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-060) |
 
 ## Release evidence ledger
 
 The records below retain original hashes, checks and limitations. Existing links
 and anchors are preserved. They are publication evidence, not instructions for
 preparing the next release; maintainers should use the [release procedure](releasing.md).
+
+## Published TypeScript 0.6.0
+
+npm serves **`@deancochran/ftms@0.6.0`** as `latest`. Tag `v0.6.0` identifies
+reviewed main commit `be188dd802f3b15e2478a240ff612fbbd92c6198`, integrated by
+[PR #43](https://github.com/deancochran/ftms/pull/43).
+
+- [Release run 37054440000](https://github.com/deancochran/ftms/actions/runs/37054440000)
+  published with npm provenance. Initial public verification timed out during
+  registry processing; a retry verified the same immutable archive and passed.
+- Public archive integrity:
+  `sha512-fzFdW/C0K1gMdNim5yNHGuBS6Gyz6JKn58I3B/lBY58fkmD4/0m+wl2kKw3L0Ljg3SHj8bKSCRWtPLIasGBeOg==`.
+  The tested archive and public installed-consumer evidence are retained by the workflow.
+- 604 tests pass; Node 20/22/24 CI, packed ESM/CommonJS consumers and declarations,
+  browser resolution, source-map and runtime-neutrality checks pass.
+- `decodeFtmsMeasurement` uses one shared raw engine and physical-unit projection
+  for all six FTMS measurement families, with named raw values and diagnostics.
+  Existing interfaces remain available; the bike convenience view delegates.
+  Legacy treadmill pace retains raw evidence without inventing physical units.
+- Public npm installation in Auuki passes 17 parser tests and its Parcel build
+  without Parcel/Jest configuration changes. The full suite retains baseline
+  failures (52 tests / 14 suites) with 465 passing tests. Main minified bundle
+  size is 474.68 kB versus baseline 461.23 kB (+13.45 kB before compression).
+  [Auuki PR #311](https://github.com/dvmarinoff/Auuki/pull/311) is proposed integration,
+  not merged adoption evidence. No live-trainer or Bluetooth qualification claim.
 
 ## Published TypeScript 0.5.0
 
