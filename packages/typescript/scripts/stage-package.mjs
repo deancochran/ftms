@@ -1,7 +1,11 @@
-import { copyFile, mkdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 
 const packageRoot = new URL("../", import.meta.url);
 const repositoryRoot = new URL("../../", packageRoot);
+
+// Both module formats are compiled from the same source. This local scope also
+// makes the matching .d.ts files CommonJS for NodeNext TypeScript consumers.
+await writeFile(new URL("dist/cjs/package.json", packageRoot), '{"type":"commonjs"}\n');
 
 // Distribution snapshots only; package-owned README and changelog stay untouched.
 await rm(new URL("conformance/", packageRoot), { force: true, recursive: true });

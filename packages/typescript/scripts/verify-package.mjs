@@ -20,7 +20,16 @@ const archiveOutput = process.env.FTMS_PACKAGE_ARCHIVE;
 const executable = (name) => (process.platform === "win32" ? `${name}.cmd` : name);
 const sourceManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
 const packagePathSegments = sourceManifest.name.split("/");
-const sourceModules = ["binary", "constants", "control", "features", "index", "parsers", "types"];
+const sourceModules = [
+  "binary",
+  "constants",
+  "control",
+  "features",
+  "index",
+  "indoor-bike",
+  "parsers",
+  "types",
+];
 const expectedPackageFiles = new Set([
   "CHANGELOG.md",
   "LICENSE",
@@ -35,7 +44,12 @@ const expectedPackageFiles = new Set([
     `dist/${module}.d.ts.map`,
     `dist/${module}.js`,
     `dist/${module}.js.map`,
+    `dist/cjs/${module}.d.ts`,
+    `dist/cjs/${module}.d.ts.map`,
+    `dist/cjs/${module}.js`,
+    `dist/cjs/${module}.js.map`,
   ]),
+  "dist/cjs/package.json",
 ]);
 
 async function listFiles(directory, relativeDirectory = "") {
@@ -65,19 +79,22 @@ function assertExactPackageFiles(actualFiles) {
 
 async function verifySourceMaps(packageDirectory) {
   for (const module of sourceModules) {
-    for (const targetExtension of ["js", "d.ts"]) {
-      const target = `dist/${module}.${targetExtension}`;
-      const mapPath = `${target}.map`;
-      const sourceMap = JSON.parse(await readFile(path.join(packageDirectory, mapPath), "utf8"));
-      if (
-        sourceMap.version !== 3 ||
-        sourceMap.file !== path.posix.basename(target) ||
-        sourceMap.sourceRoot !== "" ||
-        sourceMap.sources?.length !== 1 ||
-        sourceMap.sources[0] !== `../src/${module}.ts` ||
-        typeof sourceMap.mappings !== "string"
-      ) {
-        throw new Error(`${mapPath} does not map ${target} to its packaged TypeScript source`);
+    for (const directory of ["dist", "dist/cjs"]) {
+      for (const targetExtension of ["js", "d.ts"]) {
+        const target = `${directory}/${module}.${targetExtension}`;
+        const mapPath = `${target}.map`;
+        const sourceMap = JSON.parse(await readFile(path.join(packageDirectory, mapPath), "utf8"));
+        const sourcePrefix = directory === "dist" ? "../" : "../../";
+        if (
+          sourceMap.version !== 3 ||
+          sourceMap.file !== path.posix.basename(target) ||
+          sourceMap.sourceRoot !== "" ||
+          sourceMap.sources?.length !== 1 ||
+          sourceMap.sources[0] !== `${sourcePrefix}src/${module}.ts` ||
+          typeof sourceMap.mappings !== "string"
+        ) {
+          throw new Error(`${mapPath} does not map ${target} to its packaged TypeScript source`);
+        }
       }
     }
   }
@@ -92,27 +109,29 @@ async function verifyBuiltJavaScript(packageDirectory) {
   const importPattern =
     /(?:\b(?:import|export)\s+(?:[^"'();]*?\s+from\s*)?|\b(?:import|require)\s*\(\s*)["']([^"']+)["']/g;
 
-  for (const module of sourceModules) {
-    const relativePath = `dist/${module}.js`;
-    const javascript = await readFile(path.join(packageDirectory, relativePath), "utf8");
-    const forbiddenGlobal = javascript.match(forbiddenGlobals)?.[0];
-    if (forbiddenGlobal !== undefined) {
-      throw new Error(`${relativePath} references forbidden runtime global ${forbiddenGlobal}`);
-    }
-
-    for (const match of javascript.matchAll(importPattern)) {
-      const specifier = match[1];
-      if (specifier === undefined) continue;
-      const bareSpecifier = specifier.replace(/^node:/, "").split("/")[0];
-      if (
-        specifier.startsWith("node:") ||
-        nodeBuiltins.has(specifier) ||
-        nodeBuiltins.has(bareSpecifier)
-      ) {
-        throw new Error(`${relativePath} imports Node built-in ${specifier}`);
+  for (const directory of ["dist", "dist/cjs"]) {
+    for (const module of sourceModules) {
+      const relativePath = `${directory}/${module}.js`;
+      const javascript = await readFile(path.join(packageDirectory, relativePath), "utf8");
+      const forbiddenGlobal = javascript.match(forbiddenGlobals)?.[0];
+      if (forbiddenGlobal !== undefined) {
+        throw new Error(`${relativePath} references forbidden runtime global ${forbiddenGlobal}`);
       }
-      if (/(?:^|[/@_-])(?:react-native|bluetooth|ble|noble)(?:$|[/_-])/i.test(specifier)) {
-        throw new Error(`${relativePath} imports runtime-specific module ${specifier}`);
+
+      for (const match of javascript.matchAll(importPattern)) {
+        const specifier = match[1];
+        if (specifier === undefined) continue;
+        const bareSpecifier = specifier.replace(/^node:/, "").split("/")[0];
+        if (
+          specifier.startsWith("node:") ||
+          nodeBuiltins.has(specifier) ||
+          nodeBuiltins.has(bareSpecifier)
+        ) {
+          throw new Error(`${relativePath} imports Node built-in ${specifier}`);
+        }
+        if (/(?:^|[/@_-])(?:react-native|bluetooth|ble|noble)(?:$|[/_-])/i.test(specifier)) {
+          throw new Error(`${relativePath} imports runtime-specific module ${specifier}`);
+        }
       }
     }
   }
@@ -244,12 +263,21 @@ for (const [subpath, canonical] of [
   if (installedManifest.license !== "MIT") {
     throw new Error("Installed package must declare the MIT license");
   }
+  if (
+    installedManifest.main !== "./dist/cjs/index.js" ||
+    installedManifest.module !== "./dist/index.js" ||
+    installedManifest.types !== "./dist/index.d.ts"
+  ) {
+    throw new Error(
+      "Installed package legacy ESM/CommonJS entries do not match their declarations",
+    );
+  }
   deepStrictEqual(installedManifest.exports, {
     ".": {
-      types: "./dist/index.d.ts",
+      import: { types: "./dist/index.d.ts", default: "./dist/index.js" },
+      require: { types: "./dist/cjs/index.d.ts", default: "./dist/cjs/index.js" },
       "react-native": "./dist/index.js",
       development: "./dist/index.js",
-      import: "./dist/index.js",
       default: "./dist/index.js",
     },
     "./conformance/schema": "./conformance/v1/schema.json",
@@ -283,6 +311,16 @@ if ("reduceFtmsControl" in root || "detectFtmsMachineType" in root) {
   await run("node", ["runtime.mjs"], consumerDirectory);
   await run("node", ["--conditions=development", "runtime.mjs"], consumerDirectory);
   await run("node", ["--conditions=react-native", "runtime.mjs"], consumerDirectory);
+
+  await writeFile(
+    path.join(consumerDirectory, "runtime.cjs"),
+    `const { decodeFtmsFeatures, decodeIndoorBikeData } = require("${sourceManifest.name}");
+if (!decodeFtmsFeatures(new Uint8Array(8)).ok) throw new Error("CommonJS feature decoder mismatch");
+const reading = decodeIndoorBikeData(Uint8Array.of(0, 0, 0x10, 0x0e));
+if (reading.measurement.speedKph !== 36) throw new Error("CommonJS Indoor Bike decoder mismatch");
+`,
+  );
+  await run("node", ["runtime.cjs"], consumerDirectory);
 
   // The example is copied into a tarball-installed consumer so its bare import
   // cannot resolve through this workspace or the linked-consumer check above.
@@ -394,6 +432,14 @@ if (!features.ok || measurement.kind !== "measurement") {
   );
 
   await writeFile(
+    path.join(consumerDirectory, "consumer.cts"),
+    `import { decodeIndoorBikeData, type DecodedIndoorBikeData } from "${sourceManifest.name}";
+const decoded: DecodedIndoorBikeData = decodeIndoorBikeData(Uint8Array.of(0, 0, 0x10, 0x0e));
+void decoded;
+`,
+  );
+
+  await writeFile(
     path.join(consumerDirectory, "consumer.ts"),
     `import {
   type FtmsControlRequest,
@@ -421,7 +467,7 @@ void parsed;
           strict: true,
           target: "ES2022",
         },
-        include: ["consumer.ts"],
+        include: ["consumer.ts", "consumer.cts"],
       },
       null,
       2,

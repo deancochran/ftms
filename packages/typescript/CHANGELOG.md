@@ -3,6 +3,19 @@
 All notable changes to `@deancochran/ftms` are documented here. The package
 follows [Semantic Versioning](https://semver.org/).
 
+## 0.5.0
+
+### Added
+
+- Add `decodeIndoorBikeData`, a pure byte-only named Indoor Bike Data view with
+  physical-unit `measurement`, unscaled `raw`, and packet `diagnostics` sections.
+  It retains truncation, flags, More Data, reserved-flag, trailing-byte, and
+  unavailable-energy evidence without inferring a device layout or assembling
+  fragments. Existing parser APIs and default wire-format semantics are unchanged.
+- Publish matching ESM and CommonJS builds from the same sources. Conditional
+  root exports and legacy `module`/`main` entries resolve ESM and CommonJS
+  respectively, with matching declarations and installed-consumer verification.
+
 ## 0.4.0
 
 ### Added

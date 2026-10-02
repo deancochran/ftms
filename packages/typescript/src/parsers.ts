@@ -1111,68 +1111,73 @@ function freezeParserDefinition(definition: FtmsParserDefinition): Readonly<Ftms
   return Object.freeze(definition);
 }
 
-export const FTMS_PARSER_DEFINITIONS_BY_UUID = Object.freeze({
-  [FTMS_CHARACTERISTICS.TREADMILL_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.TREADMILL_DATA,
-    name: "Treadmill Data",
-    kind: "measurement",
-    machineType: "treadmill",
-    parse: parseFtmsTreadmillData,
-  },
-  [FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA,
-    name: "Cross Trainer Data",
-    kind: "measurement",
-    machineType: "cross_trainer",
-    parse: parseFtmsCrossTrainerData,
-  },
-  [FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA,
-    name: "Step Climber Data",
-    kind: "measurement",
-    machineType: "step_climber",
-    parse: parseFtmsStepClimberData,
-  },
-  [FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA,
-    name: "Stair Climber Data",
-    kind: "measurement",
-    machineType: "stair_climber",
-    parse: parseFtmsStairClimberData,
-  },
-  [FTMS_CHARACTERISTICS.ROWER_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.ROWER_DATA,
-    name: "Rower Data",
-    kind: "measurement",
-    machineType: "rower",
-    parse: parseFtmsRowerData,
-  },
-  [FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA]: {
-    uuid: FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA,
-    name: "Indoor Bike Data",
-    kind: "measurement",
-    machineType: "bike",
-    parse: parseFtmsIndoorBikeMeasurement,
-  },
-  [FTMS_CHARACTERISTICS.TRAINING_STATUS]: {
-    uuid: FTMS_CHARACTERISTICS.TRAINING_STATUS,
-    name: "Training Status",
-    kind: "training_status",
-    machineType: "unknown",
-    parse: parseFtmsTrainingStatus,
-  },
-  [FTMS_CHARACTERISTICS.STATUS]: {
-    uuid: FTMS_CHARACTERISTICS.STATUS,
-    name: "Fitness Machine Status",
-    kind: "machine_status",
-    machineType: "unknown",
-    parse: parseFtmsMachineStatus,
-  },
-} as const satisfies Record<string, FtmsParserDefinition>);
+// The registry is only needed for UUID dispatch. Keep its initialization pure so
+// a consumer importing a single codec does not retain every registered parser.
+export const FTMS_PARSER_DEFINITIONS_BY_UUID = /* @__PURE__ */ (() => {
+  const definitions = {
+    [FTMS_CHARACTERISTICS.TREADMILL_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.TREADMILL_DATA,
+      name: "Treadmill Data",
+      kind: "measurement",
+      machineType: "treadmill",
+      parse: parseFtmsTreadmillData,
+    },
+    [FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.CROSS_TRAINER_DATA,
+      name: "Cross Trainer Data",
+      kind: "measurement",
+      machineType: "cross_trainer",
+      parse: parseFtmsCrossTrainerData,
+    },
+    [FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.STEP_CLIMBER_DATA,
+      name: "Step Climber Data",
+      kind: "measurement",
+      machineType: "step_climber",
+      parse: parseFtmsStepClimberData,
+    },
+    [FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.STAIR_CLIMBER_DATA,
+      name: "Stair Climber Data",
+      kind: "measurement",
+      machineType: "stair_climber",
+      parse: parseFtmsStairClimberData,
+    },
+    [FTMS_CHARACTERISTICS.ROWER_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.ROWER_DATA,
+      name: "Rower Data",
+      kind: "measurement",
+      machineType: "rower",
+      parse: parseFtmsRowerData,
+    },
+    [FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA]: {
+      uuid: FTMS_CHARACTERISTICS.INDOOR_BIKE_DATA,
+      name: "Indoor Bike Data",
+      kind: "measurement",
+      machineType: "bike",
+      parse: parseFtmsIndoorBikeMeasurement,
+    },
+    [FTMS_CHARACTERISTICS.TRAINING_STATUS]: {
+      uuid: FTMS_CHARACTERISTICS.TRAINING_STATUS,
+      name: "Training Status",
+      kind: "training_status",
+      machineType: "unknown",
+      parse: parseFtmsTrainingStatus,
+    },
+    [FTMS_CHARACTERISTICS.STATUS]: {
+      uuid: FTMS_CHARACTERISTICS.STATUS,
+      name: "Fitness Machine Status",
+      kind: "machine_status",
+      machineType: "unknown",
+      parse: parseFtmsMachineStatus,
+    },
+  } as const satisfies Record<string, FtmsParserDefinition>;
 
-for (const definition of Object.values(FTMS_PARSER_DEFINITIONS_BY_UUID)) {
-  freezeParserDefinition(definition);
-}
+  for (const definition of Object.values(definitions)) {
+    freezeParserDefinition(definition);
+  }
+  return Object.freeze(definitions);
+})();
 
 export function getFtmsParserDefinition(uuid: string): FtmsParserDefinition | undefined {
   return (FTMS_PARSER_DEFINITIONS_BY_UUID as Record<string, FtmsParserDefinition>)[
