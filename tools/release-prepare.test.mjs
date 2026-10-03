@@ -43,8 +43,10 @@ test("all-package readiness includes every implemented distribution", async () =
     "swift",
     "typescript",
   ]);
-  assert.equal(result.packages.find((p) => p.port === "dart").tag, "dart-v0.1.0");
-  assert.equal(result.packages.find((p) => p.port === "go").tag, "packages/go/v0.1.0");
+  const dart = result.packages.find((p) => p.port === "dart");
+  const go = result.packages.find((p) => p.port === "go");
+  assert.equal(dart.tag, `dart-v${dart.version}`);
+  assert.equal(go.tag, `packages/go/v${go.version}`);
 });
 
 test("all-package readiness retains failures and continues independent checks", async () => {

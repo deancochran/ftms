@@ -1,17 +1,18 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:deancochran_ftms/deancochran_ftms.dart';
 import 'package:test/test.dart';
 
+import 'support/corpus.dart';
+
 void main() {
   test('canonical all-field packets pass through all six UUID routes', () {
     final corpus =
         jsonDecode(
-              File(
+              readCorpus(
                 '../../shared/conformance/measurements/v1/vectors.json',
-              ).readAsStringSync(),
+              ),
             )
             as Map<String, dynamic>;
     var count = 0;

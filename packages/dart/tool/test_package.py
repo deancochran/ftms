@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from release import validate_tag
-from verify_package import archive_bytes, extract_checked, registry_environment, require_current_package
+from verify_package import archive_bytes, extract_checked, registry_environment, require_current_package, version
 
 
 class PackageTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(env["PUB_CACHE"], "fresh")
 
     def test_stale_source_or_manifest_cannot_certify_consumer(self):
-        evidence = {"complete": True, "name": "deancochran_ftms", "version": "0.1.0",
+        evidence = {"complete": True, "name": "deancochran_ftms", "version": version(),
                     "sourceCommit": "A", "dirty": False, "files": {}}
         with patch("verify_package.provenance", return_value={"sourceCommit": "B", "dirty": False}), \
                 self.assertRaises(ValueError):
