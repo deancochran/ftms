@@ -1,8 +1,8 @@
 # Go coverage and remaining parity work
 
-Published version 0.1.0 scope: **raw codecs and capability interpretation**.
-This source checkout additionally has unreleased normalized measurement views;
-that local addition is not publication evidence. The proposed full-parity target is `FullWire`
+Published version 0.2.0 scope: **raw codecs, normalized measurements and capability interpretation**.
+This release includes UUID-selected normalized measurement views;
+see the canonical release matrix for public evidence. The proposed full-parity target is `FullWire`
 with `CapabilityEvidence`, `RangeInspection`, `NormalizedViews`, `RecordPlanning`,
 and `RecordAssembly`. This milestone does not claim that final target is complete.
 
@@ -18,7 +18,7 @@ and `RecordAssembly`. This milestone does not claim that final target is complet
 | Machine Status and Training Status | Yes | Canonical statuses |
 
 Decode-only malformed/unknown evidence is not canonical encode support.
-The unreleased UUID-selected normalized measurement reader projects all six decode
+The UUID-selected normalized measurement reader projects all six decode
 families to named optional physical metrics while retaining raw format and diagnostics.
 Encoders validate their inputs and do not return a partial packet on failure.
 Control requests expose ordered raw operands; a named-operation convenience

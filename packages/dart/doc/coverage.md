@@ -3,7 +3,7 @@
 The Dart implementation targets `FullWire`, `CapabilityEvidence`, `RangeInspection`
 and measurement `NormalizedViews`. Claims refer to executed evidence in
 `build/<platform>/verification.json`, not just the package version.
-See the [release matrix](../../../docs/released-packages.md#published-dart-010)
+See the [release matrix](../../../docs/released-packages.md#published-native-universal-measurements)
 for verified publication and the [verification record](verification.md) for
 historical local checks and their limitations.
 

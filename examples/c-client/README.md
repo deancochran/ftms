@@ -14,17 +14,17 @@ Node and Python are not required for ordinary consumption.
 Run in a new directory, not a system prefix:
 
 ```sh
-curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.2.0/ftms-c-0.2.0.tar.gz
-curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.2.0/ftms-c-0.2.0.tar.gz.sha256
-sha256sum -c ftms-c-0.2.0.tar.gz.sha256
-tar -xzf ftms-c-0.2.0.tar.gz
-cmake -S ftms-c-0.2.0 -B ftms-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
+curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.3.0/ftms-c-0.3.0.tar.gz
+curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.3.0/ftms-c-0.3.0.tar.gz.sha256
+sha256sum -c ftms-c-0.3.0.tar.gz.sha256
+tar -xzf ftms-c-0.3.0.tar.gz
+cmake -S ftms-c-0.3.0 -B ftms-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PWD/ftms-prefix"
 cmake --build ftms-build --config Release
 cmake --install ftms-build --config Release
 ```
 
 Expected archive SHA-256 (also recorded in the [release matrix](../../docs/released-packages.md)):
-`3aa60d809f3dcd02634417018d39f325c46a552734f0fe311ba748261914e61f`.
+`866ab00bd23915a086dc232a41afc99a141fa6d8948c3c7f28ac0611047a720a`.
 Compare the sidecar to this reviewed value; a matching checksum is integrity
 evidence, not device or protocol qualification.
 

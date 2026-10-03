@@ -1,7 +1,7 @@
 # FTMS for Dart
 
-> The UUID-selected decoder and automatic retention of measurement format below
-> are unreleased source additions, not part of the published pub.dev 0.1.0 package.
+The UUID-selected decoder and automatic retention of measurement format below
+are available in the published pub.dev 0.2.0 package.
 
 Pure Dart codecs for the Bluetooth **Fitness Machine Service**, usable from
 Flutter and standalone Dart. No Flutter, BLE, FFI, platform-channel or runtime
@@ -11,7 +11,7 @@ Integrate through the [consumer adapter seam](https://github.com/deancochran/ftm
 transport conversion, BLE/session lifecycle, retries, subscriptions,
 UI/application policy and control safety remain outside this protocol package.
 
-**Status: 0.1.0 published on pub.dev.** See the repository's
+**Status: 0.2.0 published on pub.dev.** See the repository's
 [release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md)
 for published identities.
 
@@ -30,7 +30,7 @@ an unconstrained dependency. For an exact reproduction of the recorded release:
 
 ```yaml
 dependencies:
-  deancochran_ftms: 0.1.0
+  deancochran_ftms: 0.2.0
 ```
 
 For development against a source checkout, use a local path dependency:

@@ -43,7 +43,7 @@ properties without changing raw evidence:
 - Metabolic equivalent: tenths.
 - Standard pace: seconds per 500 metres; selected `UInt8Legacy` treadmill pace
   retains its raw integer but has no asserted physical unit and normalizes to
-  `null` (unreleased correction). Energy: kilocalories; time: seconds; power: watts.
+  `null` (corrected in 0.1.0-alpha.2). Energy: kilocalories; time: seconds; power: watts.
 
 Control operands are ordered raw integers, **not** these floating-point projections.
 For example, `new ControlRequest(ControlOpcode.TargetPower, 250)` is 250 W, while

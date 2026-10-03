@@ -1,8 +1,8 @@
 # Universal measurement interfaces
 
 This is the design and acceptance guide for the native-port consumer-interface
-changes following TypeScript 0.6.0. Native changes in this work are **unreleased**;
-the [release matrix](released-packages.md) remains the authority for installed
+changes following TypeScript 0.6.0, published on 2026-10-03. The
+[release matrix](released-packages.md) remains the authority for installed
 package versions. This guide does not change corpus versions or wire contracts.
 
 See the [local verification record](native-universal-verification.md) for the

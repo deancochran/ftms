@@ -9,7 +9,7 @@ Integrate through the [consumer adapter seam](https://github.com/deancochran/ftm
 transport conversion, BLE/session lifecycle, retries, subscriptions,
 UI/application policy and control safety remain outside this protocol package.
 
-**Published version 0.1.0: raw codecs and static capability interpretation.**
+**Published version 0.2.0: raw codecs, named normalized measurements and static capability interpretation.**
 The pre-1.0 interface may change in minor releases. See
 [coverage](docs/coverage.md), [verification](docs/verification.md), and
 [release gates](docs/releasing.md). Publication evidence is recorded in the
@@ -22,12 +22,11 @@ go get github.com/deancochran/ftms/packages/go@latest
 ```
 
 To reproduce the recorded release specifically, use
-`go get github.com/deancochran/ftms/packages/go@v0.1.0`. Existing constraints may
+`go get github.com/deancochran/ftms/packages/go@v0.2.0`. Existing constraints may
 affect resolution; inspect the selected version before adopting changes.
 
-This source checkout additionally contains unreleased normalized measurement
-work. It is not present in the published `v0.1.0` module; use a released version
-only after its release evidence is recorded.
+The UUID-selected normalized measurement reader is available starting with
+`v0.2.0`; the earlier `v0.1.0` module retains its raw-only measurement interface.
 
 ## Implemented
 

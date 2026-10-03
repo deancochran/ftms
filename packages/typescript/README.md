@@ -357,9 +357,9 @@ and `shared/protocol/capability-discovery.md` in the repository.
 TypeScript is distributed through npm; C is independently distributed as a
 versioned source archive through GitHub releases. The repository places them in
 [language-owned packages](https://github.com/deancochran/ftms/tree/main/packages).
-Swift 0.1.0 is distributed through a revision-pinned SwiftPM Git dependency,
-Kotlin/JVM 0.1.0 through Maven Central, and Python 0.1.0a2 as a PyPI alpha with static
-capability evidence. Rust 0.1.1, Dart 0.1.0, Go v0.1.0 and C# 0.1.0-alpha.1 are also
+Swift is distributed through a revision-pinned SwiftPM Git dependency,
+Kotlin/JVM through Maven Central, and Python as a PyPI alpha with static
+capability evidence. Rust, Dart, Go and C# are also
 published independently; consult the repository's
 [release matrix](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md)
 for exact artifact identities and the distinction between released and branch source.

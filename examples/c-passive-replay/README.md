@@ -19,7 +19,7 @@ not captured from a KICKR. Zwift-specific shifting is outside this FTMS pilot.
 
 This example and capture script are **repository-only**, not included in the C
 source archive. Obtain this directory from the matching repository release tag.
-Install C **0.2.0** using `packages/c/INSTALL.md`, then build the repository example:
+Install C **0.3.0** using `packages/c/INSTALL.md`, then build the repository example:
 
 ```sh
 cmake -S examples/c-passive-replay -B build/passive-replay \

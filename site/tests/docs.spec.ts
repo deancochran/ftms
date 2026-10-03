@@ -62,7 +62,7 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
     page.getByRole("heading", { name: "Current verified releases", exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Record", exact: true }).first().click();
-  await expect(page).toHaveURL(/#published-typescript-040--c-020$/);
+  await expect(page).toHaveURL(/#published-native-universal-measurements$/);
   await page.goto("/ftms/project/evidence/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Historical audits and evidence",

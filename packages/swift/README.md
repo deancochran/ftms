@@ -1,9 +1,9 @@
 # FTMS for Swift
 
-> The UUID-selected measurement decoder and typed metric snapshot below are
-> unreleased source additions, not part of the published Swift 0.1.0 revision.
+The UUID-selected measurement decoder and typed metric snapshot below are
+available in the published Swift 0.2.0 revision.
 
-Native Swift 6 FTMS 1.0 + EC23224 protocol/domain library, package version **0.1.0**.
+Native Swift 6 FTMS 1.0 + EC23224 protocol/domain library, package version **0.2.0**.
 Its [support profile](../../docs/support-profiles.md) is `FullWire`, with
 `CapabilityEvidence`, `RangeInspection` and `NormalizedViews`; that claim includes
 no BLE or execution authorization.
@@ -34,11 +34,11 @@ UI/application policy and control safety remain outside this protocol package.
 ## Usage
 
 Add the Git repository as a **revision-pinned** SwiftPM dependency and select the
-`FTMS` product. The release tag is `swift-v0.1.0`:
+`FTMS` product. The release tag is `swift-v0.2.0`:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/deancochran/ftms.git", revision: "a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8")
+  .package(url: "https://github.com/deancochran/ftms.git", revision: "9aee23dc8e39fda7982af1d2d0f7fc9dd0e5b527")
 ],
 targets: [
   .target(name: "YourTarget", dependencies: [.product(name: "FTMS", package: "ftms")])
@@ -46,7 +46,7 @@ targets: [
 ```
 
 For an immutable dependency pin, use the full release commit recorded on the
-[release page](https://github.com/deancochran/ftms/releases/tag/swift-v0.1.0).
+[release page](https://github.com/deancochran/ftms/releases/tag/swift-v0.2.0).
 In Xcode, choose a **Commit** requirement with that full commit. Do not use a
 normal version range (`from:` / `.exact()`): SwiftPM does not interpret the
 `swift-v` prefix as an independent version namespace and the repository's `v*`
@@ -123,11 +123,11 @@ implicit passes.
 | Measurement matrix | 181,760 structural, 46 sentinel, 47 reserved-flag, and 315 incomplete-prefix checks |
 | Consumer installation | Passed through an isolated local-path SwiftPM consumer |
 
-**Published-release evidence:** `swift-v0.1.0` passed the full native suite on
+**Published-release evidence:** `swift-v0.2.0` passed the full native suite on
 Linux (Swift 6.0.3) and macOS (Swift 6.1.2 / Xcode 16.4), plus independent public
 tag consumers and macOS/iOS/tvOS/watchOS/visionOS SDK builds. The published
 reports and checksums were downloaded and independently verified. See the
-[release record](../../docs/released-packages.md#published-swift-010) for exact
+[release record](../../docs/released-packages.md#published-native-universal-measurements) for exact
 source identity, hashes, CI history and verification boundaries.
 
 Python and jsonschema are test tooling, not library dependencies. A Swift 6.0+

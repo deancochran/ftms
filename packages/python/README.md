@@ -1,11 +1,10 @@
 # FTMS for Python
 
-> The typed UUID-selected `decode_measurement` interface below is an unreleased
-> source addition, not part of the published PyPI 0.1.0a2 artifacts. Local source
-> installation/testing does not alter those immutable public artifacts.
+The typed UUID-selected `decode_measurement` interface below is available in the
+published PyPI 0.1.0a3 artifacts. Earlier 0.1.0a2 artifacts remain unchanged.
 
 `deancochran-ftms` is a pure, synchronous Python protocol package.  This
-**0.1.0a2 is an alpha with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, bidirectional Machine/Training Status, and static capability evaluation. The earlier 0.1.0a1 artifact has no capability API. It has no BLE, lifecycle, or logging APIs and is not a complete port of every API in the TypeScript/C packages.
+**0.1.0a3 is an alpha with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six measurement families with typed normalized results, bidirectional Machine/Training Status, and static capability evaluation. The earlier 0.1.0a1 artifact has no capability API. It has no BLE, lifecycle, or logging APIs and is not a complete port of every API in the TypeScript/C packages.
 
 Its wire [support profile](../../docs/support-profiles.md) is `FullWire` raw codecs,
 with `RangeInspection`, selected `NormalizedViews`, and `CapabilityEvidence`.
@@ -32,7 +31,7 @@ with your project's tooling; pip install alone does not create a lockfile.
 For a future stable release, omit `--pre`. To reproduce the verified alpha exactly:
 
 ```sh
-python -m pip install 'deancochran-ftms==0.1.0a2'
+python -m pip install 'deancochran-ftms==0.1.0a3'
 ```
 
 ```python
@@ -232,10 +231,10 @@ from these host verification results.
 
 ## Coverage and limits
 
-Version `0.1.0a2` is an **alpha with language-specific API coverage**. Features, ranges, controls,
+Version `0.1.0a3` is an **alpha with language-specific API coverage**. Features, ranges, controls,
 all six measurement families and both status characteristics have raw codecs.
 Normalized measurement/status projections and normalized range decoding are
-available. Unreleased source measurement UUID dispatch adds typed named physical metrics while
+available. Measurement UUID dispatch adds typed named physical metrics while
 preserving raw format/diagnostic evidence and explicit unsupported UUID results.
 Static capability evaluation is included starting with 0.1.0a2.
 Range, control and
