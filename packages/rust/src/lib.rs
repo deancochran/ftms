@@ -19,6 +19,7 @@ pub mod measurement;
 pub mod normalized;
 pub mod records;
 pub mod status;
+pub mod universal;
 
 pub const FEATURE_BYTES: usize = 8;
 

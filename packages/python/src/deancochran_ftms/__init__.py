@@ -27,8 +27,13 @@ from .features import (
     encode_features_raw,
 )
 from .measurements import (
+    DecodedMeasurement,
+    MeasurementDecodeResult,
+    MeasurementDiagnostics,
     MeasurementFormatOptions,
     MeasurementRaw,
+    NormalizedMeasurement,
+    decode_measurement,
     decode_measurement_raw,
     encode_measurement_raw,
     normalize_measurement,
@@ -106,6 +111,11 @@ __all__ += [
 __all__ += [
     "MeasurementFormatOptions",
     "MeasurementRaw",
+    "NormalizedMeasurement",
+    "DecodedMeasurement",
+    "MeasurementDecodeResult",
+    "MeasurementDiagnostics",
+    "decode_measurement",
     "decode_measurement_raw",
     "encode_measurement_raw",
     "normalize_measurement",

@@ -65,6 +65,11 @@ export 'src/statuses.dart'
         encodeMachineStatus,
         decodeTrainingStatus,
         encodeTrainingStatus;
+export 'src/universal_measurement.dart'
+    show
+        MeasurementUuidDecodeStatus,
+        MeasurementUuidDecodeResult,
+        decodeFtmsMeasurement;
 export 'src/values.dart'
     show
         RangeKind,

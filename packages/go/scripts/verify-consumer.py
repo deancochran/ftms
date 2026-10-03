@@ -51,8 +51,8 @@ import (
     ftms "github.com/deancochran/ftms/packages/go"
 )
 func main() {
-    measurement, err := ftms.DecodeMeasurement(ftms.IndoorBike, []byte{0, 0, 0x10, 0x0e}, ftms.MeasurementOptions{})
-    if err != nil || measurement.Values[ftms.Speed] != 3600 { panic("telemetry") }
+    measurement, err := ftms.DecodeNormalizedMeasurement(ftms.UUID16(0x2ad2), []byte{0, 0, 0x10, 0x0e}, ftms.MeasurementOptions{})
+    if err != nil || measurement.SpeedMPS == nil || *measurement.SpeedMPS != 10 || measurement.Raw.Values[ftms.Speed] != 3600 { panic("telemetry") }
     packet, err := ftms.EncodeControlRequest(ftms.ControlRequest{Opcode: 5, Operands: []int32{250}}, ftms.ControlOptions{})
     if err != nil || !bytes.Equal(packet, []byte{5,250,0}) { panic("control") }
     if _, err := ftms.DecodeControlRequest(packet, ftms.ControlOptions{}); err != nil { panic(err) }

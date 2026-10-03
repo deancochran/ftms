@@ -41,7 +41,9 @@ properties without changing raw evidence:
 - Cross-trainer stride count: tenths of a stride.
 - Stroke rate and cadence: half-units per minute.
 - Metabolic equivalent: tenths.
-- Pace: seconds per 500 metres; energy: kilocalories; time: seconds; power: watts.
+- Standard pace: seconds per 500 metres; selected `UInt8Legacy` treadmill pace
+  retains its raw integer but has no asserted physical unit and normalizes to
+  `null` (unreleased correction). Energy: kilocalories; time: seconds; power: watts.
 
 Control operands are ordered raw integers, **not** these floating-point projections.
 For example, `new ControlRequest(ControlOpcode.TargetPower, 250)` is 250 W, while

@@ -1,5 +1,9 @@
 # FTMS for C#
 
+> The UUID-selected measurement interface documented below and the legacy-pace
+> normalization correction are **unreleased source changes**, not part of the
+> published 0.1.0-alpha.1 package. Use the release matrix for installed versions.
+
 **Pure managed Bluetooth Fitness Machine Service protocol library for .NET.**
 
 **[0.1.0-alpha.1 is published on NuGet](https://www.nuget.org/packages/DeanCochran.Ftms/0.1.0-alpha.1).**
@@ -53,6 +57,20 @@ These are synthetic bytes, not a device capture. A successful raw decode can
 still contain truncation or other diagnostics: inspect `measurement.Diagnostics`.
 An absent raw field was not read; a present field with a null value is an explicit
 unavailable sentinel, not zero.
+
+When the caller has a characteristic UUID instead of a selected layout, one
+pure dispatcher covers the six FTMS machine-data UUIDs. It accepts standard
+16-bit aliases and Bluetooth-base full UUIDs, explicitly rejects vendor and
+non-measurement UUIDs, and never selects a layout from byte length:
+
+```csharp
+var universal = MeasurementUuidCodec.Decode("0x2ad2", bytes);
+if (universal.Status == MeasurementUuidDecodeStatus.Known)
+{
+    Console.WriteLine(universal.Normalized!.SpeedMetresPerSecond);
+    Console.WriteLine(universal.Diagnostics!.Truncated);
+}
+```
 
 ## Build and verify from source
 

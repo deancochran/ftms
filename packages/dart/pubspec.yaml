@@ -1,6 +1,6 @@
 name: deancochran_ftms
 description: Transport-independent Bluetooth Fitness Machine Service codecs and static capability evidence for Dart and Flutter.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/deancochran/ftms/tree/main/packages/dart
 homepage: https://deancochran.github.io/ftms/
 issue_tracker: https://github.com/deancochran/ftms/issues

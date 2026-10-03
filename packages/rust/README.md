@@ -1,5 +1,8 @@
 # FTMS for Rust
 
+> `universal::decode_measurement_uuid` below is an unreleased source addition,
+> not part of the published 0.1.1 crate.
+
 `ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.1 is
 published on crates.io, including the normalized range/control/status projections.
 See the [verified release evidence](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md#published-rust-011).
@@ -68,6 +71,14 @@ physical zero. `records::plan_measurement` emits bounded characteristic values
 for a caller byte budget, and `RecordAssembler` combines caller-delivered
 fragments under explicit generation and caller-clock age inputs. Neither owns a
 timer, connection, subscription, or BLE/GATT operation.
+
+`universal::decode_measurement_uuid` is a convenience entry for a discovered
+canonical 16-byte Bluetooth UUID and borrowed measurement bytes. It returns
+`UniversalMeasurementDecode::Known`, retaining the existing `RawMeasurement` and
+explicit `MeasurementOptions`, or `Unsupported` for an unknown UUID. Call
+`UniversalMeasurement::metric` for the existing typed `Metric` normalized view.
+Recognition compares all 16 UUID bytes (not a vendor UUID's low word), does not
+infer equipment identity, and never selects a format from packet bytes.
 
 Not implemented: BLE/GATT operations. Rust real-device
 interoperability remains unverified. This is partial FTMS conformance evidence,

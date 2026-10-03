@@ -18,6 +18,8 @@ int main(void) {
   ftms_cap_diagnostic diagnostics[1];
   ftms_cap_output out = {0};
   ftms_measurement measurement;
+  ftms_measurement_view universal;
+  ftms_measurement_fixed_point metric;
   ftms_measurement record_measurement = {0};
   ftms_record_format_context record;
   const ftms_measurement_format_options signed_resistance = {
@@ -26,6 +28,10 @@ int main(void) {
   uint8_t more_data[] = {1U, 0U};
   const uint8_t partial[] = {0x61U, 0x00U, 0x78U, 0x00U, 0x2cU, 0x01U};
   const uint8_t final[] = {0x00U, 0x00U, 0x01U, 0x00U};
+  const uint8_t treadmill[] = {0x00U, 0x00U, 0x68U, 0x01U};
+  const uint8_t legacy_pace[] = {0x20U, 0x00U, 0x01U, 0x00U, 0x07U};
+  const ftms_measurement_format_options legacy_format = {
+    FTMS_MEASUREMENT_RESISTANCE_UINT8_WHOLE, FTMS_TREADMILL_PACE_UINT8_LEGACY};
   out.diagnostics = diagnostics; out.diagnostic_capacity = 1;
   if (ftms_inspect_range(FTMS_RANGE_RESISTANCE_LEVEL, range_bytes, sizeof range_bytes,
                          &inspection) != FTMS_OK || inspection.status != FTMS_RANGE_INSPECTION_LENGTH ||
@@ -54,9 +60,19 @@ int main(void) {
        ftms_encode_control_request(&request, bytes, sizeof bytes, &written) != FTMS_OK || written != 1U ||
        ftms_capability_requirements_with_c7(&snapshot, NULL, &c7, &requirements) != FTMS_OK ||
          ftms_evaluate_capabilities_with_c7(&snapshot, NULL, &c7, &out) != FTMS_OK ||
-        ftms_decode_measurement(FTMS_MEASUREMENT_INDOOR_BIKE, more_data,
-                                sizeof more_data, &measurement) != FTMS_OK ||
-        ftms_encode_training_status(&training, NULL, 0U, bytes, sizeof bytes, &written) != FTMS_OK || written != 2U) return 1;
+         ftms_decode_measurement(FTMS_MEASUREMENT_INDOOR_BIKE, more_data,
+                                 sizeof more_data, &measurement) != FTMS_OK ||
+         ftms_decode_measurement_uuid16_view(FTMS_UUID16_TREADMILL_DATA, treadmill,
+                                             sizeof treadmill, NULL, &universal) != FTMS_OK ||
+         ftms_measurement_metric_value(&universal, FTMS_METRIC_SPEED_METRES_PER_SECOND,
+                                       &metric) != FTMS_MEASUREMENT_VALUE_NUMERIC ||
+         metric.numerator != 360 || metric.denominator != 360 ||
+         ftms_decode_measurement_uuid16_view(FTMS_UUID16_TREADMILL_DATA, legacy_pace,
+                                             sizeof legacy_pace, &legacy_format, &universal) != FTMS_OK ||
+         ftms_measurement_metric_value(&universal,
+                                       FTMS_METRIC_INSTANTANEOUS_PACE_SECONDS_PER_500_METRES,
+                                       &metric) != FTMS_MEASUREMENT_VALUE_UNKNOWN_UNIT ||
+         ftms_encode_training_status(&training, NULL, 0U, bytes, sizeof bytes, &written) != FTMS_OK || written != 2U) return 1;
   return features.target == 0 && requirements.observation_count == 0 &&
     requirements.diagnostic_count == 1 && out.report.generation == 7 &&
     diagnostics[0].code == FTMS_CAP_DIAG_REQUIRED_CHARACTERISTIC_MISSING &&

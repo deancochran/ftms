@@ -95,6 +95,10 @@ final class MeasurementRaw {
   final bool reservedFlags;
   final int bytesRead;
 
+  /// The explicit layouts used to decode this evidence. This allows a later
+  /// normalized projection to retain the selected wire interpretation.
+  final MeasurementFormatOptions format;
+
   MeasurementRaw({
     required this.kind,
     required this.flags,
@@ -107,6 +111,7 @@ final class MeasurementRaw {
     this.trailingBytes = false,
     this.reservedFlags = false,
     this.bytesRead = 0,
+    this.format = const MeasurementFormatOptions(),
   }) : values = List<int>.unmodifiable(values) {
     if (values.length != MeasurementField.values.length ||
         flags < 0 ||
@@ -339,6 +344,7 @@ MeasurementRaw decodeMeasurement(
         truncated: true,
         reservedFlags: flags & ~layout.validFlags != 0,
         bytesRead: offset,
+        format: options,
       );
     }
     final raw = _read(bytes, offset, field.width);
@@ -363,6 +369,7 @@ MeasurementRaw decodeMeasurement(
     trailingBytes: offset < bytes.length,
     reservedFlags: flags & ~layout.validFlags != 0,
     bytesRead: offset,
+    format: options,
   );
 }
 
@@ -372,10 +379,13 @@ MeasurementRaw decodeMeasurement(
 /// not describe one complete selected layout.
 /// Absent/unavailable slots must be zero. [MeasurementRaw.bytesRead] may be zero
 /// for a newly constructed value, otherwise it must match the encoded length.
+/// Omitted [options] retains the decoded format. An explicit override is
+/// validated against the supplied raw fields and byte count.
 Uint8List encodeMeasurement(
   MeasurementRaw measurement, {
-  MeasurementFormatOptions options = const MeasurementFormatOptions(),
+  MeasurementFormatOptions? options,
 }) {
+  final selectedFormat = options ?? measurement.format;
   final layout = _layouts[measurement.kind.index];
   if (measurement.truncated ||
       measurement.trailingBytes ||
@@ -393,7 +403,7 @@ Uint8List encodeMeasurement(
   }
   var required = 0, length = layout.flagBytes;
   for (final original in layout.fields) {
-    final field = original.withFormat(measurement.kind, options);
+    final field = original.withFormat(measurement.kind, selectedFormat);
     if (_selected(measurement.flags, field.bit)) {
       required |= 1 << field.index;
       length += field.width;
@@ -422,7 +432,7 @@ Uint8List encodeMeasurement(
     out.addByte((measurement.flags >> (8 * i)) & 0xff);
   }
   for (final original in layout.fields) {
-    final field = original.withFormat(measurement.kind, options);
+    final field = original.withFormat(measurement.kind, selectedFormat);
     if (!_selected(measurement.flags, field.bit)) {
       continue;
     }

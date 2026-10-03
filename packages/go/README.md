@@ -9,7 +9,7 @@ Integrate through the [consumer adapter seam](https://github.com/deancochran/ftm
 transport conversion, BLE/session lifecycle, retries, subscriptions,
 UI/application policy and control safety remain outside this protocol package.
 
-**Version 0.1.0: raw codecs and static capability interpretation.**
+**Published version 0.1.0: raw codecs and static capability interpretation.**
 The pre-1.0 interface may change in minor releases. See
 [coverage](docs/coverage.md), [verification](docs/verification.md), and
 [release gates](docs/releasing.md). Publication evidence is recorded in the
@@ -25,6 +25,10 @@ To reproduce the recorded release specifically, use
 `go get github.com/deancochran/ftms/packages/go@v0.1.0`. Existing constraints may
 affect resolution; inspect the selected version before adopting changes.
 
+This source checkout additionally contains unreleased normalized measurement
+work. It is not present in the published `v0.1.0` module; use a released version
+only after its release evidence is recorded.
+
 ## Implemented
 
 - Bidirectional Feature values, all five Supported Ranges, and all six measurement families.
@@ -37,21 +41,21 @@ affect resolution; inspect the selected version before adopting changes.
   21 Control Point operation prerequisites. It never performs I/O or says that a
   caller is authorized to execute an operation.
 
-Normalized measurement views, record planning, and record assembly remain
-pending. More Data is preserved, not assembled.
+For this source checkout, record planning and record assembly remain pending.
+More Data is preserved, not assembled.
 
 ## Example
 
 ```go
 import ftms "github.com/deancochran/ftms/packages/go"
 
-reading, err := ftms.DecodeMeasurement(
-    ftms.IndoorBike,
+reading, err := ftms.DecodeNormalizedMeasurement(
+    ftms.UUID16(0x2ad2),
     []byte{0, 0, 0x10, 0x0e},
     ftms.MeasurementOptions{},
 )
-// Handle err and reading.Diagnostics before using values.
-// reading.Values[ftms.Speed] is 3600 raw hundredths of km/h.
+// Handle err and reading.Raw.Diagnostics before using values.
+// reading.SpeedMPS is 10.0; reading.Raw retains raw values and diagnostics.
 _ = err
 _ = reading
 ```
@@ -71,6 +75,15 @@ See the [capability guide](docs/capabilities.md) and the executable
 `PrerequisiteSatisfied` is a static protocol result, **not permission to execute**.
 
 ## Raw values and errors
+
+`DecodeNormalizedMeasurement` is the one UUID-selected convenience call for all
+six measurement characteristics. Its named pointer fields are physical values;
+nil means absent, unavailable, or incomplete. It retains `Raw`, `Format`, and
+raw diagnostics so those distinct wire states are never confused with zero.
+Exact full Bluetooth-base UUID matching rejects vendor, alias, status, and other
+nonmeasurement UUIDs with `ErrUnsupported` rather than guessing.
+Cross Trainer readings additionally expose `MovementDirection`; other families
+leave it nil because no direction is encoded.
 
 `Measurement.Values` is indexed by typed `MeasurementField` constants. Map
 membership means a complete available field was decoded; a true entry in
@@ -112,6 +125,10 @@ No format is inferred from bytes, range values, device names, or capability flag
 Decoded range/measurement values retain format provenance; their encoders require
 the same selection. Alternative range candidates do not establish intended
 format, units, or permission to control equipment.
+
+The legacy unsigned-byte treadmill pace layout is retained in `Raw` only by the
+normalized reader: its physical normalized unit is unknown, so pace fields are
+nil when `TreadmillPaceUint8` is selected.
 
 ## Contributor verification
 

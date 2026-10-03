@@ -3,8 +3,14 @@
 Python distribution versions are independent of FTMS specification, shared
 conformance corpus, and other language-package versions.
 
-## Unreleased
+## 0.1.0a3
 
+Date: 2026-10-03
+
+- Add a UUID-dispatched measurement convenience decoder with immutable raw,
+  diagnostics, selected-format provenance, and named normalized physical values.
+  Normal full UUID spellings and simple aliases are accepted; vendor and
+  non-measurement UUIDs are explicit unsupported results.
 - Correct the development-status classifier from Pre-Alpha to Alpha to match
   the native alpha version and documented API maturity. This source-only change
   is for the next versioned release; immutable PyPI 0.1.0a2 metadata is unchanged.

@@ -19,6 +19,23 @@ static int valid_options(const ftms_measurement_format_options *options) {
   return options == NULL || ((unsigned)options->resistance_format <= FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS &&
     (unsigned)options->treadmill_pace_format <= FTMS_TREADMILL_PACE_UINT8_LEGACY);
 }
+
+ftms_result ftms_measurement_kind_from_uuid16(uint16_t uuid16,
+                                              ftms_measurement_kind *out) {
+  ftms_measurement_kind kind;
+  if (out == NULL) return FTMS_ERROR_NULL;
+  switch (uuid16) {
+    case FTMS_UUID16_TREADMILL_DATA: kind = FTMS_MEASUREMENT_TREADMILL; break;
+    case FTMS_UUID16_CROSS_TRAINER_DATA: kind = FTMS_MEASUREMENT_CROSS_TRAINER; break;
+    case FTMS_UUID16_STEP_CLIMBER_DATA: kind = FTMS_MEASUREMENT_STEP_CLIMBER; break;
+    case FTMS_UUID16_STAIR_CLIMBER_DATA: kind = FTMS_MEASUREMENT_STAIR_CLIMBER; break;
+    case FTMS_UUID16_ROWER_DATA: kind = FTMS_MEASUREMENT_ROWER; break;
+    case FTMS_UUID16_INDOOR_BIKE_DATA: kind = FTMS_MEASUREMENT_INDOOR_BIKE; break;
+    default: return FTMS_ERROR_KIND;
+  }
+  *out = kind;
+  return FTMS_OK;
+}
 static field_def formatted_field(ftms_measurement_kind kind, field_def field,
                                  const ftms_measurement_format_options *options) {
   if (options != NULL && field.field == FTMS_M_RESISTANCE &&
@@ -103,6 +120,77 @@ ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurem
 
 ftms_result ftms_decode_measurement(ftms_measurement_kind kind, const uint8_t *data, size_t size, ftms_measurement *out) { return ftms_decode_measurement_with_format(kind, data, size, NULL, out); }
 ftms_result ftms_encode_measurement(const ftms_measurement *measurement, uint8_t *out, size_t capacity, size_t *written) { return ftms_encode_measurement_with_format(measurement, NULL, out, capacity, written); }
+
+ftms_result ftms_decode_measurement_view(ftms_measurement_kind kind,
+                                         const uint8_t *data, size_t size,
+                                         const ftms_measurement_format_options *format,
+                                         ftms_measurement_view *out) {
+  ftms_measurement_view decoded = {0};
+  ftms_result result;
+  if (out == NULL) return FTMS_ERROR_NULL;
+  if (!valid_options(format)) return FTMS_ERROR_KIND;
+  if (format != NULL) decoded.format = *format;
+  result = ftms_decode_measurement_with_format(kind, data, size, format, &decoded.raw);
+  if (result != FTMS_OK) return result;
+  *out = decoded;
+  return FTMS_OK;
+}
+
+ftms_result ftms_decode_measurement_uuid16_view(uint16_t uuid16,
+                                                const uint8_t *data, size_t size,
+                                                const ftms_measurement_format_options *format,
+                                                ftms_measurement_view *out) {
+  ftms_measurement_kind kind;
+  ftms_result result = ftms_measurement_kind_from_uuid16(uuid16, &kind);
+  if (result != FTMS_OK) return result;
+  return ftms_decode_measurement_view(kind, data, size, format, out);
+}
+
+static ftms_measurement_field metric_field(ftms_measurement_metric metric) {
+  static const ftms_measurement_field fields[] = {
+    FTMS_M_SPEED, FTMS_M_AVERAGE_SPEED, FTMS_M_DISTANCE, FTMS_M_INCLINATION,
+    FTMS_M_RAMP_ANGLE, FTMS_M_POSITIVE_ELEVATION, FTMS_M_NEGATIVE_ELEVATION,
+    FTMS_M_INSTANTANEOUS_PACE, FTMS_M_AVERAGE_PACE, FTMS_M_TOTAL_ENERGY,
+    FTMS_M_ENERGY_PER_HOUR, FTMS_M_ENERGY_PER_MINUTE, FTMS_M_HEART_RATE,
+    FTMS_M_MET, FTMS_M_ELAPSED_TIME, FTMS_M_REMAINING_TIME, FTMS_M_FORCE_ON_BELT,
+    FTMS_M_POWER, FTMS_M_AVERAGE_POWER, FTMS_M_STEP_RATE, FTMS_M_AVERAGE_STEP_RATE,
+    FTMS_M_STRIDE_COUNT, FTMS_M_RESISTANCE, FTMS_M_FLOOR_COUNT, FTMS_M_STEP_COUNT,
+    FTMS_M_STROKE_RATE, FTMS_M_STROKE_COUNT, FTMS_M_AVERAGE_STROKE_RATE,
+    FTMS_M_CADENCE, FTMS_M_AVERAGE_CADENCE };
+  return fields[(unsigned)metric];
+}
+
+ftms_measurement_value_state ftms_measurement_metric_value(
+    const ftms_measurement_view *view, ftms_measurement_metric metric,
+    ftms_measurement_fixed_point *out) {
+  ftms_measurement_field field; uint64_t bit; uint16_t denominator = 1U;
+  if (view == NULL || !valid(view->raw.kind) || !valid_options(&view->format) ||
+      (unsigned)metric > FTMS_METRIC_AVERAGE_CADENCE_RPM)
+    return FTMS_MEASUREMENT_VALUE_ABSENT;
+  field = metric_field(metric); bit = UINT64_C(1) << field;
+  if ((view->raw.present & bit) == 0U) return FTMS_MEASUREMENT_VALUE_ABSENT;
+  if ((view->raw.unavailable & bit) != 0U) return FTMS_MEASUREMENT_VALUE_UNAVAILABLE;
+  if ((metric == FTMS_METRIC_INSTANTANEOUS_PACE_SECONDS_PER_500_METRES ||
+       metric == FTMS_METRIC_AVERAGE_PACE_SECONDS_PER_500_METRES) &&
+      view->raw.kind == FTMS_MEASUREMENT_TREADMILL &&
+      view->format.treadmill_pace_format == FTMS_TREADMILL_PACE_UINT8_LEGACY)
+    return FTMS_MEASUREMENT_VALUE_UNKNOWN_UNIT;
+  if (metric == FTMS_METRIC_SPEED_METRES_PER_SECOND ||
+      metric == FTMS_METRIC_AVERAGE_SPEED_METRES_PER_SECOND) denominator = 360U;
+  else if (metric == FTMS_METRIC_INCLINATION_PERCENT ||
+           metric == FTMS_METRIC_RAMP_ANGLE_DEGREES ||
+           metric == FTMS_METRIC_METABOLIC_EQUIVALENT ||
+           ((metric == FTMS_METRIC_POSITIVE_ELEVATION_METRES || metric == FTMS_METRIC_NEGATIVE_ELEVATION_METRES) &&
+            view->raw.kind == FTMS_MEASUREMENT_TREADMILL) ||
+           (metric == FTMS_METRIC_STRIDE_COUNT && view->raw.kind == FTMS_MEASUREMENT_CROSS_TRAINER) ||
+           (metric == FTMS_METRIC_RESISTANCE_LEVEL &&
+            view->format.resistance_format == FTMS_MEASUREMENT_RESISTANCE_SINT16_TENTHS)) denominator = 10U;
+  else if (metric == FTMS_METRIC_STROKE_RATE_PER_MINUTE ||
+           metric == FTMS_METRIC_AVERAGE_STROKE_RATE_PER_MINUTE ||
+           metric == FTMS_METRIC_CADENCE_RPM || metric == FTMS_METRIC_AVERAGE_CADENCE_RPM) denominator = 2U;
+  if (out != NULL) { out->numerator = view->raw.value[field]; out->denominator = denominator; }
+  return FTMS_MEASUREMENT_VALUE_NUMERIC;
+}
 
 static size_t group_width(ftms_measurement_kind kind, const kind_def *definition, size_t start,
                           const ftms_measurement_format_options *options) {

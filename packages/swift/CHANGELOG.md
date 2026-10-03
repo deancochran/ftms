@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+Date: 2026-10-03
+
+- Add UUID-dispatched measurement decoding for normal UUID spellings and simple
+  aliases, explicit vendor/non-measurement unsupported results, and cached named
+  optional physical metric accessors while retaining raw evidence, diagnostics,
+  stored format provenance, and the normalized dictionary API.
+
 ## 0.1.0
 
 - Initial native Swift 6 implementation of the FTMS 1.0 + EC23224 protocol

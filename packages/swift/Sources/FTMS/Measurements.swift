@@ -48,6 +48,122 @@ public struct Measurement: Equatable, Sendable {
     self.format = format
   }
 }
+
+/// One cached normalized projection with typed named physical values.
+public struct MeasurementMetricSnapshot: Equatable, Sendable {
+  public let normalized: NormalizedMetrics
+
+  init(_ measurement: Measurement) { normalized = normalizeMeasurement(measurement) }
+
+  private func number(_ name: String) -> Double? {
+    guard case .number(let value)? = normalized[name] else { return nil }
+    return value
+  }
+
+  public var hrBpm: Double? { number("hrBpm") }
+  public var powerWatts: Double? { number("powerWatts") }
+  public var averagePowerWatts: Double? { number("averagePowerWatts") }
+  public var cadenceRpm: Double? { number("cadenceRpm") }
+  public var averageCadenceRpm: Double? { number("averageCadenceRpm") }
+  public var speedMps: Double? { number("speedMps") }
+  public var averageSpeedMps: Double? { number("averageSpeedMps") }
+  public var distanceMeters: Double? { number("distanceMeters") }
+  public var elapsedTimeSeconds: Double? { number("elapsedTimeSeconds") }
+  public var remainingTimeSeconds: Double? { number("remainingTimeSeconds") }
+  public var energyKcal: Double? { number("energyKcal") }
+  public var energyPerHourKcal: Double? { number("energyPerHourKcal") }
+  public var energyPerMinuteKcal: Double? { number("energyPerMinuteKcal") }
+  public var metabolicEquivalent: Double? { number("metabolicEquivalent") }
+  public var stepCount: Double? { number("stepCount") }
+  public var stepRateSpm: Double? { number("stepRateSpm") }
+  public var averageStepRateSpm: Double? { number("averageStepRateSpm") }
+  public var strideCount: Double? { number("strideCount") }
+  public var floorCount: Double? { number("floorCount") }
+  public var positiveElevationGainMeters: Double? { number("positiveElevationGainMeters") }
+  public var negativeElevationGainMeters: Double? { number("negativeElevationGainMeters") }
+  public var inclinationPercent: Double? { number("inclinationPercent") }
+  public var rampAngleDegrees: Double? { number("rampAngleDegrees") }
+  public var resistanceLevel: Double? { number("resistanceLevel") }
+  public var instantaneousPaceSecondsPer500m: Double? { number("instantaneousPaceSecondsPer500m") }
+  public var averagePaceSecondsPer500m: Double? { number("averagePaceSecondsPer500m") }
+  public var forceOnBeltNewtons: Double? { number("forceOnBeltNewtons") }
+  public var strokeRateSpm: Double? { number("strokeRateSpm") }
+  public var averageStrokeRateSpm: Double? { number("averageStrokeRateSpm") }
+  public var strokeCount: Double? { number("strokeCount") }
+  public var movementDirection: MeasurementDirection? {
+    guard case .direction(let value)? = normalized["movementDirection"] else { return nil }
+    return value
+  }
+}
+
+/// UUID-dispatched measurement evidence with one stored normalized projection.
+public struct MeasurementSnapshot: Equatable, Sendable {
+  public let raw: Measurement
+  public let metrics: MeasurementMetricSnapshot
+
+  init(_ raw: Measurement) {
+    self.raw = raw
+    metrics = MeasurementMetricSnapshot(raw)
+  }
+}
+
+/// A UUID-dispatched result. Supported normal UUID spellings select a layout.
+public enum MeasurementUUIDDecodeResult: Equatable, Sendable {
+  case measurement(MeasurementSnapshot)
+  case unsupported(uuid: String)
+
+  public var measurement: MeasurementSnapshot? {
+    if case .measurement(let value) = self { return value }
+    return nil
+  }
+
+  public var isSupported: Bool { measurement != nil }
+}
+
+public extension Measurement {
+  /// The existing dictionary projection, using this measurement's stored decode format.
+  var normalizedMetrics: NormalizedMetrics { normalizeMeasurement(self) }
+
+  private func normalizedNumber(_ name: String) -> Double? {
+    guard case .number(let value)? = normalizedMetrics[name] else { return nil }
+    return value
+  }
+
+  var hrBpm: Double? { normalizedNumber("hrBpm") }
+  var powerWatts: Double? { normalizedNumber("powerWatts") }
+  var averagePowerWatts: Double? { normalizedNumber("averagePowerWatts") }
+  var cadenceRpm: Double? { normalizedNumber("cadenceRpm") }
+  var averageCadenceRpm: Double? { normalizedNumber("averageCadenceRpm") }
+  var speedMps: Double? { normalizedNumber("speedMps") }
+  var averageSpeedMps: Double? { normalizedNumber("averageSpeedMps") }
+  var distanceMeters: Double? { normalizedNumber("distanceMeters") }
+  var elapsedTimeSeconds: Double? { normalizedNumber("elapsedTimeSeconds") }
+  var remainingTimeSeconds: Double? { normalizedNumber("remainingTimeSeconds") }
+  var energyKcal: Double? { normalizedNumber("energyKcal") }
+  var energyPerHourKcal: Double? { normalizedNumber("energyPerHourKcal") }
+  var energyPerMinuteKcal: Double? { normalizedNumber("energyPerMinuteKcal") }
+  var metabolicEquivalent: Double? { normalizedNumber("metabolicEquivalent") }
+  var stepCount: Double? { normalizedNumber("stepCount") }
+  var stepRateSpm: Double? { normalizedNumber("stepRateSpm") }
+  var averageStepRateSpm: Double? { normalizedNumber("averageStepRateSpm") }
+  var strideCount: Double? { normalizedNumber("strideCount") }
+  var floorCount: Double? { normalizedNumber("floorCount") }
+  var positiveElevationGainMeters: Double? { normalizedNumber("positiveElevationGainMeters") }
+  var negativeElevationGainMeters: Double? { normalizedNumber("negativeElevationGainMeters") }
+  var inclinationPercent: Double? { normalizedNumber("inclinationPercent") }
+  var rampAngleDegrees: Double? { normalizedNumber("rampAngleDegrees") }
+  var resistanceLevel: Double? { normalizedNumber("resistanceLevel") }
+  var instantaneousPaceSecondsPer500m: Double? { normalizedNumber("instantaneousPaceSecondsPer500m") }
+  var averagePaceSecondsPer500m: Double? { normalizedNumber("averagePaceSecondsPer500m") }
+  var forceOnBeltNewtons: Double? { normalizedNumber("forceOnBeltNewtons") }
+  var strokeRateSpm: Double? { normalizedNumber("strokeRateSpm") }
+  var averageStrokeRateSpm: Double? { normalizedNumber("averageStrokeRateSpm") }
+  var strokeCount: Double? { normalizedNumber("strokeCount") }
+  var movementDirection: MeasurementDirection? {
+    guard case .direction(let value)? = normalizedMetrics["movementDirection"] else { return nil }
+    return value
+  }
+}
 struct Field {
   let bit: Int
   let width: Int
@@ -217,6 +333,51 @@ public func decodeMeasurement(
   result.diagnostics.trailingBytes = p < bytes.count
   if result.diagnostics.trailingBytes { result.diagnostics.issues.append("trailing_bytes") }
   return result
+}
+
+private let measurementUUIDKinds: [String: MeasurementKind] = [
+  "00002acd00001000800000805f9b34fb": .treadmill,
+  "00002ace00001000800000805f9b34fb": .crossTrainer,
+  "00002acf00001000800000805f9b34fb": .stepClimber,
+  "00002ad000001000800000805f9b34fb": .stairClimber,
+  "00002ad100001000800000805f9b34fb": .rower,
+  "00002ad200001000800000805f9b34fb": .indoorBike,
+]
+
+private func measurementKind(uuid: String) -> MeasurementKind? {
+  let bytes = Array(uuid.utf8)
+  func hex(_ byte: UInt8) -> Bool {
+    (48...57).contains(byte) || (65...70).contains(byte) || (97...102).contains(byte)
+  }
+  func known(_ short: ArraySlice<UInt8>) -> MeasurementKind? {
+    guard short.count == 4, short.allSatisfy(hex) else { return nil }
+    let value = String(decoding: short, as: UTF8.self).lowercased()
+    return measurementUUIDKinds["0000\(value)00001000800000805f9b34fb"]
+  }
+  if bytes.count == 4 { return known(bytes[...]) }
+  if bytes.count == 6, bytes[0] == 48, bytes[1] == 120 || bytes[1] == 88 {
+    return known(bytes[2...])
+  }
+  if bytes.count == 32, bytes.allSatisfy(hex) {
+    return measurementUUIDKinds[String(decoding: bytes, as: UTF8.self).lowercased()]
+  }
+  let dashIndices: Set<Int> = [8, 13, 18, 23]
+  if bytes.count == 36,
+    bytes.enumerated().allSatisfy({ dashIndices.contains($0.offset) ? $0.element == 45 : hex($0.element) })
+  {
+    return measurementUUIDKinds[
+      String(decoding: bytes.filter { $0 != 45 }, as: UTF8.self).lowercased()
+    ]
+  }
+  return nil
+}
+
+/// Decode one selected FTMS measurement characteristic without packet-shape inference.
+public func decodeMeasurement(
+  uuid: String, bytes: [UInt8], format: MeasurementFormatOptions = .init()
+) throws -> MeasurementUUIDDecodeResult {
+  guard let kind = measurementKind(uuid: uuid) else { return .unsupported(uuid: uuid) }
+  return .measurement(MeasurementSnapshot(try decodeMeasurement(kind, bytes: bytes, options: format)))
 }
 public func encodeMeasurement(_ m: Measurement, options: MeasurementFormatOptions = .init()) throws
   -> [UInt8]

@@ -44,6 +44,12 @@ export const pages = [
     group: "Guides",
   },
   {
+    source: "docs/universal-measurements.md",
+    slug: "integration/universal-measurements",
+    title: "Universal measurements",
+    group: "Guides",
+  },
+  {
     source: "docs/troubleshooting.md",
     slug: "integration/troubleshooting",
     title: "Troubleshooting",

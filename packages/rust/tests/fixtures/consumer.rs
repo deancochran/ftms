@@ -1,4 +1,5 @@
 use ftms::{measurement::*, normalized::*, status::*, *};
+use ftms::universal::*;
 
 fn main() {
     let raw = RawFeatures {
@@ -98,6 +99,39 @@ fn main() {
     let mut out = [0; 4];
     assert_eq!(encode_measurement(&bike, options, &mut out), Ok(4));
     assert_eq!(out, [33, 0, 246, 255]);
+
+    let UniversalMeasurementDecode::Known(universal) = decode_measurement_uuid(
+        TREADMILL_DATA_UUID,
+        &[0, 0, 104, 1],
+        MeasurementOptions::default(),
+    )
+    .unwrap() else {
+        panic!("known treadmill UUID")
+    };
+    assert_eq!(universal.raw.kind, MeasurementKind::Treadmill);
+    assert_eq!(
+        universal.metric(Metric::SpeedMetresPerSecond),
+        Some(NormalizedValue::Number(1.0))
+    );
+    let legacy = MeasurementOptions {
+        treadmill_pace_format: TreadmillPaceFormat::Uint8Legacy,
+        ..MeasurementOptions::default()
+    };
+    let UniversalMeasurementDecode::Known(legacy_value) =
+        decode_measurement_uuid(TREADMILL_DATA_UUID, &[0x20, 0, 1, 0, 7], legacy).unwrap()
+    else {
+        panic!("known treadmill UUID")
+    };
+    assert_eq!(
+        legacy_value.metric(Metric::InstantaneousPaceSecondsPer500Metres),
+        Some(NormalizedValue::UnknownUnit)
+    );
+    let mut vendor = INDOOR_BIKE_DATA_UUID;
+    vendor[0] = 1;
+    assert_eq!(
+        decode_measurement_uuid(vendor, &[0, 0], MeasurementOptions::default()).unwrap(),
+        UniversalMeasurementDecode::Unsupported
+    );
 
     let machine = RawMachineStatus {
         opcode: 0x14,

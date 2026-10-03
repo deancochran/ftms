@@ -185,6 +185,11 @@ public sealed class NormalizedMeasurement
     public double? GetValue(MeasurementField field)
     {
         if (!value.Fields.TryGetValue(field, out var raw) || !raw.HasValue) return null;
+        // UInt8Legacy treadmill pace retains raw evidence but has no asserted
+        // seconds-per-500-metre unit, so it must not be normalized under that label.
+        if (value.Kind == MeasurementKind.Treadmill &&
+            value.Format.TreadmillPace == TreadmillPaceFormat.UInt8Legacy &&
+            (field == MeasurementField.InstantaneousPace || field == MeasurementField.AveragePace)) return null;
         int divisor = field switch
         {
             MeasurementField.Speed or MeasurementField.AverageSpeed => 360,

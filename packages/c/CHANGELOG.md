@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+Date: 2026-10-03
+
+- Add UUID16-selected measurement views and named fixed-point physical metric
+  projection over existing raw decoders. Views retain caller-selected format and
+  explicitly distinguish absent, unavailable, numeric and unknown-unit evidence.
+
 ## 0.2.0
 
 - Add `ftms_inspect_range` and `ftms_inspect_range_with_format`: selected profile,

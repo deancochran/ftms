@@ -163,6 +163,9 @@ c = f.encode_control_request_raw(f.ControlRequestRaw(2, (1234,)))
 assert c == bytes([2, 210, 4]) and f.decode_control_request_raw(c).operands == (1234,)
 assert f.decode_control_response_raw(bytes([128, 19, 1, 100, 0, 200, 0])).low == 100
 assert f.encode_measurement_raw(f.MeasurementRaw(5, 0, 1, 0, (1234,) + (0,) * 29)) == bytes([0, 0, 210, 4])
+measurement = f.decode_measurement('00002ad2-0000-1000-8000-00805f9b34fb', bytes([0, 0, 210, 4]))
+assert measurement.known and measurement.measurement is not None
+assert measurement.measurement.raw.values[0] == 1234 and measurement.measurement.metrics.speed_mps == 1234 / 360
 assert f.decode_machine_status_raw(bytes([7, 249, 255])).parameter == (4, (-7,))
 assert f.decode_training_status_raw(bytes([1, 13]) + b'manual').text == b'manual'
 e = f.CharacteristicEvidence('00002acc00001000800000805f9b34fb', 2, f.ReadState.SUCCESS, read_bytes=bytes(8))
@@ -187,10 +190,16 @@ assert (m.distribution('deancochran-ftms').locate_file('deancochran_ftms/py.type
             typed_consumer.write_text(
                 "from typing import assert_type\n"
                 "from deancochran_ftms import (CapabilitySnapshot, CharacteristicEvidence, DiscoveryState,\n"
-                "    FeaturesRaw, MeasurementRaw, ReadState, ServiceScope, TrainingStatusRaw,\n"
-                "    decode_features_raw, decode_measurement_raw, encode_training_status_raw, evaluate_capabilities)\n"
+                "    DecodedMeasurement, FeaturesRaw, MeasurementDecodeResult, MeasurementDiagnostics, MeasurementRaw, NormalizedMeasurement, ReadState, ServiceScope, TrainingStatusRaw,\n"
+                "    decode_features_raw, decode_measurement, decode_measurement_raw, encode_training_status_raw, evaluate_capabilities)\n"
                 "assert_type(decode_features_raw(bytes(8)), FeaturesRaw)\n"
                 "assert_type(decode_measurement_raw(bytes(4), 5), MeasurementRaw)\n"
+                "decoded = decode_measurement('00002ad2-0000-1000-8000-00805f9b34fb', bytes(4))\n"
+                "assert_type(decoded, MeasurementDecodeResult)\n"
+                "if decoded.measurement is not None:\n"
+                "    assert_type(decoded.measurement, DecodedMeasurement)\n"
+                "    assert_type(decoded.measurement.metrics, NormalizedMeasurement)\n"
+                "    assert_type(decoded.measurement.diagnostics, MeasurementDiagnostics)\n"
                 "assert_type(encode_training_status_raw(TrainingStatusRaw(0, 1)), bytes)\n"
                 "snapshot = CapabilitySnapshot(DiscoveryState.COMPLETE, ServiceScope.PRESENT, 0,\n"
                 "    (CharacteristicEvidence('00002acc00001000800000805f9b34fb', 2, ReadState.SUCCESS, read_bytes=bytes(8)),))\n"

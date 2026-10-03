@@ -100,3 +100,56 @@ import Testing
   let bike = try decodeMeasurement(.indoorBike, bytes: [0x41, 0, 1])
   #expect(normalizeMeasurement(bike) == ["powerWatts": .number(nil)])
 }
+
+@Test func universalMeasurementUUIDDecoderUsesOneStoredFormatAndNamedMetrics() throws {
+  let cases: [(String, [UInt8], Double?)] = [
+    ("00002acd-0000-1000-8000-00805f9b34fb", [0, 0, 232, 3], 2.7777777777777777),
+    ("00002ace00001000800000805f9b34fb", [0, 0, 0, 232, 3], 2.7777777777777777),
+    ("00002acf00001000800000805f9b34fb", [0, 0, 12, 0, 44, 1], nil),
+    ("00002ad000001000800000805f9b34fb", [0, 0, 20, 0], nil),
+    ("00002ad100001000800000805f9b34fb", [0, 0, 64, 44, 1], nil),
+    ("00002ad200001000800000805f9b34fb", [0, 0, 232, 3], 2.7777777777777777),
+  ]
+  for (uuid, bytes, speed) in cases {
+    let result = try decodeMeasurement(uuid: uuid, bytes: bytes, format: .init())
+    guard case .measurement(let measurement) = result else {
+      Issue.record("known UUID was unsupported: \(uuid)")
+      continue
+    }
+    #expect(measurement.raw.values.isEmpty == false)
+    #expect(measurement.metrics.speedMps == speed)
+  }
+
+  let legacy = try decodeMeasurement(
+    uuid: "00002acd-0000-1000-8000-00805f9b34fb", bytes: [0x21, 0, 0],
+    format: .init(treadmillPace: .uint8Legacy))
+  guard case .measurement(let legacyMeasurement) = legacy else {
+    Issue.record("legacy treadmill UUID was unsupported")
+    return
+  }
+  #expect(legacyMeasurement.raw.values[.instantaneousPace] == 0)
+  #expect(legacyMeasurement.metrics.instantaneousPaceSecondsPer500m == nil)
+  #expect(legacyMeasurement.raw.format.treadmillPace == .uint8Legacy)
+
+  let sentinel = try decodeMeasurement(
+    uuid: "00002ad200001000800000805f9b34fb", bytes: [1, 1, 0xff, 0xff, 2, 0, 3])
+  guard case .measurement(let unavailable) = sentinel else {
+    Issue.record("bike unsupported")
+    return
+  }
+  #expect(unavailable.raw.unavailable.contains(.totalEnergy))
+  #expect(unavailable.metrics.energyKcal == nil)
+  let prefix = try decodeMeasurement(uuid: "00002ad200001000800000805f9b34fb", bytes: [0xfe, 0x1f])
+  guard case .measurement(let truncated) = prefix else {
+    Issue.record("bike unsupported")
+    return
+  }
+  #expect(truncated.raw.diagnostics.truncated)
+
+  for uuid in ["00002ACD-0000-1000-8000-00805F9B34FB", "00002ACD00001000800000805F9B34FB", "2AcD", "0x2aCd"] {
+    #expect(try decodeMeasurement(uuid: uuid, bytes: [0, 0, 0, 0]).isSupported)
+  }
+  for uuid in ["00002acd0000-1000-8000-00805f9b34fb", "00002acd_0000_1000_8000_00805f9b34fb", "0x2acd0", "00002acc00001000800000805f9b34fb", "12345678123456781234567812345678"] {
+    #expect(try decodeMeasurement(uuid: uuid, bytes: []).isSupported == false)
+  }
+}

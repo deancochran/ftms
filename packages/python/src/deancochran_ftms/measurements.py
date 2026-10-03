@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Any, cast
 
 from ._binary import immutable_bytes
 from ._errors import RawCodecError
@@ -229,6 +230,87 @@ class MeasurementRaw:
             raise RawCodecError("range", "invalid raw measurement")
 
 
+@dataclass(frozen=True, slots=True)
+class NormalizedMeasurement:
+    """Named physical values projected from one explicitly formatted raw packet."""
+
+    hr_bpm: float | int | None = None
+    power_watts: float | int | None = None
+    average_power_watts: float | int | None = None
+    cadence_rpm: float | int | None = None
+    average_cadence_rpm: float | int | None = None
+    speed_mps: float | int | None = None
+    average_speed_mps: float | int | None = None
+    distance_meters: float | int | None = None
+    elapsed_time_seconds: float | int | None = None
+    remaining_time_seconds: float | int | None = None
+    energy_kcal: float | int | None = None
+    energy_per_hour_kcal: float | int | None = None
+    energy_per_minute_kcal: float | int | None = None
+    metabolic_equivalent: float | int | None = None
+    step_count: float | int | None = None
+    step_rate_spm: float | int | None = None
+    average_step_rate_spm: float | int | None = None
+    stride_count: float | int | None = None
+    floor_count: float | int | None = None
+    positive_elevation_gain_meters: float | int | None = None
+    negative_elevation_gain_meters: float | int | None = None
+    inclination_percent: float | int | None = None
+    ramp_angle_degrees: float | int | None = None
+    resistance_level: float | int | None = None
+    instantaneous_pace_seconds_per_500m: float | int | None = None
+    average_pace_seconds_per_500m: float | int | None = None
+    force_on_belt_newtons: float | int | None = None
+    stroke_rate_spm: float | int | None = None
+    average_stroke_rate_spm: float | int | None = None
+    stroke_count: float | int | None = None
+    movement_direction: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class MeasurementDiagnostics:
+    """Typed decode evidence; raw masks and values remain available on ``raw``."""
+
+    more_data: bool
+    backward: bool
+    truncated: bool
+    trailing_bytes: bool
+    reserved_flags: bool
+    bytes_read: int
+
+
+@dataclass(frozen=True, slots=True)
+class DecodedMeasurement:
+    """Raw evidence, selected wire format, diagnostics, and named physical values."""
+
+    raw: MeasurementRaw
+    format: MeasurementFormatOptions
+    metrics: NormalizedMeasurement
+
+    @property
+    def diagnostics(self) -> MeasurementDiagnostics:
+        return MeasurementDiagnostics(
+            bool(self.raw.more_data),
+            bool(self.raw.backward),
+            bool(self.raw.truncated),
+            bool(self.raw.trailing_bytes),
+            bool(self.raw.reserved_flags),
+            self.raw.bytes_read,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MeasurementDecodeResult:
+    """UUID-dispatched measurement result; unsupported UUIDs are never layout-inferred."""
+
+    measurement: DecodedMeasurement | None
+    unsupported_uuid: str | None = None
+
+    @property
+    def known(self) -> bool:
+        return self.measurement is not None
+
+
 def _fields(k: int, o: MeasurementFormatOptions) -> Iterator[tuple[int, int, int, int, int]]:
     for bit, w, i, s, u in D[k][2]:
         if o.resistance_format == "signed16Tenths" and i == 21 and k in (1, 4, 5):
@@ -371,10 +453,10 @@ _METRICS = (
 )
 
 
-def normalize_measurement(
+def _normalize_values(
     raw: MeasurementRaw, options: MeasurementFormatOptions | None = None
 ) -> dict[str, float | int | str | None]:
-    """Project raw evidence into codec-v1 physical units; unavailable/unread values are ``None``."""
+    """Single canonical raw-to-physical projection used by both public views."""
     o = _options(options)
     if not isinstance(raw, MeasurementRaw):
         raise RawCodecError("kind", "value must be MeasurementRaw")
@@ -427,3 +509,107 @@ def normalize_measurement(
     if raw.kind == 1:
         result["movementDirection"] = "backward" if raw.backward else "forward"
     return result
+
+
+def normalize_measurement(
+    raw: MeasurementRaw, options: MeasurementFormatOptions | None = None
+) -> dict[str, float | int | str | None]:
+    """Project raw evidence into codec-v1 physical units; unavailable/unread values are ``None``."""
+    return _normalize_values(raw, options)
+
+
+_TYPED_METRIC_NAMES = {
+    "hrBpm": "hr_bpm",
+    "powerWatts": "power_watts",
+    "averagePowerWatts": "average_power_watts",
+    "cadenceRpm": "cadence_rpm",
+    "averageCadenceRpm": "average_cadence_rpm",
+    "speedMps": "speed_mps",
+    "averageSpeedMps": "average_speed_mps",
+    "distanceMeters": "distance_meters",
+    "elapsedTimeSeconds": "elapsed_time_seconds",
+    "remainingTimeSeconds": "remaining_time_seconds",
+    "energyKcal": "energy_kcal",
+    "energyPerHourKcal": "energy_per_hour_kcal",
+    "energyPerMinuteKcal": "energy_per_minute_kcal",
+    "metabolicEquivalent": "metabolic_equivalent",
+    "stepCount": "step_count",
+    "stepRateSpm": "step_rate_spm",
+    "averageStepRateSpm": "average_step_rate_spm",
+    "strideCount": "stride_count",
+    "floorCount": "floor_count",
+    "positiveElevationGainMeters": "positive_elevation_gain_meters",
+    "negativeElevationGainMeters": "negative_elevation_gain_meters",
+    "inclinationPercent": "inclination_percent",
+    "rampAngleDegrees": "ramp_angle_degrees",
+    "resistanceLevel": "resistance_level",
+    "instantaneousPaceSecondsPer500m": "instantaneous_pace_seconds_per_500m",
+    "averagePaceSecondsPer500m": "average_pace_seconds_per_500m",
+    "forceOnBeltNewtons": "force_on_belt_newtons",
+    "strokeRateSpm": "stroke_rate_spm",
+    "averageStrokeRateSpm": "average_stroke_rate_spm",
+    "strokeCount": "stroke_count",
+    "movementDirection": "movement_direction",
+}
+_MEASUREMENT_UUIDS = {
+    "00002acd00001000800000805f9b34fb": 0,
+    "00002ace00001000800000805f9b34fb": 1,
+    "00002acf00001000800000805f9b34fb": 2,
+    "00002ad000001000800000805f9b34fb": 3,
+    "00002ad100001000800000805f9b34fb": 4,
+    "00002ad200001000800000805f9b34fb": 5,
+}
+
+
+def decode_measurement(
+    characteristic_uuid: str,
+    data: bytes | bytearray | memoryview,
+    format: MeasurementFormatOptions | None = None,
+) -> MeasurementDecodeResult:
+    """Decode a full canonical Bluetooth UUID with an explicit measurement format.
+
+    Full 32-hex and standard hyphenated UUIDs are case-insensitive. The simple
+    4-hex and ``0x`` aliases are accepted too. Vendor and non-measurement UUIDs
+    remain explicit unsupported results; this function never chooses a layout
+    from bytes.
+    """
+    kind = _measurement_kind(characteristic_uuid)
+    if kind is None:
+        return MeasurementDecodeResult(
+            None, characteristic_uuid if type(characteristic_uuid) is str else None
+        )
+    selected = _options(format)
+    raw = decode_measurement_raw(data, kind, selected)
+    normalized = _normalize_values(raw, selected)
+    metrics = NormalizedMeasurement(
+        **cast(Any, {typed: normalized[wire] for wire, typed in _TYPED_METRIC_NAMES.items()})
+    )
+    return MeasurementDecodeResult(DecodedMeasurement(raw, selected, metrics))
+
+
+def _measurement_kind(uuid: object) -> int | None:
+    """Accept only documented UUID spellings; never repair arbitrary punctuation."""
+    if type(uuid) is not str:
+        return None
+    text = uuid
+    if len(text) == 4 and all(c in "0123456789abcdefABCDEF" for c in text):
+        return _MEASUREMENT_UUIDS.get(f"0000{text.lower()}00001000800000805f9b34fb")
+    if (
+        len(text) == 6
+        and text[:2] in ("0x", "0X")
+        and all(c in "0123456789abcdefABCDEF" for c in text[2:])
+    ):
+        return _MEASUREMENT_UUIDS.get(f"0000{text[2:].lower()}00001000800000805f9b34fb")
+    if len(text) == 32 and all(c in "0123456789abcdefABCDEF" for c in text):
+        return _MEASUREMENT_UUIDS.get(text.lower())
+    if (
+        len(text) == 36
+        and all(text[index] == "-" for index in (8, 13, 18, 23))
+        and all(
+            c in "0123456789abcdefABCDEF"
+            for index, c in enumerate(text)
+            if index not in (8, 13, 18, 23)
+        )
+    ):
+        return _MEASUREMENT_UUIDS.get(text.replace("-", "").lower())
+    return None

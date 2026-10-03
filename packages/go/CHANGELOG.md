@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+Date: 2026-10-03
+
+UUID-selected normalized measurement views with named optional physical metrics,
+raw diagnostics, selected format provenance, and raw-only legacy treadmill pace.
+
 ## 0.1.0
 
 Date: 2026-09-30

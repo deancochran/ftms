@@ -82,6 +82,10 @@ let source = Measurement(kind: .treadmill, flags: 0, values: [.speed: 100])
 let wire = try encodeMeasurement(source)
 let decoded = try decodeMeasurement(.treadmill, bytes: wire)
 precondition(decoded.values[.speed] == 100)
+let universal = try decodeMeasurement(uuid: "00002acd-0000-1000-8000-00805f9b34fb", bytes: wire, format: .init())
+guard case .measurement(let measurement) = universal else { fatalError("measurement UUID unsupported") }
+precondition(measurement.metrics.speedMps == 100.0 / 360)
+precondition(measurement.raw.format == .init())
 ''')
         run(["swift", "run", "Consumer"], cwd=directory)
 
