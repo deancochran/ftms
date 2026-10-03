@@ -1,5 +1,8 @@
 # FTMS for Kotlin/JVM
 
+> `MeasurementReader` and its named normalized result are unreleased source
+> additions, not part of the published Maven Central 0.1.0 artifact.
+
 Independent, transport-neutral Kotlin and Java codecs for Bluetooth Fitness
 Machine Service 1.0 plus the applicable errata recorded in the repository's
 [specification audit](../../docs/specification-audit.md).
@@ -10,8 +13,8 @@ Exact source, signed artifact hashes and public-consumer evidence are recorded i
 [released packages](../../docs/released-packages.md).
 
 Support profile: [`FullWire`](../../docs/support-profiles.md), with
-`CapabilityEvidence` and `RangeInspection`. Public values are intentionally
-raw/idiomatic rather than a clone of TypeScript's normalized convenience interface.
+`CapabilityEvidence` and `RangeInspection`, plus an idiomatic normalized
+measurement convenience view.
 
 ```kotlin
 repositories { mavenCentral() }
@@ -50,6 +53,17 @@ UI/application policy and control safety remain outside this protocol package.
 ## Kotlin example
 
 ```kotlin
+import io.github.deancochran.ftms.measurement.MeasurementReader
+import io.github.deancochran.ftms.measurement.MeasurementDecodeResult
+import java.util.UUID
+
+val result = MeasurementReader.decode(
+    UUID.fromString("00002ad2-0000-1000-8000-00805f9b34fb"),
+    byteArrayOf(0, 0, 0x10, 0x0e),
+)
+val reading = (result as? MeasurementDecodeResult.Decoded)?.measurement
+check(reading?.speedMps == 10.0) // raw evidence and diagnostics stay in reading.raw
+
 import io.github.deancochran.ftms.ControlCodec
 import io.github.deancochran.ftms.ControlCommand
 import io.github.deancochran.ftms.FeatureCodec
@@ -107,8 +121,14 @@ fixtures or install another language port. Gson, NetworkNT and JUnit are test-on
 
 ## Values, errors and compatibility
 
-Numeric codec values are **raw integer numerators**, not automatically normalized
-physical-unit values. Named command properties state their units; ranges include
+Numeric raw codec values are **raw integer numerators**, not automatically normalized
+physical-unit values. `MeasurementReader.decode(UUID, ByteArray, MeasurementFormat)`
+is the single UUID-selected convenience entry point for all six measurement
+characteristics. Its `NormalizedMeasurement` has named nullable physical metrics,
+retains the raw result and selected format, and returns typed `Decoded`,
+`Unsupported`, or `Invalid` outcomes instead of guessing UUIDs or formats. A null
+metric is absent, unavailable, or incomplete; inspect `raw` to distinguish those
+wire states from zero. Named command properties state their units; ranges include
 `scaleDivisor` and `unit`. Measurement indexes are named by `MeasurementField` and
 follow the [raw measurement contract](../../shared/conformance/measurements/README.md).
 The historical normalized-v1 adapter is test-only, not a second public API.
@@ -129,6 +149,10 @@ Range, control and measurement format selections are independent and explicit.
 Defaults match the shared contracts; alternative resistance widths and legacy
 treadmill pace are never inferred from payload length, device name or another
 characteristic. Structural range candidates do not prove physical units.
+The legacy unsigned-byte treadmill pace selection is raw-only in the normalized
+view because its physical unit is unknown.
+Cross Trainer readings expose optional `movementDirection`; other measurement
+families retain no direction because their wire layouts do not encode one.
 
 Public command data classes describe fixed wire layouts; their generated methods
 are part of the checked API surface. Unknown future procedures are not silently

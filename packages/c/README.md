@@ -1,5 +1,8 @@
 # FTMS for C
 
+> The UUID16 measurement view and named fixed-point metric accessors below are
+> unreleased source additions, not part of the published 0.2.0 archive.
+
 Portable C99 codecs for Bluetooth Fitness Machine Service telemetry, features,
 ranges, statuses and control messages. Keep your existing Bluetooth stack.
 
@@ -45,6 +48,19 @@ measurement structural matrix additionally exercises 181,760 layout cases,
 checkout `shared/conformance/{inspection,measurement-matrix}/v1/README.md` for
 contract identities, accounting and limitations. These assets are test-only,
 not dependencies of installed C consumers.
+
+## UUID16 measurement convenience
+
+For an already-discovered canonical SIG UUID16, `ftms_measurement_kind_from_uuid16`
+maps the six measurement characteristics to the existing raw decoder.
+`ftms_decode_measurement_uuid16_view` retains both decoded raw evidence and the
+explicit format used for decoding. `ftms_measurement_metric_value` then returns a
+named physical metric as an exact numerator/denominator with `ABSENT`,
+`UNAVAILABLE`, `NUMERIC`, or `UNKNOWN_UNIT` state—without allocation or floats.
+For example, `FTMS_METRIC_SPEED_METRES_PER_SECOND` is raw speed divided by 360.
+The legacy treadmill uint8 pace layout intentionally reports `UNKNOWN_UNIT`.
+These helpers do not accept arbitrary 128-bit UUIDs, infer a device type, or
+select a format from bytes.
 
 ## Contributor-only local source candidate
 

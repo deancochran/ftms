@@ -1,5 +1,9 @@
 # FTMS for Python
 
+> The typed UUID-selected `decode_measurement` interface below is an unreleased
+> source addition, not part of the published PyPI 0.1.0a2 artifacts. Local source
+> installation/testing does not alter those immutable public artifacts.
+
 `deancochran-ftms` is a pure, synchronous Python protocol package.  This
 **0.1.0a2 is an alpha with an evolving API**: it implements FTMS Features, all five supported ranges (raw and normalized), structural range inspection, raw Control Point requests/responses, all six raw measurement families, bidirectional Machine/Training Status, and static capability evaluation. The earlier 0.1.0a1 artifact has no capability API. It has no BLE, lifecycle, or logging APIs and is not a complete port of every API in the TypeScript/C packages.
 
@@ -108,9 +112,10 @@ assert len(report.operations) == 21
 assert "canExecute" not in report.to_wire()
 ```
 
-UUIDs use 32 lowercase hexadecimal characters without hyphens. Read payloads
-must be immutable `bytes`, observations must be a tuple, and state fields use the
-exported enums. Positional report rows follow the
+Capability-evidence UUIDs use 32 lowercase hexadecimal characters without hyphens;
+that strict evidence contract is separate from the flexible measurement convenience
+decoder below. Read payloads must be immutable `bytes`, observations must be a tuple,
+and state fields use the exported enums. Positional report rows follow the
 [shared capability report layout](../../shared/conformance/capabilities/README.md).
 Missing Control Point/Machine Status evidence and unknown C.7 facts in this
 example are retained as diagnostics, not silently treated as satisfied.
@@ -230,7 +235,9 @@ from these host verification results.
 Version `0.1.0a2` is an **alpha with language-specific API coverage**. Features, ranges, controls,
 all six measurement families and both status characteristics have raw codecs.
 Normalized measurement/status projections and normalized range decoding are
-available. Static capability evaluation is included starting with 0.1.0a2.
+available. Unreleased source measurement UUID dispatch adds typed named physical metrics while
+preserving raw format/diagnostic evidence and explicit unsupported UUID results.
+Static capability evaluation is included starting with 0.1.0a2.
 Range, control and
 measurement format choices are independent and explicit; no API infers them
 from packet length, feature declarations or BLE state. Host fixtures establish
@@ -258,6 +265,26 @@ raw = MeasurementRaw(5, 0, 1, 0, (1234,) + (0,) * 29)  # speed: 12.34 km/h
 assert encode_measurement_raw(raw) == bytes.fromhex("00 00 d2 04")
 assert decode_measurement_raw(bytes.fromhex("00 00 d2 04"), 5).values[0] == 1234
 ```
+
+For one UUID-selected convenience call, supply the normal full Bluetooth UUID and
+the selected format. Full 32-hex and standard hyphenated UUIDs are case-insensitive;
+the simple 4-hex and `0x` aliases are also accepted. The immutable result retains
+the raw tuple, diagnostics, and that format alongside named physical values; it never
+infers a layout from packet bytes. Vendor and non-measurement UUIDs return an explicit
+unsupported result.
+
+```python
+from deancochran_ftms import decode_measurement
+
+result = decode_measurement("00002ad2-0000-1000-8000-00805f9b34fb", bytes.fromhex("00 00 d2 04"))
+assert result.known and result.measurement is not None
+assert result.measurement.raw.values[0] == 1234
+assert result.measurement.metrics.speed_mps == 1234 / 360
+```
+
+Legacy treadmill `uint8Legacy` pace remains raw-only: its zero and other raw values
+are preserved, while its normalized pace property is `None` because no unit is
+invented.
 
 Machine Status uses `MachineStatusRaw` with raw opcode/action and optional
 `(control_opcode, operands)` parameter tuple. Training Status uses

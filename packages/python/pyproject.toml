@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "deancochran-ftms"
-version = "0.1.0a2"
+version = "0.1.0a3"
 description = "Pure Python FTMS codecs and static capability evidence evaluation (alpha)"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -63,6 +63,7 @@ only-include = [
   "tests/test_features.py",
   "tests/test_measurement_validation.py",
   "tests/test_measurements_statuses.py",
+  "tests/test_universal_measurements.py",
   "tests/test_ranges_control.py",
   "tests/test_report_integrity.py",
   "tests/test_status_validation.py",

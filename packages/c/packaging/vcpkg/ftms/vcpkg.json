@@ -1,6 +1,6 @@
 {
   "name": "ftms",
-  "version-semver": "0.2.0",
+  "version-semver": "0.3.0",
   "description": "Portable C99 FTMS protocol codecs and capability interpretation",
   "homepage": "https://github.com/deancochran/ftms",
   "license": "MIT",

@@ -5,8 +5,11 @@ import 'package:deancochran_ftms/deancochran_ftms.dart';
 void main() {
   // Synthetic Indoor Bike Data, not a device capture.
   final bytes = Uint8List.fromList([0x44, 0, 0x10, 0x0e, 0xb4, 0, 0xfa, 0]);
-  final raw = decodeMeasurement(MeasurementKind.indoorBike, bytes);
-  final metrics = normalizeMeasurement(raw);
+  final universal = decodeFtmsMeasurement('0x2ad2', bytes);
+  if (universal.status != MeasurementUuidDecodeStatus.known) {
+    throw StateError('Indoor Bike UUID was not recognized');
+  }
+  final metrics = universal.normalized!;
   if (metrics.speedMps != 10 ||
       metrics.cadenceRpm != 90 ||
       metrics.powerWatts != 250) {

@@ -1,5 +1,8 @@
 # FTMS for Dart
 
+> The UUID-selected decoder and automatic retention of measurement format below
+> are unreleased source additions, not part of the published pub.dev 0.1.0 package.
+
 Pure Dart codecs for the Bluetooth **Fitness Machine Service**, usable from
 Flutter and standalone Dart. No Flutter, BLE, FFI, platform-channel or runtime
 package dependencies. Requires Dart 3.11 or newer, below Dart 4.
@@ -51,6 +54,19 @@ final metrics = normalizeMeasurement(raw);
 // raw still retains flags, integer wire values and diagnostics.
 ```
 
+When a consumer has a characteristic UUID rather than a preselected family, use
+the one UUID-selected entry point. It accepts standard 16-bit aliases and the
+full Bluetooth-base UUID, rejects vendor UUIDs without byte-layout guessing, and
+retains the existing raw, normalized, and diagnostic views:
+
+```dart
+final result = decodeFtmsMeasurement('0x2ad2', bytes);
+if (result.status == MeasurementUuidDecodeStatus.known) {
+  print(result.normalized!.speedMps);
+  print(result.raw!.truncated);
+}
+```
+
 The bytes are synthetic, not an equipment capture. Run the complete example with
 `dart run example/main.dart`. The example checks results even when Dart assertions
 are disabled. Branch source can differ from the published package; the release
@@ -93,7 +109,9 @@ Format choices are explicit and independent:
 - Measurement resistance and treadmill pace: `MeasurementFormatOptions`.
 - Capability range interpretation: `CapabilityResistanceRangeFormat`.
 
-Use the same measurement options for decode, normalization and encode. Legacy
+Raw evidence retains the selected decode options, so `normalizeMeasurement(raw)`
+uses them automatically; pass `options` only to deliberately override that
+selection. Legacy
 treadmill pace has no asserted physical unit and therefore normalizes to null.
 Machine Status resistance always retains its signed 16-bit tenths layout.
 

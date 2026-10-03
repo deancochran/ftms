@@ -50,6 +50,7 @@ current installation instructions.
 
 - [Contributing](../CONTRIBUTING.md), [architecture](architecture.md), [roadmap](roadmap.md), [security](../SECURITY.md)
 - [Conformance runner and corpus accounting](../shared/conformance/README.md)
+- [Universal measurement interfaces](universal-measurements.md): native design and acceptance criteria for unreleased consumer improvements
 - [Release process and per-port runbooks](releasing.md)
 - [Equipment testing](equipment-testing.md) and [simulation](simulation.md)
 - [Historical audits and evidence](evidence.md)

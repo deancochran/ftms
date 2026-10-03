@@ -40,6 +40,10 @@ test: $(BUILD)/libftms.a
 	python3 tests/measurement_adapter.py $(BUILD)/measurement-driver
 	$(CC) $(CFLAGS) src/ftms.c src/measurement.c tests/test_measurement.c -o $(BUILD)/test-measurement
 	$(BUILD)/test-measurement
+	$(CC) $(CFLAGS) src/ftms.c src/measurement.c tests/test_universal_measurement.c -o $(BUILD)/test-universal-measurement
+	$(BUILD)/test-universal-measurement
+	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/measurement.c tests/test_universal_measurement.c -o $(BUILD)/test-universal-measurement-sanitized
+	$(BUILD)/test-universal-measurement-sanitized
 	clang $(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer src/ftms.c src/measurement.c tests/test_measurement.c -o $(BUILD)/test-measurement-sanitized
 	$(BUILD)/test-measurement-sanitized
 	$(CC) $(CFLAGS) src/ftms.c src/status.c tests/test_status.c -o $(BUILD)/test-status

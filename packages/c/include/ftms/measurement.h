@@ -21,6 +21,21 @@ typedef enum ftms_measurement_kind {
   FTMS_MEASUREMENT_ROWER = 4, FTMS_MEASUREMENT_INDOOR_BIKE = 5
 } ftms_measurement_kind;
 
+/* Bluetooth SIG assigned numbers for the six FTMS measurement characteristics.
+ * They are UUID16 values, not an invitation to match the low word of an
+ * arbitrary 128-bit vendor UUID. */
+#define FTMS_UUID16_TREADMILL_DATA UINT16_C(0x2acd)
+#define FTMS_UUID16_CROSS_TRAINER_DATA UINT16_C(0x2ace)
+#define FTMS_UUID16_STEP_CLIMBER_DATA UINT16_C(0x2acf)
+#define FTMS_UUID16_STAIR_CLIMBER_DATA UINT16_C(0x2ad0)
+#define FTMS_UUID16_ROWER_DATA UINT16_C(0x2ad1)
+#define FTMS_UUID16_INDOOR_BIKE_DATA UINT16_C(0x2ad2)
+
+/* Maps an explicitly canonical SIG UUID16 to its measurement layout. Unknown
+ * UUID16 values return FTMS_ERROR_KIND and do not write `out`. */
+ftms_result ftms_measurement_kind_from_uuid16(uint16_t uuid16,
+                                              ftms_measurement_kind *out);
+
 /* These caller-owned wire-format selections are compatibility overrides, not
  * device identification. NULL selects the historical FTMS layouts below. */
 typedef enum ftms_measurement_resistance_format {
@@ -59,6 +74,45 @@ typedef struct ftms_measurement {
   size_t bytes_read;
 } ftms_measurement;
 
+/* A decoded raw measurement plus the caller-selected layout profile used to
+ * decode it. This additive wrapper leaves ftms_measurement's ABI unchanged. */
+typedef struct ftms_measurement_view {
+  ftms_measurement raw;
+  ftms_measurement_format_options format;
+} ftms_measurement_view;
+
+typedef enum ftms_measurement_value_state {
+  FTMS_MEASUREMENT_VALUE_ABSENT,
+  FTMS_MEASUREMENT_VALUE_UNAVAILABLE,
+  FTMS_MEASUREMENT_VALUE_NUMERIC,
+  FTMS_MEASUREMENT_VALUE_UNKNOWN_UNIT
+} ftms_measurement_value_state;
+
+/* A physical value represented exactly as numerator / denominator. The
+ * denominator is always nonzero for NUMERIC; no floating point is required. */
+typedef struct ftms_measurement_fixed_point {
+  int32_t numerator;
+  uint16_t denominator;
+} ftms_measurement_fixed_point;
+
+typedef enum ftms_measurement_metric {
+  FTMS_METRIC_SPEED_METRES_PER_SECOND, FTMS_METRIC_AVERAGE_SPEED_METRES_PER_SECOND,
+  FTMS_METRIC_DISTANCE_METRES, FTMS_METRIC_INCLINATION_PERCENT,
+  FTMS_METRIC_RAMP_ANGLE_DEGREES, FTMS_METRIC_POSITIVE_ELEVATION_METRES,
+  FTMS_METRIC_NEGATIVE_ELEVATION_METRES, FTMS_METRIC_INSTANTANEOUS_PACE_SECONDS_PER_500_METRES,
+  FTMS_METRIC_AVERAGE_PACE_SECONDS_PER_500_METRES, FTMS_METRIC_ENERGY_KCAL,
+  FTMS_METRIC_ENERGY_PER_HOUR_KCAL, FTMS_METRIC_ENERGY_PER_MINUTE_KCAL,
+  FTMS_METRIC_HEART_RATE_BPM, FTMS_METRIC_METABOLIC_EQUIVALENT,
+  FTMS_METRIC_ELAPSED_SECONDS, FTMS_METRIC_REMAINING_SECONDS,
+  FTMS_METRIC_FORCE_NEWTONS, FTMS_METRIC_POWER_WATTS,
+  FTMS_METRIC_AVERAGE_POWER_WATTS, FTMS_METRIC_STEP_RATE_PER_MINUTE,
+  FTMS_METRIC_AVERAGE_STEP_RATE_PER_MINUTE, FTMS_METRIC_STRIDE_COUNT,
+  FTMS_METRIC_RESISTANCE_LEVEL, FTMS_METRIC_FLOOR_COUNT, FTMS_METRIC_STEP_COUNT,
+  FTMS_METRIC_STROKE_RATE_PER_MINUTE, FTMS_METRIC_STROKE_COUNT,
+  FTMS_METRIC_AVERAGE_STROKE_RATE_PER_MINUTE, FTMS_METRIC_CADENCE_RPM,
+  FTMS_METRIC_AVERAGE_CADENCE_RPM
+} ftms_measurement_metric;
+
 /* A planned characteristic value.  `length` is the number of bytes in `value`;
  * it is never greater than FTMS_MEASUREMENT_PACKET_VALUE_MAX.  The fixed bound
  * makes the planner usable without allocation. */
@@ -89,7 +143,26 @@ ftms_result ftms_encode_measurement(const ftms_measurement *measurement, uint8_t
 ftms_result ftms_decode_measurement_with_format(ftms_measurement_kind kind,
                                                 const uint8_t *data, size_t size,
                                                 const ftms_measurement_format_options *options,
-                                                ftms_measurement *out);
+                                                 ftms_measurement *out);
+/* Convenience entry points compose the existing table-driven raw decoder;
+ * they neither infer a device identity nor select a format from packet bytes.
+ * `format` is copied into the view so metric projection uses the same profile. */
+ftms_result ftms_decode_measurement_view(ftms_measurement_kind kind,
+                                         const uint8_t *data, size_t size,
+                                         const ftms_measurement_format_options *format,
+                                         ftms_measurement_view *out);
+ftms_result ftms_decode_measurement_uuid16_view(uint16_t uuid16,
+                                                const uint8_t *data, size_t size,
+                                                const ftms_measurement_format_options *format,
+                                                ftms_measurement_view *out);
+
+/* Projects a named metric from retained decoded evidence. `out` is written
+ * only for NUMERIC. It returns ABSENT for unselected/truncated fields,
+ * UNAVAILABLE for FTMS sentinels, and UNKNOWN_UNIT for legacy treadmill
+ * uint8 pace, whose physical unit is not established by that layout. */
+ftms_measurement_value_state ftms_measurement_metric_value(
+    const ftms_measurement_view *view, ftms_measurement_metric metric,
+    ftms_measurement_fixed_point *out);
 ftms_result ftms_encode_measurement_with_format(const ftms_measurement *measurement,
                                                 const ftms_measurement_format_options *options,
                                                 uint8_t *out, size_t capacity,

@@ -13,6 +13,9 @@ var (
 	ErrLength = errors.New("ftms: invalid length")
 	ErrKind   = errors.New("ftms: invalid kind")
 	ErrRange  = errors.New("ftms: value out of range")
+	// ErrUnsupported identifies an otherwise well-formed UUID for which this
+	// convenience measurement projection has no defined meaning.
+	ErrUnsupported = errors.New("ftms: unsupported measurement characteristic")
 )
 
 type Diagnostics struct {

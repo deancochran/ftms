@@ -11,6 +11,9 @@ public static class Consumer
             new byte[] { 0x44, 0, 0x10, 0x0e, 0xb4, 0, 0xfa, 0 });
         if (measurement.Normalized.SpeedMetresPerSecond != 10 || measurement.Normalized.CadenceRpm != 90 || measurement.Normalized.PowerWatts != 250)
             throw new Exception("Measurement codec failed.");
+        var universal = MeasurementUuidCodec.Decode("0x2ad2", new byte[] { 0x44, 0, 0x10, 0x0e, 0xb4, 0, 0xfa, 0 });
+        if (universal.Status != MeasurementUuidDecodeStatus.Known || universal.Normalized!.SpeedMetresPerSecond != 10)
+            throw new Exception("UUID measurement codec failed.");
         if (ControlCodec.EncodeRequest(new ControlRequest(ControlOpcode.TargetPower, 250))[1] != 250)
             throw new Exception("Control codec failed.");
         if (ControlCodec.TryDecodeResponse(new byte[] { 128 }).Success)

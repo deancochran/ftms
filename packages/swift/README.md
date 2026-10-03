@@ -1,5 +1,8 @@
 # FTMS for Swift
 
+> The UUID-selected measurement decoder and typed metric snapshot below are
+> unreleased source additions, not part of the published Swift 0.1.0 revision.
+
 Native Swift 6 FTMS 1.0 + EC23224 protocol/domain library, package version **0.1.0**.
 Its [support profile](../../docs/support-profiles.md) is `FullWire`, with
 `CapabilityEvidence`, `RangeInspection` and `NormalizedViews`; that claim includes
@@ -9,7 +12,9 @@ thin; all Swift source and tests remain package-owned. The API accepts `[UInt8]`
 and uses value types with explicit errors/diagnostics. It implements both codec
 directions for six measurement families, Feature and the five ranges, all 21
 Control Point procedures/responses, Machine/Training Status, and normalized
-adapters for the codec-v1 corpus. It also provides `inspectRange`, which reports
+adapters for the codec-v1 corpus. UUID-dispatched measurements add typed named
+physical metrics and explicit unsupported results while preserving raw evidence.
+It also provides `inspectRange`, which reports
 the caller-selected layout and every defined candidate layout without inferring a
 resistance format, and `evaluateCapabilities`, a static evidence interpreter for
 Feature, ranges, characteristic properties, and all 21 Control Point opcodes.
@@ -62,6 +67,27 @@ let bytes = try encodeControlRequest(request) // [0x05, 0x4b, 0x00]
 let response = try decodeControlResponse([0x80, 0x05, 0x01])
 ```
 
+For UUID-selected measurements, pass the normal full Bluetooth UUID and an explicit
+format. Full 32-hex and standard hyphenated UUIDs are case-insensitive; the simple
+4-hex and `0x` aliases are also accepted. The result is either `.measurement`,
+retaining raw wire values, diagnostics and the selected format, or `.unsupported` for
+vendor and non-measurement UUIDs. It never infers a layout from bytes.
+
+```swift
+let result = try decodeMeasurement(
+  uuid: "00002ad2-0000-1000-8000-00805f9b34fb", bytes: [0, 0, 0xd2, 0x04], format: .init())
+if case .measurement(let measurement) = result {
+  precondition(measurement.raw.values[.speed] == 1234)
+  precondition(measurement.metrics.speedMps == 1234.0 / 360)
+}
+```
+
+The named optional metrics are cached from one `normalizeMeasurement` projection;
+the existing dictionary interface remains available as `measurement.metrics.normalized`
+or `measurement.raw.normalizedMetrics`. Legacy
+`uint8Legacy` treadmill pace retains its raw value (including zero) but exposes no
+invented normalized pace unit.
+
 Raw operands preserve wire integers, not inferred percentages. Decoded ranges
 and measurements retain their format options; pass matching options when encoding
 an explicitly selected alternative. Normalization preserves unavailable values,
@@ -90,7 +116,7 @@ implicit passes.
 
 | Local evidence (Swift 6.0.3, Linux x86_64) | Result |
 | --- | --- |
-| Native test suite | 16 tests passed |
+| Native test suite | 17 tests passed in the local universal-interface verification |
 | Reconciled canonical fixtures | 282 / 282 passed; 0 failed, unsupported, skipped, or unresolved |
 | Deterministic malformed-input exercise | 2,080 generated payloads across all measurement/range kinds, features, controls and statuses; no process traps |
 | Directional raw assertions | Controls 72; measurements 47; statuses 63 |

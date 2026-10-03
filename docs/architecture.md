@@ -145,6 +145,12 @@ explicit package claims without requiring identical language interfaces.
 
 ## Shared behavior, idiomatic APIs
 
+The [universal measurement interface guide](universal-measurements.md) defines
+the additive consumer-facing path: characteristic identity and native bytes to
+named values through one raw engine and one physical projection per language.
+It preserves native ownership, explicit formats and existing raw interfaces;
+it does not define a cross-language runtime adapter or imply publication.
+
 - Preserve wire integer widths, signedness, endianness, scaling, and sentinel
   behavior. Similar concepts can have different encodings in different
   characteristics; do not reuse a range layout for a control operand by analogy.

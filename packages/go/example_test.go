@@ -27,6 +27,16 @@ func ExampleDecodeMeasurement() {
 	// Output: 36.0 km/h
 }
 
+func ExampleDecodeNormalizedMeasurement() {
+	reading, err := ftms.DecodeNormalizedMeasurement(ftms.UUID16(0x2ad2),
+		[]byte{0, 0, 0x10, 0x0e}, ftms.MeasurementOptions{})
+	if err != nil || reading.SpeedMPS == nil {
+		panic("invalid synthetic telemetry")
+	}
+	fmt.Printf("%.1f m/s\n", *reading.SpeedMPS)
+	// Output: 10.0 m/s
+}
+
 func ExampleEncodeControlRequest() {
 	packet, err := ftms.EncodeControlRequest(
 		ftms.ControlRequest{Opcode: 5, Operands: []int32{250}}, ftms.ControlOptions{})

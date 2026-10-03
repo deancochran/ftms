@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0
+
+Date: 2026-10-03
+
+- Add full-UUID universal measurement convenience decoding over the existing raw
+  codec and typed normalized `Metric` layer. Known results retain raw evidence
+  and explicit format; unsupported UUIDs remain explicit.
+
 ## 0.1.1
 
 Normalized range, control and status projections.

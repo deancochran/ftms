@@ -79,8 +79,9 @@ final class MeasurementNormalized {
 /// fields are represented as null. The returned view retains [raw] by reference.
 MeasurementNormalized normalizeMeasurement(
   MeasurementRaw raw, {
-  MeasurementFormatOptions options = const MeasurementFormatOptions(),
+  MeasurementFormatOptions? options,
 }) {
+  final selectedFormat = options ?? raw.format;
   double? value(MeasurementField field, [double scale = 1]) =>
       raw.present & (1 << field.index) == 0 ||
           raw.unavailable & (1 << field.index) != 0
@@ -88,7 +89,8 @@ MeasurementNormalized normalizeMeasurement(
       : raw.valueAt(field) * scale;
   final legacyPace =
       raw.kind == MeasurementKind.treadmill &&
-      options.treadmillPace == MeasurementTreadmillPaceFormat.uint8Legacy;
+      selectedFormat.treadmillPace ==
+          MeasurementTreadmillPaceFormat.uint8Legacy;
   return MeasurementNormalized(
     raw: raw,
     speedMps: value(MeasurementField.speed, 1 / 360),
@@ -128,7 +130,9 @@ MeasurementNormalized normalizeMeasurement(
     ),
     resistanceLevel: value(
       MeasurementField.resistance,
-      options.resistance == MeasurementResistanceFormat.signed16Tenths ? .1 : 1,
+      selectedFormat.resistance == MeasurementResistanceFormat.signed16Tenths
+          ? .1
+          : 1,
     ),
     floorCount: value(MeasurementField.floorCount),
     stepCount: value(MeasurementField.stepCount),

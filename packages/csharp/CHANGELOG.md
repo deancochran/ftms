@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.2
+
+Date: 2026-10-03
+
+- Add a pure UUID-selected measurement decoder for all six FTMS data layouts.
+- Keep legacy uint8 treadmill pace raw-only rather than labeling it as seconds
+  per 500 metres in normalized views.
+
 ## 0.1.0-alpha.1
 
 Initial C# prerelease; the public interface is still evolving. Consult the

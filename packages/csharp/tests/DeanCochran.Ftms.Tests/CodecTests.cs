@@ -2,12 +2,51 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.IO;
+using System.Text.Json;
 using Xunit;
 
 namespace DeanCochran.Ftms.Tests;
 
 public sealed class CodecTests
 {
+    [Fact]
+    public void UuidDecoderReadsCanonicalAllFieldPacketsForEveryFamily()
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "shared/conformance/measurements/v1/vectors.json"))) root = root.Parent;
+        Assert.NotNull(root);
+        using var corpus = JsonDocument.Parse(File.ReadAllText(Path.Combine(root!.FullName, "shared/conformance/measurements/v1/vectors.json")));
+        int count = 0;
+        foreach (var fixture in corpus.RootElement.GetProperty("cases").EnumerateArray())
+        {
+            string id = fixture.GetProperty("id").GetString()!;
+            if (!id.StartsWith("equipment-", StringComparison.Ordinal) || !id.EndsWith("-all-fields", StringComparison.Ordinal)) continue;
+            int kind = fixture.GetProperty("kind").GetInt32();
+            byte[] bytes = fixture.GetProperty("bytes").EnumerateArray().Select(value => value.GetByte()).ToArray();
+            string shortUuid = (0x2acd + kind).ToString("x4", CultureInfo.InvariantCulture);
+            foreach (string uuid in new[] { shortUuid, "0000" + shortUuid + "-0000-1000-8000-00805f9b34fb" })
+            {
+                var result = MeasurementUuidCodec.Decode(uuid, bytes);
+                Assert.Equal(MeasurementUuidDecodeStatus.Known, result.Status);
+                Assert.Equal((MeasurementKind)kind, result.Kind);
+                var expected = fixture.GetProperty("decoded");
+                uint present = expected.GetProperty("present").GetUInt32();
+                uint unavailable = expected.GetProperty("unavailable").GetUInt32();
+                for (int index = 0; index < 30; index++)
+                {
+                    bool found = result.Measurement!.Fields.TryGetValue((MeasurementField)index, out int? value);
+                    Assert.Equal((present & (1u << index)) != 0, found);
+                    if (found) Assert.Equal((unavailable & (1u << index)) != 0 ? (int?)null : expected.GetProperty("values")[index].GetInt32(), value);
+                }
+                Assert.Equal(bytes, MeasurementCodec.Encode(result.Measurement!));
+            }
+            count++;
+        }
+        Assert.Equal(6, count);
+        Assert.Equal(MeasurementUuidDecodeStatus.Unsupported, MeasurementUuidCodec.Decode("00002ad20000-1000800000805f9b34fb", Array.Empty<byte>()).Status);
+    }
+
     [Fact]
     public void FeatureWordsKeepUnsignedAndUnknownBits()
     {
@@ -125,6 +164,57 @@ public sealed class CodecTests
         Assert.Equal(bytes, MeasurementCodec.Encode(value));
         Assert.True(MeasurementCodec.Decode(MeasurementKind.IndoorBike, bytes).Diagnostics.TrailingBytes);
         Assert.Equal(FtmsError.Kind, MeasurementCodec.TryDecode((MeasurementKind)6, Array.Empty<byte>()).Error);
+    }
+
+    [Fact]
+    public void UuidDispatchCoversAllFamiliesAndKeepsHonestEvidence()
+    {
+        var cases = new Dictionary<string, MeasurementKind>
+        {
+            ["2acd"] = MeasurementKind.Treadmill,
+            ["0x2ace"] = MeasurementKind.CrossTrainer,
+            ["2acf"] = MeasurementKind.StepClimber,
+            ["2ad0"] = MeasurementKind.StairClimber,
+            ["2ad1"] = MeasurementKind.Rower,
+            ["00002ad2-0000-1000-8000-00805f9b34fb"] = MeasurementKind.IndoorBike,
+        };
+        foreach (var item in cases)
+        {
+            var result = MeasurementUuidCodec.Decode(item.Key, new byte[] { 0, 0 });
+            Assert.Equal(MeasurementUuidDecodeStatus.Known, result.Status);
+            Assert.Equal(item.Value, result.Kind);
+            Assert.NotNull(result.Measurement);
+        }
+        var bike = MeasurementUuidCodec.Decode("2ad2", new byte[] { 0x44, 0, 0x10, 0x0e, 0xb4, 0, 0xfa, 0 });
+        Assert.Equal(10, bike.Normalized!.SpeedMetresPerSecond);
+        Assert.Equal(90, bike.Normalized.CadenceRpm);
+        Assert.Equal(250, bike.Normalized.PowerWatts);
+        var partial = MeasurementUuidCodec.Decode("2ad2", new byte[] { 0 });
+        Assert.Equal(MeasurementUuidDecodeStatus.Known, partial.Status);
+        Assert.True(partial.Diagnostics!.Truncated);
+        Assert.Null(partial.Normalized!.SpeedMetresPerSecond);
+        Assert.Equal(MeasurementUuidDecodeStatus.Unsupported, MeasurementUuidCodec.Decode("2ad3", Array.Empty<byte>()).Status);
+        Assert.Equal(MeasurementUuidDecodeStatus.Unsupported, MeasurementUuidCodec.Decode("12342ad2-0000-1000-8000-00805f9b34fb", Array.Empty<byte>()).Status);
+    }
+
+    [Fact]
+    public void LegacyPaceNeverClaimsSecondsPer500Metres()
+    {
+        var format = new MeasurementFormat(treadmillPace: TreadmillPaceFormat.UInt8Legacy);
+        var result = MeasurementUuidCodec.Decode("2acd", new byte[] { 0x20, 0, 0, 0, 120 }, format);
+        Assert.Equal(120, result.Measurement!.Fields[MeasurementField.InstantaneousPace]);
+        Assert.Null(result.Normalized!.GetValue(MeasurementField.InstantaneousPace));
+        Assert.Null(result.Normalized.InstantaneousPaceSecondsPer500Metres);
+        Assert.Null(result.Normalized.AveragePaceSecondsPer500Metres);
+
+        var signedResistance = MeasurementUuidCodec.Decode("2ad2", new byte[] { 0x21, 0, 0xf6, 0xff },
+            new MeasurementFormat(ResistanceFormat.SInt16Tenths));
+        Assert.Equal(-1, signedResistance.Normalized!.ResistanceLevel);
+
+        var zero = MeasurementUuidCodec.Decode("2ad2", new byte[] { 0, 0, 0, 0 });
+        Assert.Equal(0, zero.Normalized!.SpeedMetresPerSecond);
+        var unavailable = MeasurementUuidCodec.Decode("2ad2", new byte[] { 0, 1, 0, 0, 255, 255, 255 });
+        Assert.Null(unavailable.Normalized!.EnergyKilocalories);
     }
 
     [Fact]
