@@ -1,7 +1,7 @@
 # C release and installation runbook
 
 These are maintainer instructions, not authorization to execute remote actions.
-C 0.2.0 is published as a GitHub source release whose bytes must not be replaced;
+C 0.3.0 is published as a GitHub source release whose bytes must not be replaced;
 see the [canonical release matrix](released-packages.md) for verified identity and
 platform evidence. Public Conan/vcpkg registry submission remains separate and
 unverified. `packages/c/VERSION` owns the source version. npm and every other
@@ -44,7 +44,7 @@ It does not report merely rebuilding a library as a passing protocol test.
 To verify an existing artifact **without replacing it**:
 
 ```sh
-python3 packages/c/scripts/verify-source-bundle.py --archive /path/to/ftms-c-0.2.0.tar.gz
+python3 packages/c/scripts/verify-source-bundle.py --archive /path/to/ftms-c-0.3.0.tar.gz
 ```
 
 The SHA-256 sidecar must accompany it. `SOURCE.json` checks byte integrity and
@@ -60,7 +60,7 @@ build helpers; neither workflow submits a package to a registry.
 ```sh
 python3 packages/c/scripts/source-bundle.py
 python3 packages/c/scripts/verify-package-managers.py \
-  packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz \
+  packages/c/build/source-candidate/ftms-c-0.3.0.tar.gz \
   --conan /path/to/conan --vcpkg /path/to/vcpkg
 ```
 
@@ -73,7 +73,7 @@ not become skipped-success checks. The checked-in overlay reads
 by the helper. It is not itself a public-registry submission.
 
 CI adds Linux package-manager checks and standalone source consumers on Linux,
-macOS and Windows. C 0.2.0 passed that remote release matrix; future releases must
+macOS and Windows. C 0.3.0 passed that remote release matrix; future releases must
 rerun it before claiming the same platform evidence.
 
 ## Merge and publication

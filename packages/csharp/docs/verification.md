@@ -1,8 +1,17 @@
 # C# verification evidence
 
-## Published alpha.1
+## Published alpha.2
 
-NuGet **`DeanCochran.Ftms` 0.1.0-alpha.1** is now published and verified. The
+NuGet **`DeanCochran.Ftms` 0.1.0-alpha.2** is published and public-verified.
+The [current release record](../../../docs/released-packages.md#published-native-universal-measurements)
+records the exact source commit, public package hash, repository signature and
+payload equivalence, both public target-assembly consumers and NativeAOT release
+gate. This adds UUID-selected measurements and corrects legacy treadmill pace
+normalization. Device/Unity/MAUI/qualification exclusions remain unchanged.
+
+## Historical published alpha.1
+
+NuGet **`DeanCochran.Ftms` 0.1.0-alpha.1** was published and verified. The
 [canonical release record](../../../docs/released-packages.md#published-prerelease-c-010-alpha1)
 contains the exact clean source, corrected recovery-tooling identity, public hashes
 and successful Linux/macOS/Windows release run. Public consumers executed both

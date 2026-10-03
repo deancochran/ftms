@@ -35,20 +35,20 @@ establish publication; consult the release matrix above.
 | `shared/protocol/capability-discovery.md` | Shared static capability interpretation rules | Implemented by ports according to the `CapabilityEvidence` entries in the support-profile matrix |
 | `shared/conformance/capabilities/v1/` | Separate executable capability snapshots and exact report expectations | 63 shared cases |
 | `shared/simulation/v1/` | Deterministic synthetic equipment traces | Host-only test evidence |
-| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released 0.2.0 source archive |
-| `packages/swift/` | Native SwiftPM protocol package | Released 0.1.0 |
-| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.1.0 |
-| `packages/python/` | Pure synchronous Python protocol package | Published alpha 0.1.0a2 with static capability evidence |
-| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.1.1 released with capabilities, normalized views and records |
-| `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Published on pub.dev as `deancochran_ftms` 0.1.0 |
-| `packages/go/` | Independent Go codecs and static capability interpreter | Published nested module v0.1.0 |
-| `packages/csharp/` | Native .NET codecs and static capability interpreter | Published NuGet 0.1.0-alpha.1 |
+| `packages/c/` | C99 bidirectional codecs and capability interpreter usable from C++ | Released 0.3.0 source archive |
+| `packages/swift/` | Native SwiftPM protocol package | Released 0.2.0 |
+| `packages/kotlin/` | Kotlin/JVM library usable from Java and Android | Maven Central 0.2.0 |
+| `packages/python/` | Pure synchronous Python protocol package | Published alpha 0.1.0a3 with static capability evidence |
+| `packages/rust/` | Allocation-free `no_std` Rust protocol library and Cargo tooling | crates.io 0.2.0 released with capabilities, normalized views and records |
+| `packages/dart/` | Pure Dart synchronous protocol codecs and static capability interpreter, usable from Flutter | Published on pub.dev as `deancochran_ftms` 0.2.0 |
+| `packages/go/` | Independent Go codecs and static capability interpreter | Published nested module v0.2.0 |
+| `packages/csharp/` | Native .NET codecs and static capability interpreter | Published NuGet 0.1.0-alpha.2 |
 | `examples/` | Installed-consumer and transport-boundary examples outside the core packages | Implemented host examples; limited device evidence is recorded separately |
 | `site/` | Private Astro/Starlight presentation of canonical documentation | Static website; never published as a protocol package |
 
-C# `DeanCochran.Ftms` 0.1.0-alpha.1 is published on NuGet with `FullWire`, range
+C# `DeanCochran.Ftms` 0.1.0-alpha.2 is published on NuGet with `FullWire`, range
 inspection, capability interpretation and normalized views. Its
-[release evidence](released-packages.md#published-prerelease-c-010-alpha1) records
+[release evidence](released-packages.md#published-native-universal-measurements) records
 actual public consumers; local metadata alone is not release evidence. Other future ports
 remain deferred until a consumer justifies a specific support profile. The
 existing TypeScript package continues to serve JavaScript and React Native consumers.

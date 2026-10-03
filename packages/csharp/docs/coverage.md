@@ -1,7 +1,7 @@
 # C# coverage
 
-Published NuGet prerelease **`DeanCochran.Ftms` 0.1.0-alpha.1**. See the
-[canonical release evidence](../../../docs/released-packages.md#published-prerelease-c-010-alpha1).
+Published NuGet prerelease **`DeanCochran.Ftms` 0.1.0-alpha.2**. See the
+[canonical release evidence](../../../docs/released-packages.md#published-native-universal-measurements).
 
 | Area | Decode | Encode | Notes |
 | --- | --- | --- | --- |

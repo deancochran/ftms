@@ -1,8 +1,8 @@
 # Go release process
 
-The authorized `v0.1.0` scope is raw bidirectional codecs, range inspection,
-normalized ranges and complete static capability interpretation. Measurement
-normalization and record planning/assembly remain future work; this release does
+The published `v0.2.0` scope is raw bidirectional codecs, range inspection,
+normalized ranges/measurements and complete static capability interpretation.
+Record planning/assembly remain future work; this release does
 not claim those modules. Publication evidence belongs in the canonical release
 matrix after the public consumer gate succeeds.
 
@@ -10,10 +10,10 @@ matrix after the public consumer gate succeeds.
 
 - Module: `github.com/deancochran/ftms/packages/go`
 - Package: `ftms`
-- Example consumer version: `v0.1.0`
-- Required repository tag: **`packages/go/v0.1.0`**
+- Example consumer version: `v0.2.0`
+- Required repository tag: **`packages/go/v0.2.0`**
 
-Go requires the subdirectory prefix on nested-module version tags. `go-v0.1.0`
+Go requires the subdirectory prefix on nested-module version tags. `go-v0.2.0`
 would not publish this version correctly. The `go` directive in `go.mod` is a
 toolchain minimum, not the package version. No duplicate `VERSION` authority is
 needed; the immutable tag and matching changelog identify a release. Package,
@@ -40,7 +40,7 @@ published to GitHub, request the exact module through the public proxy:
 
 ```sh
 GOPROXY=https://proxy.golang.org \
-  go list -m github.com/deancochran/ftms/packages/go@v0.1.0
+  go list -m github.com/deancochran/ftms/packages/go@v0.2.0
 ```
 
 This is a publication/indexing action, not a pre-release local smoke test. Use
@@ -61,7 +61,7 @@ and the normal public checksum database enabled:
 The repeatable public consumer gate is:
 
 ```sh
-python3 scripts/verify-consumer.py --public-version v0.1.0 --report /path/to/public-consumer.json
+python3 scripts/verify-consumer.py --public-version v0.2.0 --report /path/to/public-consumer.json
 ```
 
 It enables the public proxy and checksum database with a fresh module cache,

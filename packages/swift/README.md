@@ -127,7 +127,7 @@ implicit passes.
 Linux (Swift 6.0.3) and macOS (Swift 6.1.2 / Xcode 16.4), plus independent public
 tag consumers and macOS/iOS/tvOS/watchOS/visionOS SDK builds. The published
 reports and checksums were downloaded and independently verified. See the
-[release record](../../docs/released-packages.md#published-swift-010) for exact
+[release record](../../docs/released-packages.md#published-native-universal-measurements) for exact
 source identity, hashes, CI history and verification boundaries.
 
 Python and jsonschema are test tooling, not library dependencies. A Swift 6.0+

@@ -2,7 +2,8 @@
 
 Publishing requires explicit authorization. The distribution is `deancochran-ftms`;
 `pyproject.toml` defines its independently versioned Python release. The current
-`0.1.0a2` adds static capability evidence while retaining an evolving alpha API;
+`0.1.0a3` adds typed universal measurements while retaining static capability
+evidence and an evolving alpha API;
 it is not full cross-language convenience-API parity or device evidence.
 
 ## One-time Trusted Publishing setup

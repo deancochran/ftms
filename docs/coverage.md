@@ -76,9 +76,9 @@ accounting. Native tests separately isolate all 17 target bits, every range
 relationship, base procedures, all read reasons and argument/capacity atomicity.
 Those test-suite counts are not additional shared vectors or device evidence.
 
-The Python 0.1.0a2 release capability runner passed the same 63-case corpus with
+The Python 0.1.0a3 release capability runner passed the same 63-case corpus with
 exact reports and hashes of all four required corpus/contract inputs. Public
-wheel/sdist installation evidence is recorded in the [release matrix](released-packages.md#published-alpha-python-010a2).
+wheel/sdist installation evidence is recorded in the [release matrix](released-packages.md#published-native-universal-measurements).
 This is host and artifact evidence only, not BLE execution authority, device
 interoperability, PTS, or qualification.
 
