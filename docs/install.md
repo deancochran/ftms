@@ -16,11 +16,11 @@ Read its changelog before adopting it. Non-prerelease 0.x does not promise a sta
 
 ### C
 
-Recorded release: **0.2.0** ([evidence](released-packages.md#published-typescript-040--c-020)).
+Recorded release: **0.3.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```sh
-curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.2.0/ftms-c-0.2.0.tar.gz
-printf '%s  %s\n' '3aa60d809f3dcd02634417018d39f325c46a552734f0fe311ba748261914e61f' 'ftms-c-0.2.0.tar.gz' | sha256sum -c -
+curl -fLO https://github.com/deancochran/ftms/releases/download/c-v0.3.0/ftms-c-0.3.0.tar.gz
+printf '%s  %s\n' '866ab00bd23915a086dc232a41afc99a141fa6d8948c3c7f28ac0611047a720a' 'ftms-c-0.3.0.tar.gz' | sha256sum -c -
 ```
 
 Verify before extracting. This command uses curl and sha256sum; Windows users can compare with Get-FileHash. Public Conan/vcpkg registry availability is not assumed.
@@ -29,7 +29,7 @@ Verify before extracting. This command uses curl and sha256sum; Windows users ca
 
 ### C#
 
-Recorded release: **0.1.0-alpha.1** ([evidence](released-packages.md#published-prerelease-c-010-alpha1)).
+Recorded release: **0.1.0-alpha.2** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 The command explicitly includes prereleases; the recorded package is a prerelease, not a stable-API promise. Inspect and lock the resolved version.
 
@@ -41,7 +41,7 @@ dotnet add package DeanCochran.Ftms --prerelease
 
 ### Dart
 
-Recorded release: **0.1.0** ([evidence](released-packages.md#published-dart-010)).
+Recorded release: **0.2.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```sh
 dart pub add deancochran_ftms
@@ -52,7 +52,7 @@ dart pub add deancochran_ftms
 
 ### Go
 
-Recorded release: **0.1.0** ([evidence](released-packages.md#published-go-v010)).
+Recorded release: **0.2.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```sh
 go get github.com/deancochran/ftms/packages/go@latest
@@ -62,11 +62,11 @@ go get github.com/deancochran/ftms/packages/go@latest
 
 ### Kotlin/JVM
 
-Recorded release: **0.1.0** ([evidence](released-packages.md#published-kotlinjvm-010)).
+Recorded release: **0.2.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```kotlin
 repositories { mavenCentral() }
-dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+dependencies { implementation("io.github.deancochran:ftms:0.2.0") }
 ```
 
 Use this concrete verified dependency, not Gradle `+` or `latest.release`. Review dependency updates deliberately.
@@ -75,7 +75,7 @@ Use this concrete verified dependency, not Gradle `+` or `latest.release`. Revie
 
 ### Python
 
-Recorded release: **0.1.0a2** ([evidence](released-packages.md#published-alpha-python-010a2)).
+Recorded release: **0.1.0a3** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 The command explicitly includes prereleases; the recorded package is a prerelease, not a stable-API promise. Inspect and lock the resolved version.
 
@@ -87,7 +87,7 @@ python -m pip install --pre deancochran-ftms
 
 ### Rust
 
-Recorded release: **0.1.1** ([evidence](released-packages.md#published-rust-011)).
+Recorded release: **0.2.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```sh
 cargo add ftms
@@ -97,10 +97,10 @@ cargo add ftms
 
 ### Swift
 
-Recorded release: **0.1.0** ([evidence](released-packages.md#published-swift-010)).
+Recorded release: **0.2.0** ([evidence](released-packages.md#published-native-universal-measurements)).
 
 ```swift
-.package(url: "https://github.com/deancochran/ftms.git", revision: "a18009d6e9892d92bba00e3c6c6388a9fbc0f5c8")
+.package(url: "https://github.com/deancochran/ftms.git", revision: "9aee23dc8e39fda7982af1d2d0f7fc9dd0e5b527")
 ```
 
 Add this entry to your Package.swift dependencies and select the FTMS product. Keep the immutable revision: this monorepo's language-prefixed tags are not SwiftPM version-range releases. Do not follow main.

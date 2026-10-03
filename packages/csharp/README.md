@@ -1,12 +1,11 @@
 # FTMS for C#
 
-> The UUID-selected measurement interface documented below and the legacy-pace
-> normalization correction are **unreleased source changes**, not part of the
-> published 0.1.0-alpha.1 package. Use the release matrix for installed versions.
+The UUID-selected measurement interface and legacy-pace normalization correction
+are available in the published 0.1.0-alpha.2 package.
 
 **Pure managed Bluetooth Fitness Machine Service protocol library for .NET.**
 
-**[0.1.0-alpha.1 is published on NuGet](https://www.nuget.org/packages/DeanCochran.Ftms/0.1.0-alpha.1).**
+**[0.1.0-alpha.2 is published on NuGet](https://www.nuget.org/packages/DeanCochran.Ftms/0.1.0-alpha.2).**
 The interface remains an evolving prerelease.
 
 ```sh
@@ -17,7 +16,7 @@ This explicitly includes prereleases while the package is alpha. Retain the
 resolved dependency in your project and use a NuGet lockfile for reproducible
 restores. Once stable releases are available, omit `--prerelease` to select those.
 To reproduce the recorded alpha, use
-`dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1` instead.
+`dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.2` instead.
 
 ## Scope
 
@@ -98,7 +97,7 @@ FTMS_VERIFY_AOT=1 bash verification/verify.sh
 consumer can restore from the absolute `artifacts/packages` directory:
 
 ```sh
-dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.1 --source /absolute/path/to/artifacts/packages
+dotnet add package DeanCochran.Ftms --version 0.1.0-alpha.2 --source /absolute/path/to/artifacts/packages
 ```
 
 ## Boundaries and evidence

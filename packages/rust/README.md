@@ -1,11 +1,10 @@
 # FTMS for Rust
 
-> `universal::decode_measurement_uuid` below is an unreleased source addition,
-> not part of the published 0.1.1 crate.
+`universal::decode_measurement_uuid` is available in the published 0.2.0 crate.
 
-`ftms` is an independent Rust crate for pure FTMS binary data. Version 0.1.1 is
+`ftms` is an independent Rust crate for pure FTMS binary data. Version 0.2.0 is
 published on crates.io, including the normalized range/control/status projections.
-See the [verified release evidence](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md#published-rust-011).
+See the [verified release evidence](https://github.com/deancochran/ftms/blob/main/docs/released-packages.md#published-native-universal-measurements).
 It is `#![no_std]`, allocation-free, safe (`#![forbid(unsafe_code)]`), and has no
 runtime dependencies. It does not own Bluetooth, permissions, device lifecycle, or
 control safety.
@@ -26,9 +25,9 @@ cargo add ftms
 ```
 
 Retain the saved dependency and, for applications, Cargo.lock. To reproduce the
-recorded release specifically, use `cargo add ftms@=0.1.1` instead.
+recorded release specifically, use `cargo add ftms@=0.2.0` instead.
 
-For the published crate, see [crates.io](https://crates.io/crates/ftms/0.1.1)
+For the published crate, see [crates.io](https://crates.io/crates/ftms/0.2.0)
 and then see the existing [raw measurement and status interfaces](#raw-measurement-and-status-interfaces)
 before the contributor [toolchain and verification](#toolchain-and-verification)
 instructions below.

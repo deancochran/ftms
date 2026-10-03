@@ -1,14 +1,14 @@
 # FTMS for Kotlin/JVM
 
-> `MeasurementReader` and its named normalized result are unreleased source
-> additions, not part of the published Maven Central 0.1.0 artifact.
+`MeasurementReader` and its named normalized result are available in the
+published Maven Central 0.2.0 artifact.
 
 Independent, transport-neutral Kotlin and Java codecs for Bluetooth Fitness
 Machine Service 1.0 plus the applicable errata recorded in the repository's
 [specification audit](../../docs/specification-audit.md).
 
-Package version: **0.1.0**. Coordinates: `io.github.deancochran:ftms:0.1.0`.
-Published on [Maven Central](https://central.sonatype.com/artifact/io.github.deancochran/ftms/0.1.0).
+Package version: **0.2.0**. Coordinates: `io.github.deancochran:ftms:0.2.0`.
+Published on [Maven Central](https://central.sonatype.com/artifact/io.github.deancochran/ftms/0.2.0).
 Exact source, signed artifact hashes and public-consumer evidence are recorded in
 [released packages](../../docs/released-packages.md).
 
@@ -18,7 +18,7 @@ measurement convenience view.
 
 ```kotlin
 repositories { mavenCentral() }
-dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+dependencies { implementation("io.github.deancochran:ftms:0.2.0") }
 ```
 
 The concrete dependency above is the verified public release, not a candidate
@@ -95,7 +95,7 @@ the public Maven Central release. For local development, add the verification
 repository's file URL as a Maven repository and use the same coordinates:
 
 ```kotlin
-dependencies { implementation("io.github.deancochran:ftms:0.1.0") }
+dependencies { implementation("io.github.deancochran:ftms:0.2.0") }
 ```
 
 ## Build and verify

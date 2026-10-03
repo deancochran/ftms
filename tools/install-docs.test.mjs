@@ -36,7 +36,7 @@ test("stable rendered guidance drops prerelease flags and explanation", () => {
 test("evidence rejects another port's anchor, stale versions and incorrect identities", () => {
   const ledger = readFileSync(new URL("../docs/released-packages.md", import.meta.url), "utf8");
   for (const [port, changes] of [
-    ["go", { evidence: published.rust.evidence }],
+    ["go", { evidence: published.typescript.evidence }],
     ["rust", { version: "0.1.0" }],
     ["swift", { revision: "a".repeat(40) }],
     ["c", { sha256: "b".repeat(64) }],

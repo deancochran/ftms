@@ -3,19 +3,20 @@
 Status: this is an audit of codec directions and evidence, not a claim of complete
 FTMS conformance, device interoperability or Bluetooth qualification. TypeScript,
 C, Swift and Kotlin have published `FullWire` codecs and static capability
-interpretation; Python's published 0.1.0a2 `FullWire` raw-codec alpha also includes
+interpretation; Python's published 0.1.0a3 `FullWire` raw-codec alpha also includes
 static capability evaluation. See the role-based [support profiles](support-profiles.md) and each
 package's verification record. Historical TypeScript/C tables below do not
 substitute for language-specific evidence.
 
 Rust has separate [raw-codec conformance and package evidence](../packages/rust/docs/verification.md).
-Its released 0.1.1 artifact has allocation-free static capability evidence,
+Its released 0.2.0 artifact has allocation-free static capability evidence,
 normalized Feature/measurement views, bounded More Data planning and caller-clocked
 assembly; capability-v1 passes 63/63 exact reports. Version 0.1.1 adds range,
 control and status projections and normalized codec-v1 execution of all 97 cases
-with zero unsupported/skipped cases; see the [public release evidence](released-packages.md#published-rust-011).
+with zero unsupported/skipped cases. Version 0.2.0 adds universal UUID dispatch;
+see the [public release evidence](released-packages.md#published-native-universal-measurements).
 
-Dart has a published [0.1.0 full-wire package](../packages/dart/README.md)
+Dart has a published [0.2.0 full-wire package](../packages/dart/README.md)
 with static capability evidence, range inspection and normalized measurement
 views. Its [package-owned evidence](../packages/dart/doc/verification.md) covers
 the canonical codec, raw, capability and structural corpora separately from

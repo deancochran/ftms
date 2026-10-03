@@ -1,8 +1,8 @@
 # Released packages and executable examples
 
-Last checked against npm, GitHub, Maven Central, PyPI, crates.io, NuGet and the Go module proxy:
-**2026-09-30 UTC**.
-TypeScript additionally verified **2026-10-02 UTC** at 0.6.0.
+Native releases last checked against GitHub, Maven Central, PyPI, crates.io,
+pub.dev, NuGet and the Go module proxy: **2026-10-03 UTC**.
+TypeScript verified **2026-10-02 UTC** at 0.6.0.
 This is a point-in-time record, not a promise that branch source is published.
 
 This is the **canonical current release matrix**. [Choose a language](../packages/README.md)
@@ -15,14 +15,14 @@ Source, package, protocol and corpus versions are distinct; see [versioning](ver
 
 | Language | Verified version | Install | Publication evidence |
 | --- | --- | --- | --- |
-| C | GitHub `c-v0.2.0` | [Source archive / CMake](../packages/c/INSTALL.md) | [Record](#published-typescript-040--c-020) |
-| C# | 0.1.0-alpha.1 | [NuGet](../packages/csharp/README.md) | [Record](#published-prerelease-c-010-alpha1) |
-| Dart | 0.1.0 | [pub.dev](../packages/dart/README.md) | [Record](#published-dart-010) |
-| Go | v0.1.0 | [Go module](../packages/go/README.md) | [Record](#published-go-v010) |
-| Kotlin/JVM | 0.1.0 | [Maven Central](../packages/kotlin/README.md) | [Record](#published-kotlinjvm-010) |
-| Python | 0.1.0a2 (alpha) | [PyPI](../packages/python/README.md) | [Record](#published-alpha-python-010a2) |
-| Rust | 0.1.1 | [crates.io](../packages/rust/README.md) | [Record](#published-rust-011) |
-| Swift | 0.1.0 | [SwiftPM revision](../packages/swift/README.md) | [Record](#published-swift-010) |
+| C | GitHub `c-v0.3.0` | [Source archive / CMake](../packages/c/INSTALL.md) | [Record](#published-native-universal-measurements) |
+| C# | 0.1.0-alpha.2 | [NuGet](../packages/csharp/README.md) | [Record](#published-native-universal-measurements) |
+| Dart | 0.2.0 | [pub.dev](../packages/dart/README.md) | [Record](#published-native-universal-measurements) |
+| Go | v0.2.0 | [Go module](../packages/go/README.md) | [Record](#published-native-universal-measurements) |
+| Kotlin/JVM | 0.2.0 | [Maven Central](../packages/kotlin/README.md) | [Record](#published-native-universal-measurements) |
+| Python | 0.1.0a3 (alpha) | [PyPI](../packages/python/README.md) | [Record](#published-native-universal-measurements) |
+| Rust | 0.2.0 | [crates.io](../packages/rust/README.md) | [Record](#published-native-universal-measurements) |
+| Swift | 0.2.0 | [SwiftPM revision](../packages/swift/README.md) | [Record](#published-native-universal-measurements) |
 | TypeScript | npm `@deancochran/ftms@0.6.0` | [npm quickstart](../examples/typescript-quickstart/README.md) | [Record](#published-typescript-060) |
 
 ## Release evidence ledger
@@ -30,6 +30,55 @@ Source, package, protocol and corpus versions are distinct; see [versioning](ver
 The records below retain original hashes, checks and limitations. Existing links
 and anchors are preserved. They are publication evidence, not instructions for
 preparing the next release; maintainers should use the [release procedure](releasing.md).
+
+## Published native universal measurements
+
+All eight native additions are **published and public-verified** as of
+2026-10-03. Every tag below resolves to reviewed main commit
+`9aee23dc8e39fda7982af1d2d0f7fc9dd0e5b527`, merged by
+[PR #45](https://github.com/deancochran/ftms/pull/45). TypeScript remains 0.6.0.
+The [universal interface guide](universal-measurements.md) describes the additions;
+the [local verification record](native-universal-verification.md) retains the
+pre-release compiler evidence and exact unchanged corpus/contract hashes.
+
+| Package and tag | Publication run | Public verification |
+| --- | --- | --- |
+| C `c-v0.3.0` | [37157932569](https://github.com/deancochran/ftms/actions/runs/37157932569) | Downloaded GitHub source archive; Linux/macOS/Windows consumers and Conan/vcpkg installation gates passed |
+| Swift `swift-v0.2.0` | [37157933880](https://github.com/deancochran/ftms/actions/runs/37157933880) | Public tag resolves to exact commit; Linux/macOS SwiftPM consumers and five Apple SDK builds passed |
+| Rust `rust-v0.2.0` | [37157935479](https://github.com/deancochran/ftms/actions/runs/37157935479) | crates.io archive matches tested bytes; fresh registry consumer passed |
+| Python `python-v0.1.0a3` | [37157936201](https://github.com/deancochran/ftms/actions/runs/37157936201) | PyPI wheel/sdist exact hashes and both isolated consumers passed |
+| Kotlin/JVM `kotlin-v0.2.0` | [37157940340](https://github.com/deancochran/ftms/actions/runs/37157940340) | Maven Central: 30 public files verified; Java/Kotlin execution and Android APK build passed |
+| Dart `dart-v0.2.0` | [37157938509, attempt 2](https://github.com/deancochran/ftms/actions/runs/37157938509/attempts/2) | pub.dev exact extracted file manifest and fresh hosted consumer passed |
+| C# `csharp-v0.1.0-alpha.2` | [37157941481](https://github.com/deancochran/ftms/actions/runs/37157941481) | NuGet repository signature/payload equivalence and fresh consumers for both target frameworks passed |
+| Go `packages/go/v0.2.0` | [release evidence](https://github.com/deancochran/ftms/releases/tag/packages/go/v0.2.0) | Fresh public proxy/checksum-database installation, executed consumer and installed tests; no replace directives |
+
+Artifact SHA-256 identities:
+
+- C **0.3.0** archive SHA-256: `866ab00bd23915a086dc232a41afc99a141fa6d8948c3c7f28ac0611047a720a`.
+- Rust crate: `f2ca1289b9ca2b8b3b9b7c3b6c6cb1bb7eeaf23764797d7d61dad8eccd183be7`.
+- Python wheel: `b41de75fe2dca57dc44408e5985abdc34c855720acb92e44488dd75dea1b9d24`;
+  sdist: `1eef4e188c7be89eafe85033ac52e66085958b3de5b937f23096e2ec848119a4`.
+- Kotlin signed bundle: `b025a472f36eef6f684cdbbb33976cdd5a44681e0e5b9610f8d1a906790d142a`.
+- Dart public archive: `cb005ea8e309879bb00b90742d4abddcdea61b531e5f916160b41cd46c064136`.
+- C# uploaded package: `011f9522af51c0592050df952c683801d76f180edd44417460210f068f41adf7`;
+  NuGet repository-signed download: `b253e88d061e7ec11a71da3a36d1e698f94bf6f0608af44afc79eac8efbfc65c`.
+  The hash difference is repository signing; payload equivalence was verified.
+- Go public module ZIP: `d2a85fa8061cd44b22417cdccc24fc58df2d9819d0e971079c421a499e3c9e93`;
+  module sum: `h1:saOnFMzpZ/HKR6Vvf/AZRu5gwFV+VmVtMYp3qLWxgzE=`.
+
+The full pre-merge [manual CI](https://github.com/deancochran/ftms/actions/runs/37157479326)
+and [PR CI](https://github.com/deancochran/ftms/actions/runs/37157483789) passed.
+Release gates additionally verified C# NativeAOT. Earlier CI attempts caught
+version-hardcoded test/overlay metadata and Rust fixture formatting; these were
+corrected before merge. A Kotlin compiler download returned transient HTTP 502;
+the final full matrix passed. Dart's first upload was accepted before the public
+version index became visible; the same-tag retry verified immutable bytes without
+re-uploading or replacing them. C release environment reviewer/tag restrictions
+were explicitly authorized and configured before publication.
+
+GitHub release entries retain the public reports. Conan/vcpkg registry submissions
+were not made. No live-device, Bluetooth interoperability, emulator execution,
+PTS or qualification claim is implied; NuGet symbol indexing is asynchronous.
 
 ## Published TypeScript 0.6.0
 

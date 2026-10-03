@@ -1,7 +1,7 @@
 # FTMS for C
 
-> The UUID16 measurement view and named fixed-point metric accessors below are
-> unreleased source additions, not part of the published 0.2.0 archive.
+The UUID16 measurement view and named fixed-point metric accessors below are
+available in the published 0.3.0 archive.
 
 Portable C99 codecs for Bluetooth Fitness Machine Service telemetry, features,
 ranges, statuses and control messages. Keep your existing Bluetooth stack.
@@ -12,8 +12,8 @@ See the [release matrix](https://github.com/deancochran/ftms/blob/main/docs/rele
 for publication identity and evidence limits. This library does not manage BLE
 connections or authorize physical controls.
 
-**Release status:** C **0.2.0** is published as the independently versioned
-[`c-v0.2.0` source release](https://github.com/deancochran/ftms/releases/tag/c-v0.2.0).
+**Release status:** C **0.3.0** is published as the independently versioned
+[`c-v0.3.0` source release](https://github.com/deancochran/ftms/releases/tag/c-v0.3.0).
 The generated archive described below is a local candidate even when it has the
 same version; building it is not publication evidence. See the exact
 [release record](../../docs/released-packages.md) and role-based
@@ -65,7 +65,7 @@ select a format from bytes.
 ## Contributor-only local source candidate
 
 `python3 packages/c/scripts/source-bundle.py` (from the repository root) builds
-`packages/c/build/source-candidate/ftms-c-0.2.0.tar.gz` and its SHA-256 sidecar.
+`packages/c/build/source-candidate/ftms-c-0.3.0.tar.gz` and its SHA-256 sidecar.
 This is an **unreleased local artifact**, not a published version or Git tag.
 `SOURCE.json` distinguishes a release candidate from an archive built at a tagged
 source commit and always records `released: false`: building an archive does not
@@ -297,7 +297,7 @@ first. A compatible compiler builds the library for the consumer's CPU/ABI.
 The bundled Conan 2 recipe supports `conan create . --no-remote`; repository test
 consumers build and run C and C++ against `ftms::ftms`. The vcpkg overlay accepts an explicit,
 verified local archive and SHA-512 for validation. After an immutable release URL
-exists, `prepare-registry-recipes.py ARCHIVE --tag c-v0.2.0 --output NEW_DIRECTORY`
+exists, `prepare-registry-recipes.py ARCHIVE --tag c-v0.3.0 --output NEW_DIRECTORY`
 generates a public vcpkg recipe with its real SHA-512 for separate review. It
 requires a clean tagged release artifact and never submits or publishes anything.
 
