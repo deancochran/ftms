@@ -132,9 +132,18 @@ Local verification on 2026-10-05:
 Repeated API 35 runs during CI hardening subsequently encountered emulator boot
 timeouts and a lost transport mid-instrumentation, with QEMU thread-hang messages
 on a memory-pressured host. Those attempts failed and retained diagnostics; they
-were not skipped or counted as passes. The hardened runner's complete API 35
-rerun and the GitHub-hosted workflow execution remain to be verified. No retry
-policy hides emulator failures.
+were not skipped or counted as passes. The hardened runner subsequently passed
+all four named scenarios on both API 26 and API 35 on GitHub-hosted runners:
+[verified CI run](https://github.com/deancochran/ftms/actions/runs/37378231637).
+API 35 required a failed-job rerun after an SDK archive download failed before
+emulator startup. The successful run retained test reports and runtime identity
+artifacts; neither lane skipped tests. No automatic retry policy hides emulator
+failures.
+
+Hosted verification also exposed an existing CI-summary bug: an `abandoned` job
+could previously produce a green summary. The summary now requires explicit
+success for every selected job and rejects unknown results and selected-job
+skips, with seven regression tests.
 
 API 26 is now emulator-executed, **not a physical-device claim**. These tests do not
 exercise a real Bluetooth stack, discovery, notification subscription, the full
