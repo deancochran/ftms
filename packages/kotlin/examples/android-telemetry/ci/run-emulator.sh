@@ -64,7 +64,9 @@ actual_api=$(timeout --kill-after=5s 30 "$ADB" -s "$serial" shell getprop ro.bui
 [[ "$actual_api" == "$api" ]] || { echo "Wrong runtime API: $actual_api" >&2; exit 1; }
 {
     echo "Requested/executed API: $api/$actual_api"
-    timeout --kill-after=5s 10 "$sdk/emulator/emulator" -version
+    # Query package metadata without launching a second QEMU process. `emulator
+    # -version` can load audio libraries even though the real AVD uses -no-audio.
+    cat "$sdk/emulator/source.properties"
     timeout --kill-after=5s 30 "$ADB" -s "$serial" shell getprop ro.build.fingerprint
     java -version 2>&1
 } > "$report/environment.txt"
