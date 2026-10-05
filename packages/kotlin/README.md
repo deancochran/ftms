@@ -52,6 +52,10 @@ UI/application policy and control safety remain outside this protocol package.
 
 ## Kotlin example
 
+A standalone Android foreground, read-only Indoor Bike telemetry sample lives in
+[`examples/android-telemetry`](examples/android-telemetry/README.md). It resolves only
+the public Maven Central `io.github.deancochran:ftms:0.2.0` artifact (not this checkout).
+
 ```kotlin
 import io.github.deancochran.ftms.measurement.MeasurementReader
 import io.github.deancochran.ftms.measurement.MeasurementDecodeResult
