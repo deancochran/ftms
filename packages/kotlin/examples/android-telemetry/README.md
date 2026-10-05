@@ -24,7 +24,8 @@ bash examples/android-telemetry/verify-emulator.sh emulator-5554
 The verifier refuses non-emulator targets, builds the app/tests, installs only
 this sample and its test APK, clears this sample's data for permission-free tests,
 and requires all four instrumentation tests to pass. It does not scan, grant BLE
-permissions or connect to equipment. It requires `adb` and Python 3; set `ADB` to
+permissions or connect to equipment. It requires `adb`, Python 3 and GNU `timeout`
+(Linux, or GNU coreutils on other hosts); set `ADB` to
 an absolute adb executable if necessary. The report is retained at
 `app/build/reports/emulator/instrumentation.txt` under this example.
 
@@ -73,25 +74,81 @@ not part of this verification script.
 - No Internet permission, background service, equipment-control policy or BLE
   framework is added to the protocol package.
 
+## Continuous verification
+
+The reusable [Kotlin workflow](../../../../.github/workflows/native-kotlin.yml)
+has an Android example matrix for **API 26 and API 35**. Each lane:
+
+1. Tests the instrumentation-report checker, including failure/skip/partial-run cases.
+2. Builds the application and test APKs, runs host unit tests and lint.
+3. Boots a private, accelerated x86_64 emulator with bounded startup/shutdown.
+4. Executes all four named instrumentation scenarios with a three-minute timeout.
+5. Uploads host test/lint reports, instrumentation output and emulator/environment
+   logs for 14 days, including when an earlier step fails. Failure-only logcat is
+   collected from the synthetic emulator, never a physical device.
+
+Each API lane is independent (`fail-fast: false`). A failure propagates through
+the reusable Kotlin job to the existing **CI summary** gate. Relevant package
+changes already select Kotlin verification; no new required-check name needs to
+be configured. No physical BLE access, new secrets or release permission is used.
+
+To reproduce a CI lane on Linux, first build as above and install the matching
+SDK image, then run:
+
+```sh
+"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+  "system-images;android-26;google_apis;x86_64"
+bash examples/android-telemetry/ci/run-emulator.sh 26
+# Repeat with image android-35 and argument 35 for the other lane.
+python3 -m unittest discover -s examples/android-telemetry/ci -p 'test_*.py' -v
+```
+
+The runner refuses an existing `emulator-5580`, creates and removes only its own
+temporary AVD, checks the actual API level, and shuts down its emulator on exit.
+It uses the already built APKs through `verify-emulator.sh SERIAL --skip-build`;
+missing artifacts fail rather than skip. `RUNNER_TEMP` can select a temporary
+directory with sufficient disk space. The standalone verifier still builds by
+default. Test names are explicitly accounted for in `ci/check_instrumentation.py`;
+update that list and the checker tests when adding/removing runtime scenarios.
+
 ## Verification evidence
 
 Local verification on 2026-10-05:
 
 - **11 host unit tests passed**, zero failures/skips.
 - Debug application and instrumentation APKs built.
-- **Four instrumentation tests executed and passed on API 35 x86_64**, using a
-  dedicated Android emulator. They cover public-artifact decoding, actual demo UI
+- **Initial local CI-runner executions passed four instrumentation tests on each
+  of API 26 and API 35 x86_64**. They cover public-artifact decoding, actual demo UI
   clicks without permissions, disconnect/format clearing, stop/resume behavior,
   and empty/denied permission-result handling.
+- **11 report-accounting tests passed**, covering incomplete/empty runs, failures,
+  skips, duplicate/unexpected scenarios and false-success summaries.
 - Lint completed with zero errors. Warnings remain for the intentionally retained
   SDK/test-tool baseline, API-versioned manifest attributes, backup metadata,
   example icon and English-only UI. This is not a store-ready application.
 - The resolved FTMS JAR SHA-256 matched Maven Central:
   `c86a043bb9be0f52500156d26dfc31829db49d824c068bb725118d3dd0b61aa8`.
 
-API 26 is the build minimum, **not an executed-device claim**. These tests do not
-exercise a real Bluetooth stack, discovery, notification subscription, permission
-revocation during GATT operations or OEM lifecycle quirks. The session-generation
+Repeated API 35 runs during CI hardening subsequently encountered emulator boot
+timeouts and a lost transport mid-instrumentation, with QEMU thread-hang messages
+on a memory-pressured host. Those attempts failed and retained diagnostics; they
+were not skipped or counted as passes. The hardened runner subsequently passed
+all four named scenarios on both API 26 and API 35 on GitHub-hosted runners:
+[verified CI run](https://github.com/deancochran/ftms/actions/runs/37378231637).
+API 35 required a failed-job rerun after an SDK archive download failed before
+emulator startup. The successful run retained test reports and runtime identity
+artifacts; neither lane skipped tests. No automatic retry policy hides emulator
+failures.
+
+Hosted verification also exposed an existing CI-summary bug: an `abandoned` job
+could previously produce a green summary. The summary now requires explicit
+success for every selected job and rejects unknown results and selected-job
+skips, with seven regression tests.
+
+API 26 is now emulator-executed, **not a physical-device claim**. These tests do not
+exercise a real Bluetooth stack, discovery, notification subscription, the full
+permission-grant/Location-services flow, permission revocation during GATT
+operations or OEM lifecycle quirks. The session-generation
 unit test is not a simulated Android GATT test. No real equipment, Karoo firmware,
 recording integration or Bluetooth qualification has been verified.
 

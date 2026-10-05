@@ -156,12 +156,13 @@ jobs:
     needs: [changes, verify, workflow-lint, c, kotlin, rust, swift, python, csharp, dart, go, docs]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Require all selected verification jobs
         env:
-          RESULTS: ${{ toJson(needs.*.result) }}
-        run: |
-          echo "$RESULTS"
-          case "$RESULTS" in *failure*|*cancelled*) exit 1;; esac
+          CI_NEEDS: ${{ toJson(needs) }}
+        run: python3 tools/ci-summary.py
 
   go:
     needs: changes

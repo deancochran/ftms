@@ -21,3 +21,53 @@ jobs:
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"'
       - name: Verify codecs and isolated Kotlin, Java and Android consumers
         run: bash packages/kotlin/verification/verify.sh
+
+  android-example:
+    name: Android example (API ${{ matrix.api }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [26, 35]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select Java 17
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+      - name: Test runtime-report failure handling
+        run: python3 -m unittest discover -s packages/kotlin/examples/android-telemetry/ci -p 'test_*.py' -v
+      - name: Install Android SDK and emulator image
+        env:
+          API: ${{ matrix.api }}
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "emulator" "platforms;android-35" "build-tools;35.0.0" \
+            "system-images;android-$API;google_apis;x86_64"
+      - name: Enable accelerated emulator access
+        run: |
+          test -e /dev/kvm
+          sudo chmod a+rw /dev/kvm
+          "$ANDROID_HOME/emulator/emulator" -accel-check
+      - name: Unit tests, APK builds and lint
+        working-directory: packages/kotlin
+        run: |
+          ./gradlew --no-daemon --max-workers=2 -p examples/android-telemetry \
+            :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug
+      - name: Execute instrumented tests on a dedicated emulator
+        env:
+          API: ${{ matrix.api }}
+        run: bash packages/kotlin/examples/android-telemetry/ci/run-emulator.sh "$API"
+      - name: Retain Android test and failure reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-example-api-${{ matrix.api }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            packages/kotlin/examples/android-telemetry/app/build/reports/
+            packages/kotlin/examples/android-telemetry/app/build/test-results/
