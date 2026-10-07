@@ -28,7 +28,7 @@ jobs:
           FTMS_GO_REPORT_DIR: ${{ runner.temp }}/ftms-go-reports
       - run: go test -run='^$' -fuzz=FuzzDecodeWire -fuzztime=10s -parallel=2
       - run: go test -run='^$' -fuzz=FuzzInterpretCapabilities -fuzztime=10s -parallel=2
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: go-verification-${{ matrix.go-version }}
