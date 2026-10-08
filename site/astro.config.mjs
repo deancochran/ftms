@@ -1,6 +1,8 @@
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import { aiDocsOutput } from "./scripts/ai-output.mjs";
 import { canonicalDocs } from "./scripts/content.mjs";
+import { apiSitemap } from "./scripts/sitemap.mjs";
 import { base, repository, sidebar, site } from "./site.config.mjs";
 
 // Official configuration: https://starlight.astro.build/manual-setup/
@@ -19,5 +21,7 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css"],
       sidebar,
     }),
+    apiSitemap(),
+    aiDocsOutput(),
   ],
 });

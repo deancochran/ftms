@@ -8,6 +8,7 @@
     "preview": "astro preview --host 127.0.0.1",
     "check": "astro check",
     "test": "node --test scripts/*.test.mjs",
+    "docs:ai": "node scripts/ai-docs.mjs",
     "test:browser": "playwright test",
     "verify:output": "node scripts/verify-output.mjs"
   },

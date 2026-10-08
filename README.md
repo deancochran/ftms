@@ -93,6 +93,7 @@ the project-wide split between protocol packages and application integration.
 ## Integrate
 
 - [Documentation website](https://deancochran.github.io/ftms/)
+- [AI-readable documentation index](https://deancochran.github.io/ftms/llms.txt)
 - [Documentation and recommended reading order](docs/README.md)
 - [Static documentation site: local preview and deployment](site/README.md)
 - [Integration cookbook](docs/integration.md)

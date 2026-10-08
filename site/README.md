@@ -53,6 +53,19 @@ and mobile navigation, search, theme selection and the generated API reference.
 - `packages/typescript/docs/api/` is rebuilt with TypeDoc and copied into the
   ignored `public/api/typescript/` directory. It has its own reference UI/search;
   no API-theme bridge plugin is required.
+- `packages/typescript/typedoc.markdown.json` runs the same authoritative TypeDoc
+  entry point and exclusions through `typedoc-plugin-markdown`. `scripts/ai-docs.mjs`
+  then stages `llms.txt`, `llms-full.txt`, each explicit page's
+  `<route>/index.md`, and API Markdown beneath `.generated/ai-docs/`. The static
+  build copies that staging tree into its ignored `dist/` output. The index records
+  the exact Git revision and scope. The full corpus includes only those explicit
+  pages and generated public TypeScript API signatures; it deliberately excludes
+  `.context/`, unlisted files, HTML, and device/private material. Re-running at
+  the same revision is deterministic, and the generated manifest removes only
+  formerly generated stale Markdown paths.
+- Every rendered page exposes an **AI documentation** link and a **View Markdown**
+  link, plus `rel="describedby"` and `rel="alternate"` metadata for the curated
+  index and that page's Markdown representation.
 
 Do not add broad filesystem discovery: only explicitly mapped public documents
 are rendered. Historical audits remain reachable through the evidence index but

@@ -6,6 +6,19 @@ export const base = "/ftms";
 export const repository = "https://github.com/deancochran/ftms";
 export const sourceBranch = "main";
 export const sitePath = (route = "") => `${base}/${route ? `${route}/` : ""}`;
+export const siteFile = (file) => `${base}/${file}`;
+export const siteUrl = (route = "") => `${site}${sitePath(route)}`;
+export const siteFileUrl = (file) => `${site}${siteFile(file)}`;
+export const aiGroupNotes = {
+  Overview: "Understand the transport-independent FTMS codec boundary and its limits.",
+  "Getting started": "Choose and install a language package, then decode a first FTMS value.",
+  Guides: "Integrate codecs at the transport boundary and interpret measurements safely.",
+  Reference:
+    "Consult public APIs, protocol coverage, capability evidence, and documentation scope.",
+  Releases: "Check current distributions, versioning, and security information.",
+  Contributing:
+    "Understand architecture, release work, validation evidence, and contribution practices.",
+};
 
 // Only these public files are rendered. Historical audits remain linked on GitHub.
 export const pages = [

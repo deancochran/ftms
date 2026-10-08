@@ -62,6 +62,7 @@
     "test": "vitest run",
     "check-types": "tsc --noEmit -p tsconfig.json",
     "docs:build": "typedoc --options typedoc.json",
+    "docs:markdown": "typedoc --options typedoc.markdown.json",
     "build": "pnpm run clean && tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node ./scripts/stage-package.mjs",
     "verify:package": "node ./scripts/verify-package.mjs",
     "test:release": "node --test ./scripts/test-npm-release.mjs",
@@ -73,6 +74,7 @@
     "@types/node": "^20",
     "ajv": "8.18.0",
     "typedoc": "0.28.14",
+    "typedoc-plugin-markdown": "4.13.1",
     "typescript": "5.9.3",
     "vite": "^8.1.5",
     "vitest": "^4.1.9"

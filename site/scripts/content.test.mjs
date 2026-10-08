@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { pages, sidebar, sitePath } from "../site.config.mjs";
-import { convertMarkdown, rewriteLink } from "./content.mjs";
+import { convertAiMarkdown, convertMarkdown, rewriteLink } from "./content.mjs";
 
 test("routes and sources are unique and constrained", () => {
   assert.equal(new Set(pages.map((page) => page.source)).size, pages.length);
@@ -66,4 +66,22 @@ test("Markdown conversion retains tables/code, resolves references and restores 
   assert.match(result, /\| A\s+\| B/);
   assert.ok(!result.includes("# Integration cookbook"));
   assert.ok(result.includes("/edit/main/docs/integration.md"));
+});
+
+test("AI Markdown retains canonical headings without frontmatter or UI-only anchors", () => {
+  const page = pages.find((entry) => entry.source === "docs/integration.md");
+  const result = convertAiMarkdown(
+    "# Integration cookbook\n\n[title](#integration-cookbook)\n\n```js\nconst packet = bytes;\n```\n",
+    page,
+    new Map([[page.source, "integration-cookbook"]]),
+  );
+  assert.match(result, /^# Integration cookbook/m);
+  assert.ok(
+    result.includes(
+      "https://deancochran.github.io/ftms/integration/cookbook/index.md#integration-cookbook",
+    ),
+  );
+  assert.match(result, /```js/);
+  assert.doesNotMatch(result, /^---/m);
+  assert.doesNotMatch(result, /#_top/);
 });

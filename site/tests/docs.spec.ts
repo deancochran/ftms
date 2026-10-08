@@ -12,6 +12,34 @@ test("landing, quickstarts and generated API work beneath /ftms", async ({ page 
   await expect(
     page.getByRole("heading", { name: "FTMS Protocol Libraries", exact: true }),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "AI documentation", exact: true })).toHaveAttribute(
+    "href",
+    "/ftms/llms.txt",
+  );
+  await expect(page.getByRole("link", { name: "View Markdown", exact: true })).toHaveAttribute(
+    "href",
+    "/ftms/index.md",
+  );
+  await expect(
+    page
+      .locator("link")
+      .evaluateAll((links) =>
+        links.find((link) => link.getAttribute("rel") === "describedby")?.getAttribute("href"),
+      ),
+  ).resolves.toBe("/ftms/llms.txt");
+  await expect(
+    page
+      .locator("link")
+      .evaluateAll((links) =>
+        links
+          .find(
+            (link) =>
+              link.getAttribute("rel") === "alternate" &&
+              link.getAttribute("type") === "text/markdown",
+          )
+          ?.getAttribute("href"),
+      ),
+  ).resolves.toBe("/ftms/index.md");
   await page.getByRole("link", { name: "Get started", exact: true }).click();
   await expect(page).toHaveURL(/\/ftms\/start\/choose-language\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Choose a language");

@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
-import { pages, repository, sitePath, sourceBranch } from "../site.config.mjs";
+import { pages, repository, site, siteFile, sitePath, sourceBranch } from "../site.config.mjs";
 
 export const root = fileURLToPath(new URL("../../", import.meta.url));
 const contentDirectory = path.join(root, "site/src/content/docs");
@@ -35,7 +35,13 @@ function publicFile(source) {
   return normalized;
 }
 
-export function rewriteLink(href, source, titleAnchors = new Map(), image = false) {
+export function rewriteLink(
+  href,
+  source,
+  titleAnchors = new Map(),
+  image = false,
+  restoreTitleAnchor = true,
+) {
   if (/^(?:mailto:|tel:)/i.test(href)) return href;
   let relative = href;
   const githubPrefix = `${repository}/blob/${sourceBranch}/`;
@@ -53,7 +59,9 @@ export function rewriteLink(href, source, titleAnchors = new Map(), image = fals
   const page = sourcePages.get(target);
   if (page && !image) {
     const hash =
-      decodeURIComponent(url.hash.slice(1)) === titleAnchors.get(target) ? "#_top" : url.hash;
+      restoreTitleAnchor && decodeURIComponent(url.hash.slice(1)) === titleAnchors.get(target)
+        ? "#_top"
+        : url.hash;
     return `${sitePath(page.slug)}${url.search}${hash}`;
   }
   const encoded = target.split("/").map(encodeURIComponent).join("/");
@@ -78,6 +86,17 @@ export function convertMarkdown(markdown, page, titleAnchors) {
   const metadata = {
     title: page.title,
     editUrl: `${repository}/edit/${sourceBranch}/${page.source}`,
+    head: [
+      { tag: "link", attrs: { rel: "describedby", href: siteFile("llms.txt") } },
+      {
+        tag: "link",
+        attrs: {
+          rel: "alternate",
+          type: "text/markdown",
+          href: `${sitePath(page.slug)}index.md`,
+        },
+      },
+    ],
   };
   if (page.slug === "") {
     metadata.description =
@@ -98,7 +117,29 @@ export function convertMarkdown(markdown, page, titleAnchors) {
     page.source === "docs/api.md"
       ? `\n[Open the generated TypeScript API reference](${sitePath("api/typescript")})\n`
       : "";
-  return `---\n${frontmatter}\n---\n${apiLink}\n${processor.stringify(tree)}`;
+  const discoveryLinks = `[AI documentation](${siteFile("llms.txt")}) · [View Markdown](${sitePath(page.slug)}index.md)`;
+  return `---\n${frontmatter}\n---\n${discoveryLinks}\n${apiLink}\n${processor.stringify(tree)}`;
+}
+
+// AI-facing Markdown deliberately keeps the canonical H1 and omits Starlight UI metadata.
+export function convertAiMarkdown(markdown, page, titleAnchors) {
+  const tree = processor.parse(markdown);
+  const first = tree.children[0];
+  if (first?.type !== "heading" || first.depth !== 1) {
+    throw new Error(`${page.source} must start with a level-one title`);
+  }
+  visit(tree, (node) => {
+    if (["link", "image", "definition"].includes(node.type)) {
+      node.url = rewriteLink(node.url, page.source, titleAnchors, node.type === "image", false);
+      if (node.url.startsWith(sitePath())) {
+        const url = new URL(node.url, site);
+        if (pages.some((entry) => sitePath(entry.slug) === url.pathname))
+          url.pathname += "index.md";
+        node.url = url.href;
+      }
+    }
+  });
+  return processor.stringify(tree);
 }
 
 export async function prepareContent() {
@@ -138,6 +179,11 @@ export function canonicalDocs() {
         const destination = path.join(root, "site/public/api/typescript");
         await rm(destination, { recursive: true, force: true });
         await cp(api, destination, { recursive: true });
+        const { addApiDiscovery } = await import("./api-discovery.mjs");
+        await addApiDiscovery(destination);
+        // TypeDoc HTML replaces its public directory; restore generated Markdown afterwards.
+        const { writeAiDocuments } = await import("./ai-docs.mjs");
+        await writeAiDocuments();
       },
       "astro:server:setup": ({ server }) => {
         const sources = new Set(pages.map((page) => path.join(root, page.source)));
@@ -146,9 +192,30 @@ export function canonicalDocs() {
         server.watcher.on("change", (file) => {
           if (sources.has(file)) {
             pending = pending
-              .then(prepareContent)
+              .then(async () => {
+                await prepareContent();
+                const { writeAiDocuments } = await import("./ai-docs.mjs");
+                await writeAiDocuments();
+              })
               .catch((error) => server.config.logger.error(String(error)));
           }
+        });
+        server.middlewares.use(async (request, response, next) => {
+          const url = new URL(request.url ?? "/", "http://localhost");
+          const prefix = sitePath();
+          if (!/\.(?:md|txt)$/.test(url.pathname)) return next();
+          // Astro strips `base` before user middleware in dev, while direct middleware
+          // tests may retain it; accept either representation but only known generated files.
+          const relative = decodeURIComponent(
+            url.pathname.startsWith(prefix)
+              ? url.pathname.slice(prefix.length)
+              : url.pathname.slice(1),
+          );
+          if (!relative || path.posix.normalize(relative).startsWith("..")) return next();
+          const generated = path.join(root, "site/.generated/ai-docs", relative);
+          if (!existsSync(generated)) return next();
+          response.setHeader("Content-Type", "text/markdown; charset=utf-8");
+          response.end(await readFile(generated));
         });
       },
     },

@@ -13,7 +13,7 @@
     "release:prepare": "node tools/release-prepare.mjs",
     "docs:check": "node --test tools/check-docs.test.mjs tools/port-catalog.test.mjs tools/install-docs.test.mjs && node tools/check-docs.mjs",
     "docs:install:generate": "node tools/install-docs.mjs --write",
-    "docs:build": "pnpm --filter @deancochran/ftms docs:build",
+    "docs:build": "pnpm --filter @deancochran/ftms docs:build && pnpm --filter @deancochran/ftms docs:markdown && pnpm --filter @ftms/site docs:ai",
     "site:dev": "pnpm docs:build && pnpm --filter @ftms/site dev",
     "site:build": "pnpm docs:build && pnpm --filter @ftms/site build",
     "site:preview": "pnpm --filter @ftms/site preview",
