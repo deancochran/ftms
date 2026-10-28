@@ -19,7 +19,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
           cache: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: "3.12"
       - run: python3 -m pip install -r scripts/requirements.txt
